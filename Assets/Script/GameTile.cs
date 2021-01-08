@@ -87,6 +87,7 @@ public class GameTile : MonoBehaviour
             westRotation;
     }
 
+    // 用于交替搜索优先级
     public bool IsAlternative { get; set; }
 
     public GameTileContent Content

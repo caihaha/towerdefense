@@ -43,7 +43,7 @@ public class Enemy : MonoBehaviour
 		transform.localRotation = direction.GetRotation();
 	}
 
-	// 跟新敌人的状态(live/dead)
+	// 更新敌人的状态(live/dead)
 	public bool GameUpdate()
 	{
 		progress += Time.deltaTime;
@@ -65,9 +65,7 @@ public class Enemy : MonoBehaviour
 
 		if (directionChange != DirectionChange.None)
 		{
-			float angle = Mathf.LerpUnclamped(
-				directionAngleFrom, directionAngleTo, progress
-			);
+			float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
 			transform.localRotation = Quaternion.Euler(0f, angle, 0f);
 		}
 		return true;

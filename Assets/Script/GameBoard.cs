@@ -21,9 +21,13 @@ public class GameBoard : MonoBehaviour
 
     GameTileContentFactory contentFactory;
 
-    List<GameTile> spawnPoints = new List<GameTile>();
+    // List<GameTile> spawnPoints = new List<GameTile>();
+    //public int SpawnPointCount => spawnPoints.Count;
 
-    public int SpawnPointCount => spawnPoints.Count;
+    // 出生点
+    GameTile spawnPoint;
+    // 目标点
+    GameTile destinationPoint;
 
     bool showGrid, showPaths;
     public bool ShowGrid
@@ -102,11 +106,12 @@ public class GameBoard : MonoBehaviour
         }
 
         ToggleDestination(tiles[tiles.Length / 2]);
-        ToggleSpawnPoint(tiles[0]);
+        // ToggleSpawnPoint(tiles[0]);
     }
 
     bool FindPaths()
     {
+        // 初始化所有点
         foreach (GameTile tile in tiles)
         {
             if (tile.Content.Type == GameTileContentType.Destination)
@@ -120,6 +125,7 @@ public class GameBoard : MonoBehaviour
             }
         }
 
+        // 没有目标点
         if (searchFrontier.Count == 0)
         {
             return false;
@@ -183,15 +189,24 @@ public class GameBoard : MonoBehaviour
     {
         if (tile.Content.Type == GameTileContentType.Destination)
         {
-            tile.Content = contentFactory.Get(GameTileContentType.Empty);
-            if(!FindPaths())
-            {
-                tile.Content = contentFactory.Get(GameTileContentType.Destination);
-                FindPaths();
-            }
+            //tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            //if (!FindPaths())
+            //{
+            //    tile.Content = contentFactory.Get(GameTileContentType.Destination);
+            //    FindPaths();
+            //}
+
+            // 不做处理，最少要有一个目标点
+            Debug.Log("Destination Can't Delete");
         }
         else if (tile.Content.Type == GameTileContentType.Empty)
         {
+            if (destinationPoint != null)
+            {
+                destinationPoint.Content = contentFactory.Get(GameTileContentType.Empty);
+            }
+            destinationPoint = tile;
+
             tile.Content = contentFactory.Get(GameTileContentType.Destination);
             FindPaths();
         }
@@ -214,25 +229,48 @@ public class GameBoard : MonoBehaviour
         }
 	}
 
-    public void ToggleSpawnPoint(GameTile tile)
+    public bool ToggleSpawnPoint(GameTile tile)
     {
         if (tile.Content.Type == GameTileContentType.SpawnPoint)
         {
-            if (spawnPoints.Count > 1)
+            //if (spawnPoints.Count > 1)
+            //{
+            //    spawnPoints.Remove(tile);
+            //    tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            //}
+
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            if (spawnPoint != null)
             {
-                spawnPoints.Remove(tile);
-                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                spawnPoint = null;
             }
+            return false;
         }
         else if (tile.Content.Type == GameTileContentType.Empty)
         {
             tile.Content = contentFactory.Get(GameTileContentType.SpawnPoint);
-            spawnPoints.Add(tile);
+
+            // spawnPoints.Add(tile);
+            // 删掉原来的
+            if(spawnPoint != null)
+            {
+                spawnPoint.Content = contentFactory.Get(GameTileContentType.Empty);
+            }
+            spawnPoint = tile;
+            return true;
         }
+
+        return false;
     }
 
-    public GameTile GetSpawnPoint(int index)
+    public GameTile GetSpawnPoint()
     {
-        return spawnPoints[index];
+        // return spawnPoints[index];
+        return spawnPoint;
+    }
+
+    public GameTile GetDestination()
+    {
+        return destinationPoint;
     }
 }

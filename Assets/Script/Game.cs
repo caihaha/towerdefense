@@ -19,7 +19,7 @@ public class Game : MonoBehaviour
     [SerializeField, Range(0.1f, 10f)]
     float spawnSpeed = 1f;
 
-    float spawnProgress;
+    // float spawnProgress;
 
     EnemyCollection enemies = new EnemyCollection();
 
@@ -64,12 +64,12 @@ public class Game : MonoBehaviour
             board.ShowGrid = !board.ShowGrid;
         }
 
-        spawnProgress += spawnSpeed * Time.deltaTime;
-        while (spawnProgress >= 1f)
-        {
-            spawnProgress -= 1f;
-            SpawnEnemy();
-        }
+        //spawnProgress += spawnSpeed * Time.deltaTime;
+        //while (spawnProgress >= 1f)
+        //{
+        //    spawnProgress -= 1f;
+        //    SpawnEnemy();
+        //}
 
         enemies.GameUpdate();
     }
@@ -94,7 +94,8 @@ public class Game : MonoBehaviour
             }
             else
             {
-                board.ToggleSpawnPoint(tile);
+                // board.ToggleSpawnPoint(tile);
+                SpawnPoint(tile);
             }
         }
     }
@@ -102,12 +103,17 @@ public class Game : MonoBehaviour
     // 产生Enemy,Enemy只会在出生点上。
     void SpawnEnemy()
     {
-        GameTile spawnPoint =
-            board.GetSpawnPoint(Random.Range(0, board.SpawnPointCount));
+        //GameTile spawnPoint = board.GetSpawnPoint(Random.Range(0, board.SpawnPointCount));
+        GameTile spawnPoint = board.GetSpawnPoint();
         Enemy enemy = enemyFactory.Get();
         enemy.SpawnOn(spawnPoint);
 
         enemies.Add(enemy);
     }
 
+    void SpawnPoint(GameTile tile)
+    {
+        if(board.ToggleSpawnPoint(tile))
+            SpawnEnemy();
+    }
 }
