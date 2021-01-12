@@ -2,6 +2,7 @@
 
 public class Enemy : MonoBehaviour
 {
+	#region 数据成员
 	EnemyFactory originFactory;
 
 	GameTile tileFrom, tileTo;
@@ -11,6 +12,9 @@ public class Enemy : MonoBehaviour
 	Direction direction;
 	DirectionChange directionChange;
 	float directionAngleFrom, directionAngleTo;
+
+	// 处理寻路
+	PathManager pathManager;
 
 	public EnemyFactory OriginFactory
 	{
@@ -22,6 +26,26 @@ public class Enemy : MonoBehaviour
 		}
 	}
 
+	public GameTile TileFrom
+    {
+		get => tileFrom;
+        set
+        {
+			tileFrom = value;
+        }
+    }
+
+	public GameTile TileTo
+	{
+		get => tileTo;
+		set
+		{
+			tileTo = value;
+		}
+	}
+	#endregion
+
+	#region 初始化
 	public void SpawnOn(GameTile tile)
 	{
 		Debug.Assert(tile.NextTileOnPath != null, "Nowhere to go!", this);
@@ -30,10 +54,12 @@ public class Enemy : MonoBehaviour
 
 		progress = 0f;
 		PrepareIntro();
+
+		pathManager = new PathManager();
 	}
 
-	// 初始化状态
-	void PrepareIntro()
+    // 初始化状态
+    void PrepareIntro()
 	{
 		positionFrom = tileFrom.transform.localPosition;
 		positionTo = tileFrom.ExitPoint;
@@ -42,27 +68,37 @@ public class Enemy : MonoBehaviour
 		directionAngleFrom = directionAngleTo = direction.GetAngle();
 		transform.localRotation = direction.GetRotation();
 	}
+	#endregion
 
-	// 更新敌人的状态(live/dead)
+	#region 更新敌人的状态
 	public bool GameUpdate()
 	{
 		progress += Time.deltaTime;
 		while (progress >= 1f)
 		{
-			tileFrom = tileTo;
-			tileTo = tileTo.NextTileOnPath;
+			// tileFrom当前位置
+			if (tileTo != null)
+            {
+				tileFrom = tileTo;
+			}
+
+			tileTo = tileFrom.NextTileOnPath;
+
 			if(tileTo == null)
             {
-				OriginFactory.Reclaim(this);
-				return false;
+				// 找不到路径(到达目标)就销毁
+				// OriginFactory.Reclaim(this);
+				return true;
             }
 
 			progress -= 1f;
 			PrepareNextState();
 		}
 
+		// 更新位置
 		transform.localPosition = Vector3.LerpUnclamped(positionFrom, positionTo, progress);
 
+		// 调整方向
 		if (directionChange != DirectionChange.None)
 		{
 			float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
@@ -70,9 +106,10 @@ public class Enemy : MonoBehaviour
 		}
 		return true;
 	}
+    #endregion
 
-	// 改变下一个状态
-	void PrepareNextState()
+    #region 改变下一个状态
+    void PrepareNextState()
 	{
 		positionFrom = positionTo;
 		positionTo = tileFrom.ExitPoint;
@@ -83,9 +120,14 @@ public class Enemy : MonoBehaviour
 		switch (directionChange)
 		{
 			case DirectionChange.None: PrepareForward(); break;
+			case DirectionChange.TurnUpRight: PrepareTurnUpRight(); break;
 			case DirectionChange.TurnRight: PrepareTurnRight(); break;
+			case DirectionChange.TurnAroundRight: PrepareTurnAroundRight(); break;
+			case DirectionChange.TurnAround: PrepareTurnAround(); break;
+			case DirectionChange.TurnAroundLeft: PrepareTurnAroundLeft(); break;
 			case DirectionChange.TurnLeft: PrepareTurnLeft(); break;
-			default: PrepareTurnAround(); break;
+			case DirectionChange.TurnUpLeft: PrepareTurnUpLeft(); break;
+			default: PrepareForward(); break;
 		}
 	}
 
@@ -94,19 +136,34 @@ public class Enemy : MonoBehaviour
 		transform.localRotation = direction.GetRotation();
 		directionAngleTo = direction.GetAngle();
 	}
-
+	void PrepareTurnUpRight()
+	{
+		directionAngleTo = directionAngleFrom + 45f;
+	}
 	void PrepareTurnRight()
 	{
 		directionAngleTo = directionAngleFrom + 90f;
 	}
-
-	void PrepareTurnLeft()
+	void PrepareTurnAroundRight()
 	{
-		directionAngleTo = directionAngleFrom - 90f;
+		directionAngleTo = directionAngleFrom + 135f;
 	}
-
 	void PrepareTurnAround()
 	{
 		directionAngleTo = directionAngleFrom + 180f;
 	}
+	void PrepareTurnUpLeft()
+	{
+		directionAngleTo = directionAngleFrom - 45f;
+	}
+	void PrepareTurnLeft()
+	{
+		directionAngleTo = directionAngleFrom - 90f;
+	}
+	void PrepareTurnAroundLeft()
+	{
+		directionAngleTo = directionAngleFrom - 135f;
+	}
+
+	#endregion
 }

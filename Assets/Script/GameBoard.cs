@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameBoard : MonoBehaviour
 {
+    #region 数据成员
     [SerializeField]
     Transform ground = default;
 
@@ -24,8 +25,16 @@ public class GameBoard : MonoBehaviour
     // List<GameTile> spawnPoints = new List<GameTile>();
     //public int SpawnPointCount => spawnPoints.Count;
 
-    // 出生点
-    GameTile spawnPoint;
+    // 现在的位置
+    GameTile nowPoint;
+    public GameTile NowPoint
+    {
+        get => nowPoint;
+        set
+        {
+            nowPoint = value;
+        }
+    }
     // 目标点
     GameTile destinationPoint;
 
@@ -70,13 +79,15 @@ public class GameBoard : MonoBehaviour
             }
         }
     }
+    #endregion
+
     public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
     {
         this.size = size;
         this.contentFactory = contentFactory;
         ground.localScale = new Vector3(size.x, size.y, 1f);
 
-        Vector2 offset = new Vector2((size.x - 1) * 0.5f, (size.y - 1) * 0.5f);
+        Vector2Int offset = new Vector2Int((size.x - 1) >> 1, (size.y - 1) >> 1);
         tiles = new GameTile[size.x * size.y];
         for (int i = 0, y = 0; y < size.y; ++y)
         {
@@ -88,11 +99,11 @@ public class GameBoard : MonoBehaviour
 
                 if (x > 0)
                 {
-                    GameTile.MakeEastWeastNightbors(tile, tiles[i - 1]);
+                    GameTile.MakeRightLeftNightbors(tile, tiles[i - 1]);
                 }
                 if (y > 0)
                 {
-                    GameTile.MakeNorthSouthNightbors(tile, tiles[i - size.x]);
+                    GameTile.MakeUpDownNightbors(tile, tiles[i - size.x]);
                 }
 
                 tile.IsAlternative = (x & 1) == 0;
@@ -103,6 +114,11 @@ public class GameBoard : MonoBehaviour
 
                 tile.Content = contentFactory.Get(GameTileContentType.Empty);
             }
+        }
+
+        for(int i = 0; i < tiles.Length; ++i)
+        {
+            GameTile.MakeDiagonalNightbors(tiles[i]);
         }
 
         ToggleDestination(tiles[tiles.Length / 2]);
@@ -138,17 +154,17 @@ public class GameBoard : MonoBehaviour
             {
                 if(tile.IsAlternative)
                 {
-                    searchFrontier.Enqueue(tile.GrowPathNorth());
-                    searchFrontier.Enqueue(tile.GrowPathSouth());
-                    searchFrontier.Enqueue(tile.GrowPathEast());
-                    searchFrontier.Enqueue(tile.GrowPathWest());
+                    searchFrontier.Enqueue(tile.GrowPathUp());
+                    searchFrontier.Enqueue(tile.GrowPathDown());
+                    searchFrontier.Enqueue(tile.GrowPathRight());
+                    searchFrontier.Enqueue(tile.GrowPathLeft());
                 }
                 else
                 {
-                    searchFrontier.Enqueue(tile.GrowPathWest());
-                    searchFrontier.Enqueue(tile.GrowPathEast());
-                    searchFrontier.Enqueue(tile.GrowPathSouth());
-                    searchFrontier.Enqueue(tile.GrowPathNorth());
+                    searchFrontier.Enqueue(tile.GrowPathLeft());
+                    searchFrontier.Enqueue(tile.GrowPathRight());
+                    searchFrontier.Enqueue(tile.GrowPathDown());
+                    searchFrontier.Enqueue(tile.GrowPathUp());
                 }
             }
         }
@@ -185,19 +201,20 @@ public class GameBoard : MonoBehaviour
         return null;
     }
 
+    public GameTile GetTileByIdx(int index)
+    {
+        if (tiles.Length < index)
+            return null;
+
+        return tiles[index];
+    }
+
     public void ToggleDestination(GameTile tile)
     {
         if (tile.Content.Type == GameTileContentType.Destination)
         {
-            //tile.Content = contentFactory.Get(GameTileContentType.Empty);
-            //if (!FindPaths())
-            //{
-            //    tile.Content = contentFactory.Get(GameTileContentType.Destination);
-            //    FindPaths();
-            //}
-
             // 不做处理，最少要有一个目标点
-            Debug.Log("Destination Can't Delete");
+            Debug.Log("Destination Repeated");
         }
         else if (tile.Content.Type == GameTileContentType.Empty)
         {
@@ -228,46 +245,6 @@ public class GameBoard : MonoBehaviour
             }
         }
 	}
-
-    public bool ToggleSpawnPoint(GameTile tile)
-    {
-        if (tile.Content.Type == GameTileContentType.SpawnPoint)
-        {
-            //if (spawnPoints.Count > 1)
-            //{
-            //    spawnPoints.Remove(tile);
-            //    tile.Content = contentFactory.Get(GameTileContentType.Empty);
-            //}
-
-            tile.Content = contentFactory.Get(GameTileContentType.Empty);
-            if (spawnPoint != null)
-            {
-                spawnPoint = null;
-            }
-            return false;
-        }
-        else if (tile.Content.Type == GameTileContentType.Empty)
-        {
-            tile.Content = contentFactory.Get(GameTileContentType.SpawnPoint);
-
-            // spawnPoints.Add(tile);
-            // 删掉原来的
-            if(spawnPoint != null)
-            {
-                spawnPoint.Content = contentFactory.Get(GameTileContentType.Empty);
-            }
-            spawnPoint = tile;
-            return true;
-        }
-
-        return false;
-    }
-
-    public GameTile GetSpawnPoint()
-    {
-        // return spawnPoints[index];
-        return spawnPoint;
-    }
 
     public GameTile GetDestination()
     {

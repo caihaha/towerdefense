@@ -7,13 +7,13 @@ public class GameTile : MonoBehaviour
     [SerializeField]
     Transform arrow = default;
 
-    GameTile west, east, north, south, nextOnPath;
-    int distance;
+    GameTile left, right, up, down, upRight, downRight, upLeft, downLeft, nextOnPath;
+    float distance;
 
-    static Quaternion northRotation = Quaternion.Euler(90f, 0f, 0f);
-    static Quaternion eastRotation = Quaternion.Euler(90f, 90f, 0f);
-    static Quaternion southRotation = Quaternion.Euler(90f, 180f, 0f);
-    static Quaternion westRotation = Quaternion.Euler(90f, 270f, 0f);
+    static Quaternion upRotation = Quaternion.Euler(90f, 0f, 0f);
+    static Quaternion rightRotation = Quaternion.Euler(90f, 90f, 0f);
+    static Quaternion downRotation = Quaternion.Euler(90f, 180f, 0f);
+    static Quaternion leftRotation = Quaternion.Euler(90f, 270f, 0f);
 
     GameTileContent content;
 
@@ -23,23 +23,46 @@ public class GameTile : MonoBehaviour
 
     public Direction PathDirection { get; private set; }
 
-    public static void MakeEastWeastNightbors(GameTile east, GameTile west)
+    public static void MakeRightLeftNightbors(GameTile right, GameTile left)
     {
-        Debug.Assert(west.east == null && east.west == null, "Redefined neighbors");
-        west.east = east;
-        east.west = west;
+        Debug.Assert(left.right == null && right.left == null, "Redefined neighbors");
+        left.right = right;
+        right.left = left;
     }
 
-    public static void MakeNorthSouthNightbors(GameTile north, GameTile south)
+    public static void MakeUpDownNightbors(GameTile up, GameTile down)
     {
-        Debug.Assert(north.south == null && south.north == null, "Redefined neighbors");
-        north.south = south;
-        south.north = north;
+        Debug.Assert(up.down == null && down.up == null, "Redefined neighbors");
+        up.down = down;
+        down.up = up;
+    }
+
+    public static void MakeDiagonalNightbors(GameTile tile)
+    {
+        if(tile.up != null && tile.up.right != null)
+        {
+            tile.upRight = tile.up.right;
+        }
+
+        if (tile.up != null && tile.up.left != null)
+        {
+            tile.upLeft = tile.up.left;
+        }
+
+        if (tile.down != null && tile.down.left != null)
+        {
+            tile.downLeft = tile.down.left;
+        }
+
+        if (tile.down != null && tile.down.right != null)
+        {
+            tile.downRight = tile.down.right;
+        }
     }
 
     public void ClearPath()
     {
-        distance = int.MaxValue;
+        distance = float.MaxValue;
         nextOnPath = null;
     }
 
@@ -50,7 +73,7 @@ public class GameTile : MonoBehaviour
         ExitPoint = transform.localPosition;
     }
 
-    public bool HasPath => distance != int.MaxValue;
+    public bool HasPath => distance != float.MaxValue;
 
     GameTile GrowPathTo(GameTile neighbor, Direction direction)
     {
@@ -64,27 +87,27 @@ public class GameTile : MonoBehaviour
         neighbor.ExitPoint = (neighbor.transform.localPosition + transform.localPosition) * 0.5f;
 
         neighbor.PathDirection = direction;
-        return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null; ;
+        return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
     }
 
-    public GameTile GrowPathNorth() => GrowPathTo(north, Direction.South);
-    public GameTile GrowPathEast() => GrowPathTo(east, Direction.West);
-    public GameTile GrowPathWest() => GrowPathTo(west, Direction.East);
-    public GameTile GrowPathSouth() => GrowPathTo(south, Direction.North);
+    public GameTile GrowPathUp() => GrowPathTo(up, Direction.Down);
+    public GameTile GrowPathRight() => GrowPathTo(right, Direction.Left);
+    public GameTile GrowPathLeft() => GrowPathTo(left, Direction.Right);
+    public GameTile GrowPathDown() => GrowPathTo(down, Direction.Up);
 
     public void ShowPath()
     {
-        if(distance == 0)
+        if(Mathf.Abs(distance - 0.00001f) <= 0)
         {
             arrow.gameObject.SetActive(false);
             return;
         }
         arrow.gameObject.SetActive(true);
         arrow.localRotation =
-            nextOnPath == north ? northRotation :
-            nextOnPath == east ? eastRotation :
-            nextOnPath == south ? southRotation :
-            westRotation;
+            nextOnPath == up ? upRotation :
+            nextOnPath == right ? rightRotation :
+            nextOnPath == down ? downRotation :
+            leftRotation;
     }
 
     // 用于交替搜索优先级

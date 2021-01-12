@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
+    #region 数据成员
     [SerializeField]
-    Vector2Int boardSize = new Vector2Int(11, 11);
+    Vector2Int boardSize = Common.BoardSize;
 
     [SerializeField]
     GameBoard board = default;
@@ -17,16 +18,15 @@ public class Game : MonoBehaviour
     EnemyFactory enemyFactory = default;
 
     [SerializeField, Range(0.1f, 10f)]
-    float spawnSpeed = 1f;
-
-    // float spawnProgress;
-
     EnemyCollection enemies = new EnemyCollection();
+    #endregion
 
+    #region 内部引用
     public void Awake()
     {
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
+        SpawnEnemy(board.GetTileByIdx(0));
     }
 
     void OnValidate()
@@ -64,16 +64,11 @@ public class Game : MonoBehaviour
             board.ShowGrid = !board.ShowGrid;
         }
 
-        //spawnProgress += spawnSpeed * Time.deltaTime;
-        //while (spawnProgress >= 1f)
-        //{
-        //    spawnProgress -= 1f;
-        //    SpawnEnemy();
-        //}
-
         enemies.GameUpdate();
     }
+    #endregion
 
+    #region 处理点击
     void HandleTouch()
     {
         GameTile tile = board.GetTile(TouchRay);
@@ -88,32 +83,19 @@ public class Game : MonoBehaviour
         GameTile tile = board.GetTile(TouchRay);
         if (tile != null)
         {
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                board.ToggleDestination(tile);
-            }
-            else
-            {
-                // board.ToggleSpawnPoint(tile);
-                SpawnPoint(tile);
-            }
+            // 目标点
+            board.ToggleDestination(tile);
         }
     }
 
-    // 产生Enemy,Enemy只会在出生点上。
-    void SpawnEnemy()
+    // 产生Enemy
+    void SpawnEnemy(GameTile tile)
     {
-        //GameTile spawnPoint = board.GetSpawnPoint(Random.Range(0, board.SpawnPointCount));
-        GameTile spawnPoint = board.GetSpawnPoint();
+        board.NowPoint = tile;
         Enemy enemy = enemyFactory.Get();
-        enemy.SpawnOn(spawnPoint);
-
+        
+        enemy.SpawnOn(tile);
         enemies.Add(enemy);
     }
-
-    void SpawnPoint(GameTile tile)
-    {
-        if(board.ToggleSpawnPoint(tile))
-            SpawnEnemy();
-    }
+    #endregion
 }
