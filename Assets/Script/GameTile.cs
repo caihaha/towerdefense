@@ -11,9 +11,13 @@ public class GameTile : MonoBehaviour
     float distance;
 
     static Quaternion upRotation = Quaternion.Euler(90f, 0f, 0f);
+    static Quaternion upRightRotation = Quaternion.Euler(90f, 45f, 0f);
     static Quaternion rightRotation = Quaternion.Euler(90f, 90f, 0f);
+    static Quaternion downRightRotation = Quaternion.Euler(90f, 135f, 0f);
     static Quaternion downRotation = Quaternion.Euler(90f, 180f, 0f);
+    static Quaternion downLeftRotation = Quaternion.Euler(90f, 225f, 0f);
     static Quaternion leftRotation = Quaternion.Euler(90f, 270f, 0f);
+    static Quaternion upLeftRotation = Quaternion.Euler(90f, 315f, 0f);
 
     GameTileContent content;
 
@@ -123,9 +127,13 @@ public class GameTile : MonoBehaviour
         arrow.gameObject.SetActive(true);
         arrow.localRotation =
             nextOnPath == up ? upRotation :
+            nextOnPath == upRight ? upRightRotation :
             nextOnPath == right ? rightRotation :
+            nextOnPath == downRight ? downRightRotation :
             nextOnPath == down ? downRotation :
-            leftRotation;
+            nextOnPath == downLeft ? downLeftRotation :
+            nextOnPath == left ? leftRotation :
+            upLeftRotation;
     }
 
     // 用于交替搜索优先级
