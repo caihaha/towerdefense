@@ -89,11 +89,29 @@ public class GameTile : MonoBehaviour
         neighbor.PathDirection = direction;
         return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
     }
+    GameTile GrowPathToDiagonal(GameTile neighbor, Direction direction)
+    {
+        if (neighbor == null || neighbor.HasPath)
+        {
+            return null;
+        }
+        neighbor.distance = distance + 1.414f;
+        neighbor.nextOnPath = this;
+
+        neighbor.ExitPoint = (neighbor.transform.localPosition + transform.localPosition) * 0.5f;
+
+        neighbor.PathDirection = direction;
+        return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
+    }
 
     public GameTile GrowPathUp() => GrowPathTo(up, Direction.Down);
     public GameTile GrowPathRight() => GrowPathTo(right, Direction.Left);
     public GameTile GrowPathLeft() => GrowPathTo(left, Direction.Right);
     public GameTile GrowPathDown() => GrowPathTo(down, Direction.Up);
+    public GameTile GrowPathUpRight() => GrowPathToDiagonal(upRight, Direction.DownLeft);
+    public GameTile GrowPathUpLeft() => GrowPathToDiagonal(upLeft, Direction.DownRight);
+    public GameTile GrowPathDownRight() => GrowPathToDiagonal(downRight, Direction.UpLeft);
+    public GameTile GrowPathDownLeft() => GrowPathToDiagonal(downLeft, Direction.UpRight);
 
     public void ShowPath()
     {

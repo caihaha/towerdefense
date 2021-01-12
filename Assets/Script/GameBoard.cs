@@ -152,20 +152,28 @@ public class GameBoard : MonoBehaviour
             GameTile tile = searchFrontier.Dequeue();
             if(tile != null)
             {
-                if(tile.IsAlternative)
-                {
-                    searchFrontier.Enqueue(tile.GrowPathUp());
-                    searchFrontier.Enqueue(tile.GrowPathDown());
-                    searchFrontier.Enqueue(tile.GrowPathRight());
-                    searchFrontier.Enqueue(tile.GrowPathLeft());
-                }
-                else
-                {
-                    searchFrontier.Enqueue(tile.GrowPathLeft());
-                    searchFrontier.Enqueue(tile.GrowPathRight());
-                    searchFrontier.Enqueue(tile.GrowPathDown());
-                    searchFrontier.Enqueue(tile.GrowPathUp());
-                }
+                searchFrontier.Enqueue(tile.GrowPathUp());
+                searchFrontier.Enqueue(tile.GrowPathUpRight());
+                searchFrontier.Enqueue(tile.GrowPathRight());
+                searchFrontier.Enqueue(tile.GrowPathDownRight());
+                searchFrontier.Enqueue(tile.GrowPathDown());
+                searchFrontier.Enqueue(tile.GrowPathDownLeft());
+                searchFrontier.Enqueue(tile.GrowPathLeft());
+                searchFrontier.Enqueue(tile.GrowPathUpLeft());
+                //if(tile.IsAlternative)
+                //{
+                //    searchFrontier.Enqueue(tile.GrowPathUp());
+                //    searchFrontier.Enqueue(tile.GrowPathDown());
+                //    searchFrontier.Enqueue(tile.GrowPathRight());
+                //    searchFrontier.Enqueue(tile.GrowPathLeft());
+                //}
+                //else
+                //{
+                //    searchFrontier.Enqueue(tile.GrowPathLeft());
+                //    searchFrontier.Enqueue(tile.GrowPathRight());
+                //    searchFrontier.Enqueue(tile.GrowPathDown());
+                //    searchFrontier.Enqueue(tile.GrowPathUp());
+                //}
             }
         }
 
