@@ -24,8 +24,16 @@ public class GameTile : MonoBehaviour
     public GameTile NextTileOnPath => nextOnPath;
 
     public Vector3 ExitPoint{ get; private set; }
-
-    public Direction PathDirection { get; private set; }
+    
+    private Direction pathDirection;
+    public Direction PathDirection 
+    { 
+        get => pathDirection; 
+        set
+        {
+            pathDirection = value;
+        }
+    }
 
     public static void MakeRightLeftNightbors(GameTile right, GameTile left)
     {
@@ -78,6 +86,7 @@ public class GameTile : MonoBehaviour
     }
 
     public bool HasPath => distance != float.MaxValue;
+    public bool IsDiatance => Mathf.Abs(distance) <= 0.00001f;
 
     GameTile GrowPathTo(GameTile neighbor, Direction direction)
     {
@@ -88,7 +97,7 @@ public class GameTile : MonoBehaviour
         neighbor.distance = distance + 1;
         neighbor.nextOnPath = this;
 
-        neighbor.ExitPoint = (neighbor.transform.localPosition + transform.localPosition) * 0.5f;
+        neighbor.ExitPoint = neighbor.transform.localPosition; // (neighbor.transform.localPosition + transform.localPosition) * 0.5f;
 
         neighbor.PathDirection = direction;
         return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
@@ -119,7 +128,7 @@ public class GameTile : MonoBehaviour
 
     public void ShowPath()
     {
-        if(Mathf.Abs(distance - 0.00001f) <= 0)
+        if(IsDiatance)
         {
             arrow.gameObject.SetActive(false);
             return;

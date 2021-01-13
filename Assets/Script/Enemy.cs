@@ -83,13 +83,10 @@ public class Enemy : MonoBehaviour
 			}
 
 			tileTo = tileFrom.NextTileOnPath;
-
-			if(tileTo == null)
+			if (tileTo != null && tileTo.IsDiatance)
             {
-				// 找不到路径(到达目标)就销毁
-				// OriginFactory.Reclaim(this);
-				return true;
-            }
+				tileTo.PathDirection = tileFrom.PathDirection;
+			}
 
 			progress -= 1f;
 			PrepareNextState();
