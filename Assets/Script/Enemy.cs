@@ -126,8 +126,7 @@ public class Enemy : MonoBehaviour
 			case DirectionChange.TurnAround: PrepareTurnAround(); break;
 			case DirectionChange.TurnAroundLeft: PrepareTurnAroundLeft(); break;
 			case DirectionChange.TurnLeft: PrepareTurnLeft(); break;
-			case DirectionChange.TurnUpLeft: PrepareTurnUpLeft(); break;
-			default: PrepareForward(); break;
+			default: PrepareTurnUpLeft(); break;
 		}
 	}
 

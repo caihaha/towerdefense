@@ -153,12 +153,12 @@ public class GameBoard : MonoBehaviour
             if(tile != null)
             {
                 searchFrontier.Enqueue(tile.GrowPathUp());
-                searchFrontier.Enqueue(tile.GrowPathUpRight());
-                searchFrontier.Enqueue(tile.GrowPathRight());
-                searchFrontier.Enqueue(tile.GrowPathDownRight());
                 searchFrontier.Enqueue(tile.GrowPathDown());
-                searchFrontier.Enqueue(tile.GrowPathDownLeft());
+                searchFrontier.Enqueue(tile.GrowPathRight());
                 searchFrontier.Enqueue(tile.GrowPathLeft());
+                searchFrontier.Enqueue(tile.GrowPathUpRight());
+                searchFrontier.Enqueue(tile.GrowPathDownLeft());
+                searchFrontier.Enqueue(tile.GrowPathDownRight());
                 searchFrontier.Enqueue(tile.GrowPathUpLeft());
                 //if (tile.IsAlternative)
                 //{
