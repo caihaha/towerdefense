@@ -87,6 +87,7 @@ public class GameTile : MonoBehaviour
     {
         distance = float.MaxValue;
         nextOnPath = null;
+        lastOnPath = null;
         ExitPoint = transform.localPosition;
     }
 
@@ -94,6 +95,7 @@ public class GameTile : MonoBehaviour
     {
         distance = 0;
         nextOnPath = null;
+        lastOnPath = null;
         ExitPoint = transform.localPosition;
     }
 

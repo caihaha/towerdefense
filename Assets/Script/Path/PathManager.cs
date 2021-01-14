@@ -12,6 +12,7 @@ public class PathManager
     public bool DFS(GameTile start, GameTile end)
     {
         isFinded = false;
+        searchFrontier.Clear();
         searchFrontier.Enqueue(start);
 
         while (searchFrontier.Count > 0)

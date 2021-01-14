@@ -85,6 +85,13 @@ public class GameBoard : MonoBehaviour
     }
     #endregion
 
+    public static GameBoard Instance { get; private set; }
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
     public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
     {
         this.size = size;
@@ -224,5 +231,10 @@ public class GameBoard : MonoBehaviour
     public void SetGameTileContentType(GameTile tile, GameTileContentType contentType)
     {
         tile.Content = contentFactory.Get(contentType);
+    }
+
+    public int GetTilesSize()
+    {
+        return tiles.Length;
     }
 }
