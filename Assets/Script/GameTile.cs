@@ -102,7 +102,7 @@ public class GameTile : MonoBehaviour
 
     GameTile GrowPathTo(GameTile neighbor, Direction direction)
     {
-        if (neighbor == null || neighbor.HasPath)
+        if (neighbor == null || neighbor.lastOnPath != null)
         {
             return null;
         }

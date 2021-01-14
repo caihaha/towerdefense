@@ -189,14 +189,6 @@ public class GameBoard : MonoBehaviour
             }
         }
 
-        foreach (GameTile tile in tiles)
-        {
-            if(!tile.HasPath)
-            {
-                return false;
-            }
-        }
-
         if(showPaths)
         {
             foreach (GameTile tile in tiles)

@@ -23,6 +23,7 @@ public class PathManager
             }
             else if (tile.Content.Type == GameTileContentType.SpawnPoint)
             {
+                tile.ClearPath();
                 searchFrontier.Enqueue(tile);
             }
             else

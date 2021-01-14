@@ -64,7 +64,7 @@ public class Game : MonoBehaviour
             board.ShowGrid = !board.ShowGrid;
         }
 
-            enemies.GameUpdate();
+        enemies.GameUpdate();
     }
     #endregion
 
