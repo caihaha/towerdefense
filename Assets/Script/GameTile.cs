@@ -7,7 +7,7 @@ public class GameTile : MonoBehaviour
     [SerializeField]
     Transform arrow = default;
 
-    GameTile left, right, up, down, upRight, downRight, upLeft, downLeft, nextOnPath;
+    GameTile left, right, up, down, upRight, downRight, upLeft, downLeft, nextOnPath, lastOnPath;
     float distance;
 
     static Quaternion upRotation = Quaternion.Euler(90f, 0f, 0f);
@@ -22,16 +22,27 @@ public class GameTile : MonoBehaviour
     GameTileContent content;
 
     public GameTile NextTileOnPath => nextOnPath;
+    public GameTile LastTileOnPath => lastOnPath;
 
     public Vector3 ExitPoint{ get; private set; }
-    
-    private Direction pathDirection;
+
+    // lastDirection父节点过来的方向
+    private Direction pathDirection, lastDirection;
     public Direction PathDirection 
     { 
         get => pathDirection; 
         set
         {
             pathDirection = value;
+        }
+    }
+
+    public Direction LastDirection
+    {
+        get => lastDirection;
+        set
+        {
+            lastDirection = value;
         }
     }
 
@@ -76,6 +87,7 @@ public class GameTile : MonoBehaviour
     {
         distance = float.MaxValue;
         nextOnPath = null;
+        ExitPoint = transform.localPosition;
     }
 
     public void BecomeDestination()
@@ -94,37 +106,37 @@ public class GameTile : MonoBehaviour
         {
             return null;
         }
-        neighbor.distance = distance + 1;
-        neighbor.nextOnPath = this;
 
-        neighbor.ExitPoint = neighbor.transform.localPosition; // (neighbor.transform.localPosition + transform.localPosition) * 0.5f;
+        neighbor.lastOnPath = this;
 
-        neighbor.PathDirection = direction;
+        neighbor.LastDirection = direction;
         return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
     }
-    GameTile GrowPathToDiagonal(GameTile neighbor, Direction direction)
+
+    public GameTile BackPathTo(GameTile neighbor, Direction direction)
     {
         if (neighbor == null || neighbor.HasPath)
         {
             return null;
         }
-        neighbor.distance = distance + 1.414f;
-        neighbor.nextOnPath = this;
 
-        neighbor.ExitPoint = (neighbor.transform.localPosition + transform.localPosition) * 0.5f;
+        neighbor.distance += DirectionExtensions.IsDiagonalDirection(direction) ? distance + 1.4142f : distance + 1f;
+
+        neighbor.nextOnPath = this;
+        neighbor.ExitPoint = neighbor.transform.localPosition; // (neighbor.transform.localPosition + transform.localPosition) * 0.5f;
 
         neighbor.PathDirection = direction;
         return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
     }
 
-    public GameTile GrowPathUp() => GrowPathTo(up, Direction.Down);
-    public GameTile GrowPathRight() => GrowPathTo(right, Direction.Left);
-    public GameTile GrowPathLeft() => GrowPathTo(left, Direction.Right);
-    public GameTile GrowPathDown() => GrowPathTo(down, Direction.Up);
-    public GameTile GrowPathUpRight() => GrowPathToDiagonal(upRight, Direction.DownLeft);
-    public GameTile GrowPathUpLeft() => GrowPathToDiagonal(upLeft, Direction.DownRight);
-    public GameTile GrowPathDownRight() => GrowPathToDiagonal(downRight, Direction.UpLeft);
-    public GameTile GrowPathDownLeft() => GrowPathToDiagonal(downLeft, Direction.UpRight);
+    public GameTile GrowPathUp() => GrowPathTo(up, Direction.Up);
+    public GameTile GrowPathRight() => GrowPathTo(right, Direction.Right);
+    public GameTile GrowPathLeft() => GrowPathTo(left, Direction.Left);
+    public GameTile GrowPathDown() => GrowPathTo(down, Direction.Down);
+    public GameTile GrowPathUpRight() => GrowPathTo(upRight, Direction.UpRight);
+    public GameTile GrowPathUpLeft() => GrowPathTo(upLeft, Direction.UpLeft);
+    public GameTile GrowPathDownRight() => GrowPathTo(downRight, Direction.DownRight);
+    public GameTile GrowPathDownLeft() => GrowPathTo(downLeft, Direction.DownLeft);
 
     public void ShowPath()
     {

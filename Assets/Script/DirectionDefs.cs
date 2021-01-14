@@ -1,17 +1,5 @@
 ﻿using UnityEngine;
 
-//public enum Direction
-//{
-//    North,
-//    East,
-//    South,
-//    West,
-//    NorthEast,
-//    SouthEast,
-//    SouthWest,
-//    NorthWest
-//}
-
 public enum Direction
 {
     Begin,
@@ -98,5 +86,13 @@ public static class DirectionExtensions
     public static float GetAngle(this Direction direction)
     {
         return (float)direction * 45f;
+    }
+
+    public static bool IsDiagonalDirection(Direction dir)
+    {
+        return dir == Direction.DownLeft ||
+            dir == Direction.DownRight ||
+            dir == Direction.UpLeft ||
+            dir == Direction.UpRight;
     }
 }

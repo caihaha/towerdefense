@@ -13,9 +13,6 @@ public class Enemy : MonoBehaviour
 	DirectionChange directionChange;
 	float directionAngleFrom, directionAngleTo;
 
-	// 处理寻路
-	PathManager pathManager;
-
 	public EnemyFactory OriginFactory
 	{
 		get => originFactory;
@@ -48,14 +45,12 @@ public class Enemy : MonoBehaviour
 	#region 初始化
 	public void SpawnOn(GameTile tile)
 	{
-		Debug.Assert(tile.NextTileOnPath != null, "Nowhere to go!", this);
+		// Debug.Assert(tile.NextTileOnPath != null, "Nowhere to go!", this);
 		tileFrom = tile;
 		tileTo = tile.NextTileOnPath;
 
 		progress = 0f;
 		PrepareIntro();
-
-		pathManager = new PathManager();
 	}
 
     // 初始化状态

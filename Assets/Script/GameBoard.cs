@@ -22,6 +22,8 @@ public class GameBoard : MonoBehaviour
 
     GameTileContentFactory contentFactory;
 
+    public bool hasPath;
+
     // List<GameTile> spawnPoints = new List<GameTile>();
     //public int SpawnPointCount => spawnPoints.Count;
 
@@ -37,6 +39,8 @@ public class GameBoard : MonoBehaviour
     }
     // 目标点
     GameTile destinationPoint;
+
+    PathManager pathManager;
 
     bool showGrid, showPaths;
     public bool ShowGrid
@@ -121,8 +125,15 @@ public class GameBoard : MonoBehaviour
             GameTile.MakeDiagonalNightbors(tiles[i]);
         }
 
-        ToggleDestination(tiles[tiles.Length / 2]);
+        pathManager = new PathManager();
+        // ToggleDestination(tiles[tiles.Length / 2]);
         // ToggleSpawnPoint(tiles[0]);
+    }
+
+    public bool PathFinder()
+    {
+        hasPath = pathManager.DFS(nowPoint, destinationPoint, tiles);
+        return hasPath;
     }
 
     bool FindPaths()
@@ -228,34 +239,40 @@ public class GameBoard : MonoBehaviour
         {
             if (destinationPoint != null)
             {
-                destinationPoint.Content = contentFactory.Get(GameTileContentType.Empty);
+                SetGameTileContentType(destinationPoint, GameTileContentType.Empty);
             }
             destinationPoint = tile;
 
-            tile.Content = contentFactory.Get(GameTileContentType.Destination);
-            FindPaths();
+            SetGameTileContentType(tile, GameTileContentType.Destination);
+            PathFinder();
         }
     }
 
     public void ToggleWall (GameTile tile) {
         if (tile.Content.Type == GameTileContentType.Wall)
         {
-            tile.Content = contentFactory.Get(GameTileContentType.Empty);
-            FindPaths();
+            SetGameTileContentType(tile, GameTileContentType.Empty);
+            PathFinder();
         }
         else if (tile.Content.Type == GameTileContentType.Empty)
         {
-            tile.Content = contentFactory.Get(GameTileContentType.Wall);
-            if (!FindPaths())
+            SetGameTileContentType(tile, GameTileContentType.Wall);
+
+            if (!PathFinder())
             {
-                tile.Content = contentFactory.Get(GameTileContentType.Empty);
-                FindPaths();
+                SetGameTileContentType(tile, GameTileContentType.Empty);
+                PathFinder();
             }
         }
 	}
 
-    public GameTile GetDestination()
+    public GameTile DestinationPoint
     {
-        return destinationPoint;
+        get => destinationPoint;
+    }
+
+    public void SetGameTileContentType(GameTile tile, GameTileContentType contentType)
+    {
+        tile.Content = contentFactory.Get(contentType);
     }
 }

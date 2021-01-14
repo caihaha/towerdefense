@@ -3,7 +3,6 @@
 [System.Serializable]
 public class EnemyCollection
 {
-
 	List<Enemy> enemies = new List<Enemy>();
 
 	// 添加敌人

@@ -64,7 +64,7 @@ public class Game : MonoBehaviour
             board.ShowGrid = !board.ShowGrid;
         }
 
-        enemies.GameUpdate();
+            enemies.GameUpdate();
     }
     #endregion
 
@@ -92,10 +92,13 @@ public class Game : MonoBehaviour
     void SpawnEnemy(GameTile tile)
     {
         board.NowPoint = tile;
+        board.SetGameTileContentType(tile, GameTileContentType.SpawnPoint);
         Enemy enemy = enemyFactory.Get();
         
         enemy.SpawnOn(tile);
         enemies.Add(enemy);
+
+        board.PathFinder();
     }
     #endregion
 }
