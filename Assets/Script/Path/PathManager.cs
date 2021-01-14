@@ -45,7 +45,7 @@ public class PathManager
         if (isFinded)
             FinishPath(start, end);
 
-        return true;
+        return isFinded;
     }
 
     void FinishPath(GameTile start, GameTile end)

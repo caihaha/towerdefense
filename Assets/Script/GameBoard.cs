@@ -143,6 +143,9 @@ public class GameBoard : MonoBehaviour
         if (nowPoint == null || destinationPoint == null)
             return false;
 
+        if (nowPoint == destinationPoint)
+            return true;
+
         foreach (GameTile tile in tiles)
         {
             if (tile.Content.Type == GameTileContentType.Destination)
@@ -161,6 +164,14 @@ public class GameBoard : MonoBehaviour
         }
 
         hasPath = pathManager.DFS(nowPoint, destinationPoint);
+        if (hasPath && showPaths)
+        {
+            foreach (GameTile tile in tiles)
+            {
+                tile.ShowPath();
+            }
+        }
+
         return hasPath;
     }
 
