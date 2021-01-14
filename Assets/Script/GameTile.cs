@@ -24,7 +24,7 @@ public class GameTile : MonoBehaviour
     public GameTile NextTileOnPath => nextOnPath;
     public GameTile LastTileOnPath => lastOnPath;
 
-    public Vector3 ExitPoint{ get; private set; }
+    public Vector3 ExitPoint{ get; set; }
 
     // lastDirection父节点过来的方向
     private Direction pathDirection, lastDirection;

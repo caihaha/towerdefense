@@ -100,6 +100,7 @@ public class GameBoard : MonoBehaviour
                 GameTile tile = tiles[i] = Instantiate(tilePrefab);
                 tile.transform.SetParent(transform, false);
                 tile.transform.localPosition = new Vector3(x - offset.x, 0f, y - offset.y);
+                tile.ExitPoint = tile.transform.localPosition;
 
                 if (x > 0)
                 {

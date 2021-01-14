@@ -45,21 +45,21 @@ public class PathManager
             if (tile.Content.Type == GameTileContentType.Destination)
                 break;
 
-            if (!GrowPathUp(tile))
+            if (!IsDestination(tile.GrowPathUp()))
                 break;
-            if (!GrowPathDown(tile))
+            if (!IsDestination(tile.GrowPathDown()))
                 break;
-            if (!GrowPathRight(tile))
+            if (!IsDestination(tile.GrowPathRight()))
                 break;
-            if (!GrowPathLeft(tile))
+            if (!IsDestination(tile.GrowPathLeft()))
                 break;
-            if (!GrowPathUpRight(tile))
+            if (!IsDestination(tile.GrowPathUpRight()))
                 break;
-            if (!GrowPathDownLeft(tile))
+            if (!IsDestination(tile.GrowPathDownLeft()))
                 break;
-            if (!GrowPathDownRight(tile))
+            if (!IsDestination(tile.GrowPathDownRight()))
                 break;
-            if (!GrowPathUpLeft(tile))
+            if (!IsDestination(tile.GrowPathUpLeft()))
                 break;
         }
 
@@ -78,53 +78,17 @@ public class PathManager
         }
     }
 
-    bool GrowPathUp(GameTile tile)
-    {
-        return IsDestination(tile.GrowPathUp());
-    }
-
-    bool GrowPathDown(GameTile tile)
-    {
-        return IsDestination(tile.GrowPathDown());
-    }
-
-    bool GrowPathRight(GameTile tile)
-    {
-        return IsDestination(tile.GrowPathRight());
-    }
-
-    bool GrowPathLeft(GameTile tile)
-    {
-        return IsDestination(tile.GrowPathLeft());
-    }
-
-    bool GrowPathUpRight(GameTile tile)
-    {
-        return IsDestination(tile.GrowPathUpRight());
-    }
-
-    bool GrowPathDownLeft(GameTile tile)
-    {
-        return IsDestination(tile.GrowPathDownLeft());
-    }
-
-    bool GrowPathDownRight(GameTile tile)
-    {
-        return IsDestination(tile.GrowPathDownRight());
-    }
-
-    bool GrowPathUpLeft(GameTile tile)
-    {
-        return IsDestination(tile.GrowPathUpLeft());
-    }
-
     bool IsDestination(GameTile tile)
     {
-        searchFrontier.Enqueue(tile);
-        if (tile != null && tile.Content.Type == GameTileContentType.Destination)
+        if(tile != null)
         {
-            isFinded = true;
-            return false;
+            searchFrontier.Enqueue(tile);
+
+            if(tile.Content.Type == GameTileContentType.Destination)
+            {
+                isFinded = true;
+                return false;
+            }
         }
 
         return true;
