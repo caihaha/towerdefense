@@ -26,7 +26,7 @@ public class GameTile : MonoBehaviour
 
     public Vector3 ExitPoint{ get; set; }
 
-    // lastDirection父节点过来的方向
+    // lastDirection记录父节点过来的方向，回溯的时候用
     private Direction pathDirection, lastDirection;
     public Direction PathDirection 
     { 

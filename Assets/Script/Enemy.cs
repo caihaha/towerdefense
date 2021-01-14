@@ -89,7 +89,8 @@ public class Enemy : MonoBehaviour
 
 		// 更新位置
 		transform.localPosition = Vector3.LerpUnclamped(positionFrom, positionTo, progress);
-		GameBoard.Instance.NowPoint = tileFrom;
+		if(tileTo != null)
+			GameBoard.Instance.NowPoint = tileTo;
 
 		// 调整方向
 		if (directionChange != DirectionChange.None)
