@@ -140,7 +140,7 @@ public class GameTile : MonoBehaviour
 
     public void ShowPath()
     {
-        if(IsDiatance)
+        if(IsDiatance || nextOnPath == null)
         {
             arrow.gameObject.SetActive(false);
             return;
