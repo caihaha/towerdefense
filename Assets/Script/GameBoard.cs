@@ -133,18 +133,18 @@ public class GameBoard : MonoBehaviour
 
     public bool PathFinder()
     {
-        hasPath = pathManager.DFS(nowPoint, destinationPoint, tiles);
-        return hasPath;
-    }
+        if (nowPoint == null || destinationPoint == null)
+            return false;
 
-    bool FindPaths()
-    {
-        // 初始化所有点
         foreach (GameTile tile in tiles)
         {
             if (tile.Content.Type == GameTileContentType.Destination)
             {
                 tile.BecomeDestination();
+            }
+            else if (tile == nowPoint)
+            {
+                tile.ClearPath();
                 searchFrontier.Enqueue(tile);
             }
             else
@@ -153,51 +153,8 @@ public class GameBoard : MonoBehaviour
             }
         }
 
-        // 没有目标点
-        if (searchFrontier.Count == 0)
-        {
-            return false;
-        }
-
-        while (searchFrontier.Count > 0)
-        {
-            GameTile tile = searchFrontier.Dequeue();
-            if(tile != null)
-            {
-                searchFrontier.Enqueue(tile.GrowPathUp());
-                searchFrontier.Enqueue(tile.GrowPathDown());
-                searchFrontier.Enqueue(tile.GrowPathRight());
-                searchFrontier.Enqueue(tile.GrowPathLeft());
-                searchFrontier.Enqueue(tile.GrowPathUpRight());
-                searchFrontier.Enqueue(tile.GrowPathDownLeft());
-                searchFrontier.Enqueue(tile.GrowPathDownRight());
-                searchFrontier.Enqueue(tile.GrowPathUpLeft());
-                //if (tile.IsAlternative)
-                //{
-                //    searchFrontier.Enqueue(tile.GrowPathUp());
-                //    searchFrontier.Enqueue(tile.GrowPathDown());
-                //    searchFrontier.Enqueue(tile.GrowPathRight());
-                //    searchFrontier.Enqueue(tile.GrowPathLeft());
-                //}
-                //else
-                //{
-                //    searchFrontier.Enqueue(tile.GrowPathLeft());
-                //    searchFrontier.Enqueue(tile.GrowPathRight());
-                //    searchFrontier.Enqueue(tile.GrowPathDown());
-                //    searchFrontier.Enqueue(tile.GrowPathUp());
-                //}
-            }
-        }
-
-        if(showPaths)
-        {
-            foreach (GameTile tile in tiles)
-            {
-                tile.ShowPath();
-            }
-        }
-
-        return true;
+        hasPath = pathManager.DFS(nowPoint, destinationPoint);
+        return hasPath;
     }
 
     public GameTile GetTile(Ray ray)

@@ -9,33 +9,10 @@ public class PathManager
 
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
 
-    public bool DFS(GameTile start, GameTile end, GameTile[] tiles)
+    public bool DFS(GameTile start, GameTile end)
     {
         isFinded = false;
-        if (start == null || end == null)
-            return false;
-
-        foreach (GameTile tile in tiles)
-        {
-            if (tile.Content.Type == GameTileContentType.Destination)
-            {
-                tile.BecomeDestination();
-            }
-            else if (tile.Content.Type == GameTileContentType.SpawnPoint)
-            {
-                tile.ClearPath();
-                searchFrontier.Enqueue(tile);
-            }
-            else
-            {
-                tile.ClearPath();
-            }
-        }
-
-        if (searchFrontier.Count == 0)
-        {
-            return false;
-        }
+        searchFrontier.Enqueue(start);
 
         while (searchFrontier.Count > 0)
         {
@@ -73,7 +50,7 @@ public class PathManager
     void FinishPath(GameTile start, GameTile end)
     {
         GameTile tmp = end;
-        while (tmp != null && tmp.Content.Type != GameTileContentType.SpawnPoint)
+        while (tmp != null && tmp != start)
         {
             tmp = tmp.BackPathTo(tmp.LastTileOnPath, tmp.LastDirection);
         }

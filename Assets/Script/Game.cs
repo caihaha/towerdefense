@@ -92,7 +92,6 @@ public class Game : MonoBehaviour
     void SpawnEnemy(GameTile tile)
     {
         board.NowPoint = tile;
-        board.SetGameTileContentType(tile, GameTileContentType.SpawnPoint);
         Enemy enemy = enemyFactory.Get();
         
         enemy.SpawnOn(tile);
