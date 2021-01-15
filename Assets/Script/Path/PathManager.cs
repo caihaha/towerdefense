@@ -9,6 +9,131 @@ public class PathManager
 
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
 
+    List<GameTile> openList = new List<GameTile>();
+    Queue<GameTile> clostList = new Queue<GameTile>();
+
+    #region AStare
+    public bool AStart(GameTile start, GameTile end)
+    {
+        isFinded = false;
+        openList.Clear();
+        clostList.Clear();
+        openList.Add(start);
+
+        while(openList.Count > 0)
+        {
+            GameTile tile = GetLeastFTile();
+            if (tile == null)
+                continue;
+
+            clostList.Enqueue(tile);
+            if (tile.Content.Type == GameTileContentType.Destination)
+            {
+                isFinded = true;
+                break;
+            }
+
+            for (Direction dir = Direction.Begin; dir < Direction.End; ++ dir)
+            {
+                GameTile nextTile = GrowPathTo(tile, end, dir);
+                if (nextTile == null)
+                    continue;
+
+                openList.Add(nextTile);
+            }
+        }
+
+        if(isFinded)
+        {
+            FinishPath(start, end);
+        }
+
+        return isFinded;
+    }
+
+    // 可以维护一个最大堆
+    GameTile GetLeastFTile()
+    {
+        if (openList == null)
+            return null;
+
+        GameTile resTile = openList[0];
+
+        for(int i = 1; i < openList.Count; ++i)
+        {
+            if (resTile.fCost > openList[i].fCost)
+                resTile = openList[i];
+        }
+
+        openList.Remove(resTile);
+        return resTile;
+    }
+
+    public bool IsTileInOpenList(GameTile tile)
+    {
+        foreach (var tmp in openList)
+        {
+            if(tmp == tile)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // 可以维护一个最大堆
+    public bool IsTileInCloseList(GameTile tile)
+    {
+        foreach(var tmp in clostList)
+        {
+            if (tmp == tile)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    GameTile GrowPathTo(in GameTile tile, GameTile end, Direction direction)
+    {
+        if (tile == null)
+            return null;
+
+        GameTile neighbor = tile.GetTileByDirection(direction);
+        if (neighbor == null)
+            return null;
+
+        // 在关闭列表
+        if (IsTileInCloseList(neighbor))
+        {
+            return null;
+        }
+
+        // 计算fCost
+        float gCost = PathDefs.CalcG(tile, neighbor, direction);
+        float hCost = PathDefs.Heuristic(end, neighbor);
+        float fCost = gCost + hCost;
+
+        if (IsTileInOpenList(neighbor))
+        {
+            if (fCost >= neighbor.fCost)
+            {
+                return null;
+            }
+        }
+        neighbor.gCost = gCost;
+        neighbor.fCost = fCost;
+
+        neighbor.LastDirection = direction;
+        neighbor.LastTileOnPath = tile;
+
+        return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
+    }
+    #endregion
+
+    #region DFS
     public bool DFS(GameTile start, GameTile end)
     {
         isFinded = false;
@@ -22,24 +147,19 @@ public class PathManager
                 continue;
 
             if (tile.Content.Type == GameTileContentType.Destination)
+            {
+                isFinded = true;
                 break;
+            }
 
-            if (!IsDestination(tile.GrowPathUp()))
-                break;
-            if (!IsDestination(tile.GrowPathDown()))
-                break;
-            if (!IsDestination(tile.GrowPathRight()))
-                break;
-            if (!IsDestination(tile.GrowPathLeft()))
-                break;
-            if (!IsDestination(tile.GrowPathUpRight()))
-                break;
-            if (!IsDestination(tile.GrowPathDownLeft()))
-                break;
-            if (!IsDestination(tile.GrowPathDownRight()))
-                break;
-            if (!IsDestination(tile.GrowPathUpLeft()))
-                break;
+            // 可以打乱方向
+            for (Direction dir = Direction.Begin; dir < Direction.End; ++dir)
+            {
+                if(IsDestination(GrowPathTo(tile, dir)))
+                {
+                    break;
+                }
+            }
         }
 
         if (isFinded)
@@ -66,16 +186,28 @@ public class PathManager
             if(tile.Content.Type == GameTileContentType.Destination)
             {
                 isFinded = true;
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
-    PathFinder pathFinder;
-    
-    uint nextPathId;
+    GameTile GrowPathTo(GameTile tile, Direction direction)
+    {
+        GameTile neighbor = tile.GetTileByDirection(direction);
+
+        if (neighbor == null || neighbor.LastTileOnPath != null)
+        {
+            return null;
+        }
+
+        neighbor.LastTileOnPath = tile;
+        neighbor.LastDirection = direction;
+
+        return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
+    }
+    #endregion
 
     // 到达目标点
     bool isFinded;

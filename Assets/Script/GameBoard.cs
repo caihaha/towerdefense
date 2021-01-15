@@ -163,7 +163,8 @@ public class GameBoard : MonoBehaviour
             }
         }
 
-        hasPath = pathManager.DFS(nowPoint, destinationPoint);
+        // hasPath = pathManager.DFS(nowPoint, destinationPoint);
+        hasPath = pathManager.AStart(nowPoint, destinationPoint);
         if (hasPath && showPaths)
         {
             foreach (GameTile tile in tiles)

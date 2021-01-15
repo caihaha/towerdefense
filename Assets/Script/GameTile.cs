@@ -4,10 +4,22 @@ using UnityEngine;
 
 public class GameTile : MonoBehaviour
 {
+    #region 数据成员
     [SerializeField]
     Transform arrow = default;
 
-    GameTile left, right, up, down, upRight, downRight, upLeft, downLeft, nextOnPath, lastOnPath;
+    GameTile left, right, up, down, upRight, downRight, upLeft, downLeft;
+    public GameTile Left => left;
+    public GameTile Up => up;
+    public GameTile Right => right;
+    public GameTile Down => down;
+    public GameTile UpRight => upRight;
+    public GameTile DownRight => downRight;
+    public GameTile UpLeft => upLeft;
+    public GameTile DownLeft => downLeft;
+
+    // lastOnPath广度优先搜索使用
+    GameTile nextOnPath, lastOnPath;
     float distance;
 
     static Quaternion upRotation = Quaternion.Euler(90f, 0f, 0f);
@@ -20,23 +32,21 @@ public class GameTile : MonoBehaviour
     static Quaternion upLeftRotation = Quaternion.Euler(90f, 315f, 0f);
 
     GameTileContent content;
+    public Vector3 ExitPoint { get; set; }
 
     public GameTile NextTileOnPath => nextOnPath;
-    public GameTile LastTileOnPath => lastOnPath;
-
-    public Vector3 ExitPoint{ get; set; }
 
     // lastDirection记录父节点过来的方向，回溯的时候用
-    private Direction pathDirection, lastDirection;
-    public Direction PathDirection 
-    { 
-        get => pathDirection; 
+    public GameTile LastTileOnPath
+    {
+        get => lastOnPath;
         set
         {
-            pathDirection = value;
+            lastOnPath = value;
         }
     }
 
+    private Direction lastDirection;
     public Direction LastDirection
     {
         get => lastDirection;
@@ -45,6 +55,20 @@ public class GameTile : MonoBehaviour
             lastDirection = value;
         }
     }
+
+    private Direction pathDirection;
+    public Direction PathDirection
+    {
+        get => pathDirection;
+        set
+        {
+            pathDirection = value;
+        }
+    }
+
+    // A*寻路
+    public float fCost, gCost;
+    #endregion
 
     public static void MakeRightLeftNightbors(GameTile right, GameTile left)
     {
@@ -62,7 +86,7 @@ public class GameTile : MonoBehaviour
 
     public static void MakeDiagonalNightbors(GameTile tile)
     {
-        if(tile.up != null && tile.up.right != null)
+        if (tile.up != null && tile.up.right != null)
         {
             tile.upRight = tile.up.right;
         }
@@ -88,6 +112,10 @@ public class GameTile : MonoBehaviour
         distance = float.MaxValue;
         nextOnPath = null;
         lastOnPath = null;
+
+        gCost = 0f;
+        fCost = float.MaxValue;
+
         ExitPoint = transform.localPosition;
     }
 
@@ -96,24 +124,15 @@ public class GameTile : MonoBehaviour
         distance = 0;
         nextOnPath = null;
         lastOnPath = null;
+
+        gCost = 0f;
+        fCost = float.MaxValue;
+
         ExitPoint = transform.localPosition;
     }
 
     public bool HasPath => distance != float.MaxValue;
     public bool IsDiatance => Mathf.Abs(distance) <= 0.00001f;
-
-    GameTile GrowPathTo(GameTile neighbor, Direction direction)
-    {
-        if (neighbor == null || neighbor.lastOnPath != null)
-        {
-            return null;
-        }
-
-        neighbor.lastOnPath = this;
-
-        neighbor.LastDirection = direction;
-        return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
-    }
 
     public GameTile BackPathTo(GameTile neighbor, Direction direction)
     {
@@ -131,18 +150,9 @@ public class GameTile : MonoBehaviour
         return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
     }
 
-    public GameTile GrowPathUp() => GrowPathTo(up, Direction.Up);
-    public GameTile GrowPathRight() => GrowPathTo(right, Direction.Right);
-    public GameTile GrowPathLeft() => GrowPathTo(left, Direction.Left);
-    public GameTile GrowPathDown() => GrowPathTo(down, Direction.Down);
-    public GameTile GrowPathUpRight() => GrowPathTo(upRight, Direction.UpRight);
-    public GameTile GrowPathUpLeft() => GrowPathTo(upLeft, Direction.UpLeft);
-    public GameTile GrowPathDownRight() => GrowPathTo(downRight, Direction.DownRight);
-    public GameTile GrowPathDownLeft() => GrowPathTo(downLeft, Direction.DownLeft);
-
     public void ShowPath()
     {
-        if(IsDiatance || nextOnPath == null)
+        if (IsDiatance || nextOnPath == null)
         {
             arrow.gameObject.SetActive(false);
             return;
@@ -180,5 +190,17 @@ public class GameTile : MonoBehaviour
     public void HidePath()
     {
         arrow.gameObject.SetActive(false);
+    }
+
+    public GameTile GetTileByDirection(Direction direction)
+    {
+        return direction == Direction.Up ? up :
+            direction == Direction.UpLeft ? upLeft :
+            direction == Direction.UpRight ? upRight :
+            direction == Direction.Left ? left :
+            direction == Direction.Right ? right :
+            direction == Direction.DownLeft ? downLeft :
+            direction == Direction.DownRight ? downRight :
+            down;
     }
 }
