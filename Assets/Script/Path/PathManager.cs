@@ -10,7 +10,7 @@ public class PathManager
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
 
     List<GameTile> openList = new List<GameTile>();
-    Queue<GameTile> clostList = new Queue<GameTile>();
+    HashSet<GameTile> clostList = new HashSet<GameTile>();
 
     #region AStare
     public bool AStart(GameTile start, GameTile end)
@@ -26,7 +26,7 @@ public class PathManager
             if (tile == null)
                 continue;
 
-            clostList.Enqueue(tile);
+            clostList.Add(tile);
             if (tile.Content.Type == GameTileContentType.Destination)
             {
                 isFinded = true;
@@ -82,21 +82,12 @@ public class PathManager
         return false;
     }
 
-    // 可以维护一个最大堆
     public bool IsTileInCloseList(GameTile tile)
     {
-        foreach(var tmp in clostList)
-        {
-            if (tmp == tile)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return clostList.Contains(tile);
     }
 
-    GameTile GrowPathTo(in GameTile tile, GameTile end, Direction direction)
+    GameTile GrowPathTo(GameTile tile, GameTile end, Direction direction)
     {
         if (tile == null)
             return null;
@@ -105,7 +96,42 @@ public class PathManager
         if (neighbor == null)
             return null;
 
-        // 在关闭列表
+        if (DirectionExtensions.IsDiagonalDirection(direction))
+        {
+            switch (direction)
+            {
+                case Direction.UpRight:
+                    {
+                        if (tile.Up.Content.Type == GameTileContentType.Wall &&
+                        tile.Right.Content.Type == GameTileContentType.Wall)
+                            return null;
+                        break;
+                    }
+                case Direction.UpLeft:
+                    {
+                        if (tile.Up.Content.Type == GameTileContentType.Wall &&
+                        tile.Left.Content.Type == GameTileContentType.Wall)
+                            return null;
+                        break;
+                    }
+                case Direction.DownRight:
+                    {
+                        if (tile.Down.Content.Type == GameTileContentType.Wall &&
+                        tile.Right.Content.Type == GameTileContentType.Wall)
+                            return null;
+                        break;
+                    }
+                case Direction.DownLeft:
+                    {
+                        if (tile.Down.Content.Type == GameTileContentType.Wall &&
+                        tile.Left.Content.Type == GameTileContentType.Wall)
+                            return null;
+                        break;
+                    }
+            }
+        }
+
+        // 在Close列表
         if (IsTileInCloseList(neighbor))
         {
             return null;
