@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameBoard : MonoBehaviour
@@ -17,30 +16,14 @@ public class GameBoard : MonoBehaviour
     Vector2Int size;
 
     GameTile[] tiles;
-
-    Queue<GameTile> searchFrontier = new Queue<GameTile>();
+    public GameTile[] Tiles => tiles;
+    public int TileSize => tiles.Length;
 
     GameTileContentFactory contentFactory;
 
-    public bool hasPath;
-
-    // List<GameTile> spawnPoints = new List<GameTile>();
-    //public int SpawnPointCount => spawnPoints.Count;
-
-    // 现在的位置
-    GameTile nowPoint;
-    public GameTile NowPoint
-    {
-        get => nowPoint;
-        set
-        {
-            nowPoint = value;
-        }
-    }
     // 目标点
     GameTile destinationPoint;
-
-    PathManager pathManager;
+    public GameTile DestinationPoint => destinationPoint;
 
     bool showGrid, showPaths;
     public bool ShowGrid
@@ -132,48 +115,6 @@ public class GameBoard : MonoBehaviour
         {
             GameTile.MakeDiagonalNightbors(tiles[i]);
         }
-
-        pathManager = new PathManager();
-        // ToggleDestination(tiles[tiles.Length / 2]);
-        // ToggleSpawnPoint(tiles[0]);
-    }
-
-    public bool PathFinder()
-    {
-        if (nowPoint == null || destinationPoint == null)
-            return false;
-
-        if (nowPoint == destinationPoint)
-            return true;
-
-        foreach (GameTile tile in tiles)
-        {
-            if (tile.Content.Type == GameTileContentType.Destination)
-            {
-                tile.BecomeDestination();
-            }
-            else if (tile == nowPoint)
-            {
-                tile.ClearPath();
-                searchFrontier.Enqueue(tile);
-            }
-            else
-            {
-                tile.ClearPath();
-            }
-        }
-
-        // hasPath = pathManager.DFS(nowPoint, destinationPoint);
-        hasPath = pathManager.AStart(nowPoint, destinationPoint);
-        if (hasPath && showPaths)
-        {
-            foreach (GameTile tile in tiles)
-            {
-                tile.ShowPath();
-            }
-        }
-
-        return hasPath;
     }
 
     public GameTile GetTile(Ray ray)
@@ -197,12 +138,13 @@ public class GameBoard : MonoBehaviour
         return tiles[index];
     }
 
-    public void ToggleDestination(GameTile tile)
+    public bool ToggleDestination(GameTile tile)
     {
         if (tile.Content.Type == GameTileContentType.Destination)
         {
             // 不做处理，最少要有一个目标点
             Debug.Log("Destination Repeated");
+            return false;
         }
         else if (tile.Content.Type == GameTileContentType.Empty)
         {
@@ -213,40 +155,25 @@ public class GameBoard : MonoBehaviour
             destinationPoint = tile;
 
             SetGameTileContentType(tile, GameTileContentType.Destination);
-            PathFinder();
+            return true;
         }
+
+        return false;
     }
 
     public void ToggleWall (GameTile tile) {
         if (tile.Content.Type == GameTileContentType.Wall)
         {
             SetGameTileContentType(tile, GameTileContentType.Empty);
-            PathFinder();
         }
         else if (tile.Content.Type == GameTileContentType.Empty)
         {
             SetGameTileContentType(tile, GameTileContentType.Wall);
-
-            if (!PathFinder())
-            {
-                SetGameTileContentType(tile, GameTileContentType.Empty);
-                PathFinder();
-            }
         }
 	}
-
-    public GameTile DestinationPoint
-    {
-        get => destinationPoint;
-    }
 
     public void SetGameTileContentType(GameTile tile, GameTileContentType contentType)
     {
         tile.Content = contentFactory.Get(contentType);
-    }
-
-    public int GetTilesSize()
-    {
-        return tiles.Length;
     }
 }

@@ -1,15 +1,7 @@
 ﻿using UnityEngine;
 
-public class PathFinder
+public class PathFinder : IPathFinder
 {
-    public void DoRawSearch()
-    {
 
-    }
-
-    public void DoSearch()
-    {
-
-    }
 
 }

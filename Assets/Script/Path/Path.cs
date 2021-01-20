@@ -1,10 +1,32 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class Path
+namespace IPath
 {
-    List<Vector2Int> square_list_type = new List<Vector2Int>();
+    public enum SearchResult
+    {
+        Ok,
+        CantGetCloser,
+        GoalOutOfRange,
+        Error
+    };
 
-    float pathCost;
-    float goalRadius;
+    public class Path
+    {
+        public Path()
+        {
+            goalRadius = -1f;
+            pathCost = -1f;
+        }
+
+        public List<Vector3> path;
+        public List<Vector2Int> squares;
+
+        public Vector3 desiredGoal;
+        public Vector3 pathGoal;
+
+        public float pathCost;
+        public float goalRadius;
+    }
 }
+

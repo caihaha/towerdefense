@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+
 public class PathManager
 {
-    public PathManager()
-    {
-    }
-
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
 
     List<GameTile> openList = new List<GameTile>();
     HashSet<GameTile> clostList = new HashSet<GameTile>();
+
+    // 到达目标点
+    bool isFinded;
 
     #region AStare
     public bool AStart(GameTile start, GameTile end)
@@ -235,6 +235,94 @@ public class PathManager
     }
     #endregion
 
-    // 到达目标点
-    bool isFinded;
+    #region 数据成员
+    class MultiPath
+    {
+        public IPath.Path path;
+        public IPath.SearchResult searchResult;
+
+        public GameTile start;
+        public GameTile finalGoal;
+
+        public Enemy caller;
+
+        public MultiPath(GameTile startPos)
+        {
+            searchResult = IPath.SearchResult.Error;
+            start = startPos;
+            caller = null;
+        }
+    }
+
+
+    PathFinder pathFinder;
+    Dictionary<uint, MultiPath> pathMap;
+    uint nextPathID;
+    #endregion
+
+    #region 对外接口
+    public void DeletePath(uint pathID)
+    {
+        if (pathID == 0)
+        {
+            return;
+        }
+
+        if (pathMap.ContainsKey(pathID))
+        {
+            pathMap.Remove(pathID);
+        }
+    }
+
+    public void NextWayPoint()
+    {
+
+    }
+
+    public uint RequiredPath(Enemy caller, GameTile startPos, GameTile goalPos)
+    {
+        if(!IsFinalized())
+        {
+            return 0;
+        }
+
+        MultiPath newPath = new MultiPath(startPos);
+        newPath.finalGoal = goalPos;
+        newPath.caller = caller;
+
+        IPath.SearchResult result = ArrangePath(newPath, startPos, goalPos, caller);
+
+        uint pathID;
+        FinalizePath(newPath, startPos, goalPos, result == IPath.SearchResult.CantGetCloser);
+        newPath.searchResult = result;
+        pathID = Store(newPath);
+
+        return pathID;
+    }
+    #endregion
+    
+    #region 内部函数
+    private IPath.SearchResult ArrangePath(MultiPath newPath, GameTile starePos, GameTile goalPos, Enemy caller)
+    {
+        IPath.SearchResult result = pathFinder.GetPath(caller, starePos, newPath.path);
+
+        return result;
+    }
+
+    private uint Store(MultiPath path)
+    {
+        pathMap.Add(++nextPathID, path);
+        return nextPathID;
+    }
+
+    static void FinalizePath(MultiPath path, GameTile startPos, GameTile goalPos, bool cantGerCloser)
+    {
+
+    }
+
+    bool IsFinalized()
+    {
+        return pathFinder != null;
+    }
+    #endregion
 }

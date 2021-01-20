@@ -32,4 +32,9 @@ public static class PathDefs
     }
 }
 
+public static class PathConstants
+{
+    public static uint MAX_SEARCHED_NODES = 655536;
+}
+
 

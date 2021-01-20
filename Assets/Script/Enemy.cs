@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class Enemy : MonoBehaviour
 {
-	#region 数据成员
-	EnemyFactory originFactory;
+    #region 数据成员
+    #region 移动
+    EnemyFactory originFactory;
 
 	GameTile tileFrom, tileTo;
 	Vector3 positionFrom, positionTo;
@@ -23,34 +26,47 @@ public class Enemy : MonoBehaviour
 		}
 	}
 
-	public GameTile TileFrom
-    {
-		get => tileFrom;
+	public GameTile TileFrom => tileFrom;
+
+	public GameTile TileTo => tileTo;
+    #endregion
+
+    #region 寻路
+    PathManager pathManager;
+
+	// 现在的位置
+	GameTile nowPoint;
+	public GameTile NowPoint => nowPoint;
+
+	// 目标点
+	GameTile goalPoint;
+	public GameTile GoalPoint
+	{
+		get => goalPoint;
         set
         {
-			tileFrom = value;
+			goalPoint = value;
         }
-    }
-
-	public GameTile TileTo
-	{
-		get => tileTo;
-		set
-		{
-			tileTo = value;
-		}
 	}
+
+	bool AtGoal => nowPoint == goalPoint;
+
+	uint pathID;
+	#endregion
+
 	#endregion
 
 	#region 初始化
 	public void SpawnOn(GameTile tile)
 	{
-		// Debug.Assert(tile.NextTileOnPath != null, "Nowhere to go!", this);
+		nowPoint = tile;
 		tileFrom = tile;
 		tileTo = tile.NextTileOnPath;
 
 		progress = 0f;
 		PrepareIntro();
+
+		pathManager = new PathManager();
 	}
 
     // 初始化状态
@@ -89,8 +105,6 @@ public class Enemy : MonoBehaviour
 
 		// 更新位置
 		transform.localPosition = Vector3.LerpUnclamped(positionFrom, positionTo, progress);
-		if(tileTo != null)
-			GameBoard.Instance.NowPoint = tileTo;
 
 		// 调整方向
 		if (directionChange != DirectionChange.None)
@@ -98,6 +112,10 @@ public class Enemy : MonoBehaviour
 			float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
 			transform.localRotation = Quaternion.Euler(0f, angle, 0f);
 		}
+
+		if (tileFrom != null)
+			nowPoint = tileFrom;
+
 		return true;
 	}
     #endregion
@@ -158,5 +176,129 @@ public class Enemy : MonoBehaviour
 		directionAngleTo = directionAngleFrom - 135f;
 	}
 
-	#endregion
+    #endregion
+
+    #region Zero-K
+    #region 对外接口
+	public void PathFinder()
+    {
+		if (nowPoint == null || goalPoint == null)
+			return;
+
+		if (AtGoal)
+			return;
+
+		foreach (GameTile tile in GameBoard.Instance.Tiles)
+		{
+			if (tile.Content.Type == GameTileContentType.Destination)
+			{
+				tile.BecomeDestination();
+			}
+			else
+			{
+				tile.ClearPath();
+			}
+		}
+
+		tileTo = null;
+		bool hasPath = pathManager.AStart(nowPoint, goalPoint);
+		if (hasPath && GameBoard.Instance.ShowPaths)
+		{
+			foreach (GameTile tile in GameBoard.Instance.Tiles)
+			{
+				tile.ShowPath();
+			}
+		}
+	}
+
+    public bool Update()
+    {
+		UpdateOwnerHeading();
+		UpdateOwnerPos();
+		HandleObjectCollisions();
+
+		return true;
+    }
+
+	public void StartMoving()
+    {
+		if (nowPoint == null || goalPoint == null)
+			return;
+
+		if (AtGoal)
+			return;
+
+		foreach (GameTile tile in GameBoard.Instance.Tiles)
+		{
+			if (tile.Content.Type == GameTileContentType.Destination)
+			{
+				tile.BecomeDestination();
+			}
+			else
+			{
+				tile.ClearPath();
+			}
+		}
+
+		ReRequestPath();
+	}
+    #endregion
+
+    #region 内部函数
+    private void UpdateOwnerHeading()
+    {
+		FollowPath();
+	}
+
+    private void UpdateOwnerPos()
+    {
+        
+    }
+
+	private void HandleObjectCollisions()
+    {
+
+    }
+
+    private bool FollowPath()
+    {
+		return true;
+    }
+
+	private void ReRequestPath()
+    {
+		StopEngine();
+		StartEngine();
+    }
+
+	private void StopEngine()
+    {
+		if(pathID != 0)
+        {
+			pathManager.DeletePath(pathID);
+			pathID = 0;
+        }
+
+		tileTo = null;
+    }
+
+	private void StartEngine()
+    {
+		if (pathID == 0)
+        {
+			GetNewPath();
+		}
+	}
+
+	private uint GetNewPath()
+    {
+		uint newPathID = 0;
+		newPathID = pathManager.RequiredPath(this, nowPoint, goalPoint);
+
+
+		return newPathID;
+    }
+    #endregion
+
+    #endregion
 }

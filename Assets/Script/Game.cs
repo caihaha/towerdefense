@@ -75,6 +75,7 @@ public class Game : MonoBehaviour
         if(tile != null)
         {
             board.ToggleWall(tile);
+            enemies.PathFinder();
         }
     }
 
@@ -84,20 +85,22 @@ public class Game : MonoBehaviour
         if (tile != null)
         {
             // 目标点
-            board.ToggleDestination(tile);
+            if(board.ToggleDestination(tile))
+            {
+                enemies.SetDestination(tile);
+                enemies.PathFinder();
+            }
         }
     }
 
     // 产生Enemy
     void SpawnEnemy(GameTile tile)
     {
-        board.NowPoint = tile;
         Enemy enemy = enemyFactory.Get();
-        
         enemy.SpawnOn(tile);
-        enemies.Add(enemy);
 
-        board.PathFinder();
+        enemies.Add(enemy);
+        enemy.PathFinder();
     }
     #endregion
 }

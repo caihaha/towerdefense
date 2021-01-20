@@ -19,4 +19,20 @@ public class EnemyCollection
 			enemies[i].GameUpdate();
 		}
 	}
+
+	public void SetDestination(GameTile tile)
+    {
+        for (int i = 0; i < enemies.Count; ++i)
+        { 
+			enemies[i].GoalPoint = tile;
+		}
+	}
+
+	public void PathFinder()
+    {
+		for (int i = 0; i < enemies.Count; i++)
+		{
+			enemies[i].PathFinder();
+		}
+	}
 }
