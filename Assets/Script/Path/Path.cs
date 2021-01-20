@@ -19,11 +19,11 @@ namespace IPath
             pathCost = -1f;
         }
 
-        public List<Vector3> path;
+        public List<GameTile> path;
         public List<Vector2Int> squares;
 
-        public Vector3 desiredGoal;
-        public Vector3 pathGoal;
+        public GameTile desiredGoal;
+        public GameTile pathGoal;
 
         public float pathCost;
         public float goalRadius;

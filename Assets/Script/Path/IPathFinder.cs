@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class IPathFinder
+abstract public class IPathFinder
 {
     #region 数据成员
     public List<PathNode> openBlocks = new List<PathNode>();
@@ -16,20 +16,10 @@ public class IPathFinder
     #endregion
 
     #region 内部函数
-    private IPath.SearchResult DoSearch()
-    {
+    abstract protected IPath.SearchResult DoSearch(Enemy owner);
 
-        return IPath.SearchResult.Ok;
-    }
+    abstract protected void FinishSearch(IPath.Path path);
 
-    private void TestNeighborTiles(PathNode suqare, Enemy owner)
-    {
-
-    }
-
-    private void TestBolock(PathNode suqare, Enemy owner)
-    {
-
-    }
+    abstract protected bool TestBlock(PathNode suqare, Enemy owner);
     #endregion
 }

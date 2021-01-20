@@ -1,11 +1,5 @@
 ﻿using UnityEngine;
 
-public enum PathSearchResult
-{
-    Ok,
-    CantGetCloser
-}
-
 public enum PathFindType
 {
     DFS,
