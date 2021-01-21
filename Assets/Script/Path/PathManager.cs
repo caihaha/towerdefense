@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PathManager
 {
+    #region A*和DFS
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
 
     List<GameTile> openList = new List<GameTile>();
@@ -236,6 +237,8 @@ public class PathManager
     }
     #endregion
 
+    #endregion
+
     #region 数据成员
     class MultiPath
     {
@@ -307,14 +310,14 @@ public class PathManager
     #endregion
     
     #region 内部函数
-    private IPath.SearchResult ArrangePath(MultiPath newPath, GameTile starePos, GameTile goalPos, Enemy caller)
+    IPath.SearchResult ArrangePath(MultiPath newPath, GameTile starePos, GameTile goalPos, Enemy caller)
     {
         IPath.SearchResult result = pathFinder.GetPath(caller, starePos, goalPos, newPath.path);
 
         return result;
     }
 
-    private uint Store(MultiPath path)
+    uint Store(MultiPath path)
     {
         pathMap.Add(++nextPathID, path);
         return nextPathID;

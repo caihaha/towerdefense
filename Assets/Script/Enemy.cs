@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
     #region 移动
     EnemyFactory originFactory;
 
-	GameTile tileFrom, tileTo;
+	GameTile currWayPoint, nextWayPoint;
 	Vector3 positionFrom, positionTo;
 	float progress;
 
@@ -25,10 +25,6 @@ public class Enemy : MonoBehaviour
 			originFactory = value;
 		}
 	}
-
-	public GameTile TileFrom => tileFrom;
-
-	public GameTile TileTo => tileTo;
     #endregion
 
     #region 寻路
@@ -36,7 +32,6 @@ public class Enemy : MonoBehaviour
 
 	// 现在的位置
 	GameTile nowPoint;
-	public GameTile NowPoint => nowPoint;
 
 	// 目标点
 	GameTile goalPoint;
@@ -60,8 +55,8 @@ public class Enemy : MonoBehaviour
 	public void SpawnOn(GameTile tile)
 	{
 		nowPoint = tile;
-		tileFrom = tile;
-		tileTo = tile.NextTileOnPath;
+		currWayPoint = tile;
+		nextWayPoint = null;
 
 		progress = 0f;
 		PrepareIntro();
@@ -72,9 +67,9 @@ public class Enemy : MonoBehaviour
     // 初始化状态
     void PrepareIntro()
 	{
-		positionFrom = tileFrom.transform.localPosition;
-		positionTo = tileFrom.ExitPoint;
-		direction = tileFrom.PathDirection;
+		positionFrom = currWayPoint.transform.localPosition;
+		positionTo = currWayPoint.ExitPoint;
+		direction = currWayPoint.PathDirection;
 		directionChange = DirectionChange.None;
 		directionAngleFrom = directionAngleTo = direction.GetAngle();
 		transform.localRotation = direction.GetRotation();
@@ -87,16 +82,16 @@ public class Enemy : MonoBehaviour
 		progress += Time.deltaTime;
 		while (progress >= 1f)
 		{
-			// tileFrom当前位置
-			if (tileTo != null)
+			// currWayPoint当前位置
+			if (nextWayPoint != null)
             {
-				tileFrom = tileTo;
+				currWayPoint = nextWayPoint;
 			}
 
-			tileTo = tileFrom.NextTileOnPath;
-			if (tileTo != null && tileTo.IsDiatance)
+			nextWayPoint = currWayPoint.NextTileOnPath;
+			if (nextWayPoint != null && nextWayPoint.IsDiatance)
             {
-				tileTo.PathDirection = tileFrom.PathDirection;
+				nextWayPoint.PathDirection = currWayPoint.PathDirection;
 			}
 
 			progress -= 1f;
@@ -113,8 +108,8 @@ public class Enemy : MonoBehaviour
 			transform.localRotation = Quaternion.Euler(0f, angle, 0f);
 		}
 
-		if (tileFrom != null)
-			nowPoint = tileFrom;
+		if (currWayPoint != null)
+			nowPoint = currWayPoint;
 
 		return true;
 	}
@@ -124,9 +119,9 @@ public class Enemy : MonoBehaviour
     void PrepareNextState()
 	{
 		positionFrom = positionTo;
-		positionTo = tileFrom.ExitPoint;
-		directionChange = direction.GetDirectionChangeTo(tileFrom.PathDirection);
-		direction = tileFrom.PathDirection;
+		positionTo = currWayPoint.ExitPoint;
+		directionChange = direction.GetDirectionChangeTo(currWayPoint.PathDirection);
+		direction = currWayPoint.PathDirection;
 		directionAngleFrom = directionAngleTo;
 
 		switch (directionChange)
@@ -200,7 +195,7 @@ public class Enemy : MonoBehaviour
 			}
 		}
 
-		tileTo = null;
+		nextWayPoint = null;
 		bool hasPath = pathManager.AStart(nowPoint, goalPoint);
 		if (hasPath && GameBoard.Instance.ShowPaths)
 		{
@@ -279,7 +274,7 @@ public class Enemy : MonoBehaviour
 			pathID = 0;
         }
 
-		tileTo = null;
+		nextWayPoint = null;
     }
 
 	private void StartEngine()
@@ -303,7 +298,28 @@ public class Enemy : MonoBehaviour
     {
 
     }
-    #endregion
 
-    #endregion
+	void GetnextWayPoint()
+	{
+		positionFrom = positionTo;
+		positionTo = currWayPoint.ExitPoint;
+		directionChange = direction.GetDirectionChangeTo(currWayPoint.PathDirection);
+		direction = currWayPoint.PathDirection;
+		directionAngleFrom = directionAngleTo;
+
+		switch (directionChange)
+		{
+			case DirectionChange.None: PrepareForward(); break;
+			case DirectionChange.TurnUpRight: PrepareTurnUpRight(); break;
+			case DirectionChange.TurnRight: PrepareTurnRight(); break;
+			case DirectionChange.TurnAroundRight: PrepareTurnAroundRight(); break;
+			case DirectionChange.TurnAround: PrepareTurnAround(); break;
+			case DirectionChange.TurnAroundLeft: PrepareTurnAroundLeft(); break;
+			case DirectionChange.TurnLeft: PrepareTurnLeft(); break;
+			default: PrepareTurnUpLeft(); break;
+		}
+	}
+	#endregion
+
+	#endregion
 }
