@@ -8,7 +8,7 @@ public class PathFinder : IPathFinder
 
         while (openBlocks.Count > 0)
         {
-            PathNode node = GetLeastFTile();
+            PathNode node = GetLeastFCostNode();
             if (node == null)
                 continue;
 
@@ -58,14 +58,7 @@ public class PathFinder : IPathFinder
         float fCost = gCost + hCost;
 
         PathNode openBlock = GetOpenBlocksByTiles(nextTile);
-        if (openBlock != null)
-        {
-            if (fCost >= openBlock.fCost)
-            {
-                return false;
-            }
-        }
-        else
+        if (openBlock == null)
         {
             openBlock = new PathNode();
             openBlock.tile = nextTile;
@@ -79,7 +72,7 @@ public class PathFinder : IPathFinder
     }
 
     #region 内部函数
-    PathNode GetLeastFTile()
+    PathNode GetLeastFCostNode()
     {
         if (openBlocks == null)
             return null;

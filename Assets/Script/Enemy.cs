@@ -123,9 +123,10 @@ public class Enemy : MonoBehaviour
 				currWayPoint = nextWayPoint;
 			}
 
-			nextWayPoint = pathManager.NextWayPoint(pathID);
-			// 到达终点
-			nextWayPoint = nextWayPoint == null ? currWayPoint : nextWayPoint;
+			do
+			{
+				nextWayPoint = pathManager.NextWayPoint(pathID);
+			} while (nextWayPoint == currWayPoint);
 
 			progress -= 1f;
 			PrepareNextState();
@@ -137,6 +138,8 @@ public class Enemy : MonoBehaviour
 			float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
 			transform.localRotation = Quaternion.Euler(0f, angle, 0f);
 		}
+
+		nowPoint = currWayPoint;
 	}
 
 	// 更新位置
@@ -177,10 +180,7 @@ public class Enemy : MonoBehaviour
 
 	private uint GetNewPath()
     {
-		uint newPathID = 0;
-		newPathID = pathManager.RequiredPath(this, nowPoint, goalPoint);
-
-		return newPathID;
+		return pathManager.RequiredPath(this, nowPoint, goalPoint); ;
     }
 
 	private bool FollowPath()
@@ -197,16 +197,15 @@ public class Enemy : MonoBehaviour
 	{
 		
 	}
-
 	#region 改变下一个状态
 	void PrepareNextState()
 	{
 		positionFrom = positionTo;
 		positionTo = currWayPoint.ExitPoint;
 
-		if (currWayPoint != nextWayPoint)
+		if (currWayPoint != null && currWayPoint != nowPoint)
 		{
-			direction = currWayPoint.GetDirectionByTile(nextWayPoint);
+			direction = nowPoint.GetDirectionByTile(currWayPoint);
 			directionChange = direction.GetDirectionChangeTo(direction);
 		}
 
