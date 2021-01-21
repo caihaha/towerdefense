@@ -53,7 +53,7 @@ public class PathFinder : IPathFinder
         }
 
         // 计算fCost
-        float gCost = PathDefs.CalcG(parentSquare.tile, nextTile, dir);
+        float gCost = PathDefs.CalcG(parentSquare.gCost, nextTile, dir);
         float hCost = PathDefs.Heuristic(goalTile, nextTile);
         float fCost = gCost + hCost;
 
@@ -100,6 +100,9 @@ public class PathFinder : IPathFinder
     {
         GameTile tile = ob.tile;
 
+        if (tile == null)
+            return;
+
         for (Direction dir = Direction.Begin; dir < Direction.End; ++dir)
         {
             // 上下左右
@@ -110,7 +113,12 @@ public class PathFinder : IPathFinder
             // 对角线
             else
             {
+                GameTile neighbor = tile.GetTileByDirection(dir);
+                if (neighbor == null)
+                    continue;
+
                 bool isCanPath = true;
+
                 switch (dir)
                 {
                     case Direction.UpRight:

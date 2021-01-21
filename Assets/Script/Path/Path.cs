@@ -19,7 +19,7 @@ namespace IPath
             pathCost = -1f;
         }
 
-        public List<GameTile> path;
+        public List<GameTile> path = new List<GameTile>();
 
         public GameTile desiredGoal;
         public GameTile pathGoal;

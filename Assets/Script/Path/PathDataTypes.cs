@@ -5,7 +5,7 @@ public class PathNode
     public float fCost;
     public float gCost;
 
-    public GameTile tile;
+    public GameTile tile = new GameTile();
 
     public static bool operator < (PathNode lpn, PathNode rpn)
     {
@@ -15,16 +15,6 @@ public class PathNode
     public static bool operator > (PathNode lpn, PathNode rpn)
     {
         return lpn.fCost > rpn.fCost;
-    }
-
-    public static bool operator == (PathNode lpn, PathNode rpn)
-    {
-        return lpn.tile == rpn.tile;
-    }
-
-    public static bool operator !=(PathNode lpn, PathNode rpn)
-    {
-        return lpn.tile != rpn.tile;
     }
 }
 

@@ -54,7 +54,7 @@ public class GameBoard : MonoBehaviour
             {
                 foreach (GameTile tile in tiles)
                 {
-                    tile.ShowPath();
+                    // tile.ShowPath();
                 }
             }
             else

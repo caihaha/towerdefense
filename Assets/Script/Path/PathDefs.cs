@@ -20,9 +20,9 @@ public static class PathDefs
         return ((dx + dz) * c1 + Mathf.Min(dx, dz) * c2);
     }
 
-    public static float CalcG(GameTile parentTile, GameTile tile, Direction direction)
+    public static float CalcG(float parentgCost, GameTile tile, Direction direction)
     {
-        return tile.gCost = parentTile.gCost + (DirectionExtensions.IsDiagonalDirection(direction) ? 1.4142f : 1f);
+        return parentgCost + (DirectionExtensions.IsDiagonalDirection(direction) ? 1.4142f : 1f);
     }
 }
 

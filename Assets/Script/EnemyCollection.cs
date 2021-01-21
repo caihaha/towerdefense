@@ -32,7 +32,7 @@ public class EnemyCollection
     {
 		for (int i = 0; i < enemies.Count; i++)
 		{
-			enemies[i].PathFinder();
+			enemies[i].StartMoving();
 		}
 	}
 }

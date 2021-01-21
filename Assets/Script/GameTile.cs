@@ -20,11 +20,6 @@ public class GameTile : MonoBehaviour
 
     public uint num;
 
-    // lastOnPath广度优先搜索使用
-    GameTile nextOnPath, lastOnPath;
-
-    float distance;
-
     static Quaternion upRotation = Quaternion.Euler(90f, 0f, 0f);
     static Quaternion upRightRotation = Quaternion.Euler(90f, 45f, 0f);
     static Quaternion rightRotation = Quaternion.Euler(90f, 90f, 0f);
@@ -37,40 +32,6 @@ public class GameTile : MonoBehaviour
     GameTileContent content;
     public Vector3 ExitPoint { get; set; }
 
-    public GameTile NextTileOnPath => nextOnPath;
-
-    // lastDirection记录父节点过来的方向，回溯的时候用
-    public GameTile LastTileOnPath
-    {
-        get => lastOnPath;
-        set
-        {
-            lastOnPath = value;
-        }
-    }
-
-    private Direction lastDirection;
-    public Direction LastDirection
-    {
-        get => lastDirection;
-        set
-        {
-            lastDirection = value;
-        }
-    }
-
-    private Direction pathDirection;
-    public Direction PathDirection
-    {
-        get => pathDirection;
-        set
-        {
-            pathDirection = value;
-        }
-    }
-
-    // A*寻路
-    public float fCost, gCost;
     #endregion
 
     public static void MakeRightLeftNightbors(GameTile right, GameTile left)
@@ -112,65 +73,15 @@ public class GameTile : MonoBehaviour
 
     public void ClearPath()
     {
-        distance = float.MaxValue;
-        nextOnPath = null;
-        lastOnPath = null;
-
-        gCost = 0f;
-        fCost = float.MaxValue;
-
         ExitPoint = transform.localPosition;
     }
 
     public void BecomeDestination()
     {
-        distance = 0;
-        nextOnPath = null;
-        lastOnPath = null;
-
-        gCost = 0f;
-        fCost = float.MaxValue;
-
         ExitPoint = transform.localPosition;
     }
 
-    public bool HasPath => distance != float.MaxValue;
-    public bool IsDiatance => Mathf.Abs(distance) <= 0.00001f;
-
-    public GameTile BackPathTo(GameTile neighbor, Direction direction)
-    {
-        if (neighbor == null || neighbor.HasPath)
-        {
-            return null;
-        }
-
-        neighbor.distance += DirectionExtensions.IsDiagonalDirection(direction) ? distance + 1.4142f : distance + 1f;
-
-        neighbor.nextOnPath = this;
-        neighbor.ExitPoint = neighbor.transform.localPosition; // (neighbor.transform.localPosition + transform.localPosition) * 0.5f;
-
-        neighbor.PathDirection = direction;
-        return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
-    }
-
-    public void ShowPath()
-    {
-        if (IsDiatance || nextOnPath == null)
-        {
-            arrow.gameObject.SetActive(false);
-            return;
-        }
-        arrow.gameObject.SetActive(true);
-        arrow.localRotation =
-            nextOnPath == up ? upRotation :
-            nextOnPath == upRight ? upRightRotation :
-            nextOnPath == right ? rightRotation :
-            nextOnPath == downRight ? downRightRotation :
-            nextOnPath == down ? downRotation :
-            nextOnPath == downLeft ? downLeftRotation :
-            nextOnPath == left ? leftRotation :
-            upLeftRotation;
-    }
+    public bool IsDestination => Content.Type == GameTileContentType.Destination;
 
     // 用于交替搜索优先级
     public bool IsAlternative { get; set; }
@@ -205,5 +116,23 @@ public class GameTile : MonoBehaviour
             direction == Direction.DownLeft ? downLeft :
             direction == Direction.DownRight ? downRight :
             down;
+    }
+
+    public Direction GetDirectionByTile(GameTile tile)
+    {
+        if(tile == null)
+        {
+            Debug.LogError("GetDirectionByTile, tile is null");
+            return Direction.Up;
+        }
+
+        return tile == up ? Direction.Up :
+            tile == upLeft ? Direction.UpLeft :
+            tile == upRight ? Direction.UpRight :
+            tile == left ? Direction.Left :
+            tile == right ? Direction.Right :
+            tile == downLeft ? Direction.DownLeft :
+            tile == downRight ? Direction.DownRight :
+            Direction.Down;
     }
 }

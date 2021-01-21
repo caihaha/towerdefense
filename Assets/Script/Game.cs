@@ -54,10 +54,10 @@ public class Game : MonoBehaviour
             HandleAlternativeTouch();
         }
 
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            board.ShowPaths = !board.ShowPaths;
-        }
+        //if (Input.GetKeyDown(KeyCode.V))
+        //{
+        //    board.ShowPaths = !board.ShowPaths;
+        //}
 
         if (Input.GetKeyDown(KeyCode.G))
         {
@@ -100,7 +100,7 @@ public class Game : MonoBehaviour
         enemy.SpawnOn(tile);
 
         enemies.Add(enemy);
-        enemy.PathFinder();
+        enemy.StartMoving();
     }
     #endregion
 }
