@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
 
-public struct PathNode
+public class PathNode
 {
     public float fCost;
-    public float gCose;
+    public float gCost;
 
-    public int nodeNum;
     public GameTile tile;
 
     public static bool operator < (PathNode lpn, PathNode rpn)
@@ -20,12 +19,12 @@ public struct PathNode
 
     public static bool operator == (PathNode lpn, PathNode rpn)
     {
-        return lpn.nodeNum == rpn.nodeNum;
+        return lpn.tile == rpn.tile;
     }
 
     public static bool operator !=(PathNode lpn, PathNode rpn)
     {
-        return lpn.nodeNum != rpn.nodeNum;
+        return lpn.tile != rpn.tile;
     }
 }
 

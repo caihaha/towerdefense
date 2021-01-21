@@ -39,7 +39,8 @@ public class PathManager
                 if (nextTile == null)
                     continue;
 
-                openList.Add(nextTile);
+                if(!IsTileInOpenList(nextTile))
+                    openList.Add(nextTile);
             }
         }
 
@@ -157,6 +158,15 @@ public class PathManager
 
         return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
     }
+
+    void FinishPath(GameTile start, GameTile end)
+    {
+        GameTile tmp = end;
+        while (tmp != null && tmp != start)
+        {
+            tmp = tmp.BackPathTo(tmp.LastTileOnPath, tmp.LastDirection);
+        }
+    }
     #endregion
 
     #region DFS
@@ -192,15 +202,6 @@ public class PathManager
             FinishPath(start, end);
 
         return isFinded;
-    }
-
-    void FinishPath(GameTile start, GameTile end)
-    {
-        GameTile tmp = end;
-        while (tmp != null && tmp != start)
-        {
-            tmp = tmp.BackPathTo(tmp.LastTileOnPath, tmp.LastDirection);
-        }
     }
 
     bool IsDestination(GameTile tile)
@@ -254,13 +255,17 @@ public class PathManager
         }
     }
 
-
     PathFinder pathFinder;
-    Dictionary<uint, MultiPath> pathMap;
+    Dictionary<uint, MultiPath> pathMap = new Dictionary<uint, MultiPath>();
     uint nextPathID;
     #endregion
 
     #region 对外接口
+    public PathManager()
+    {
+        pathFinder = new PathFinder();
+    }
+
     public void DeletePath(uint pathID)
     {
         if (pathID == 0)
@@ -304,7 +309,7 @@ public class PathManager
     #region 内部函数
     private IPath.SearchResult ArrangePath(MultiPath newPath, GameTile starePos, GameTile goalPos, Enemy caller)
     {
-        IPath.SearchResult result = pathFinder.GetPath(caller, starePos, newPath.path);
+        IPath.SearchResult result = pathFinder.GetPath(caller, starePos, goalPos, newPath.path);
 
         return result;
     }
@@ -315,7 +320,7 @@ public class PathManager
         return nextPathID;
     }
 
-    static void FinalizePath(MultiPath path, GameTile startPos, GameTile goalPos, bool cantGerCloser)
+    static void FinalizePath(MultiPath path, GameTile startPos, GameTile goalPos, bool cantGetCloser)
     {
 
     }

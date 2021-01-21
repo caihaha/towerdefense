@@ -18,8 +18,11 @@ public class GameTile : MonoBehaviour
     public GameTile UpLeft => upLeft;
     public GameTile DownLeft => downLeft;
 
+    public uint num;
+
     // lastOnPath广度优先搜索使用
     GameTile nextOnPath, lastOnPath;
+
     float distance;
 
     static Quaternion upRotation = Quaternion.Euler(90f, 0f, 0f);

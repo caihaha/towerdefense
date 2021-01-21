@@ -20,7 +20,6 @@ namespace IPath
         }
 
         public List<GameTile> path;
-        public List<Vector2Int> squares;
 
         public GameTile desiredGoal;
         public GameTile pathGoal;

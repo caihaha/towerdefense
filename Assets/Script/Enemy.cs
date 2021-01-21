@@ -213,7 +213,7 @@ public class Enemy : MonoBehaviour
 
     public bool Update()
     {
-		UpdateOwnerHeading();
+		UpdateOwnerSpeedAndHeading();
 		UpdateOwnerPos();
 		HandleObjectCollisions();
 
@@ -245,7 +245,7 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region 内部函数
-    private void UpdateOwnerHeading()
+    private void UpdateOwnerSpeedAndHeading()
     {
 		FollowPath();
 	}
@@ -286,7 +286,7 @@ public class Enemy : MonoBehaviour
     {
 		if (pathID == 0)
         {
-			GetNewPath();
+			pathID = GetNewPath();
 		}
 	}
 
@@ -297,6 +297,11 @@ public class Enemy : MonoBehaviour
 
 
 		return newPathID;
+    }
+
+	private void ChangeHeading()
+    {
+
     }
     #endregion
 
