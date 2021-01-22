@@ -150,8 +150,13 @@ public class Enemy : MonoBehaviour
 
 	private void HandleObjectCollisions()
     {
+		HandleStaticObjectCollision();
+	}
 
-    }
+	private void HandleStaticObjectCollision()
+	{
+
+	}
 
 	private void ReRequestPath()
     {
@@ -175,6 +180,7 @@ public class Enemy : MonoBehaviour
 		if (pathID == 0)
         {
 			pathID = GetNewPath();
+			progress = 1;
 		}
 	}
 

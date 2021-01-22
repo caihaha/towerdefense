@@ -44,7 +44,7 @@ public class PathFinder : IPathFinder
     override protected bool TestBlock(PathNode parentSquare, GameTile goalTile, Enemy owner, Direction dir)
     {
         GameTile nextTile = parentSquare.tile.GetTileByDirection(dir);
-        if (nextTile == null)
+        if (nextTile == null || nextTile.Content.Type == GameTileContentType.Wall)
             return false;
 
         // 在Close列表
