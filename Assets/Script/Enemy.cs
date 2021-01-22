@@ -126,7 +126,7 @@ public class Enemy : MonoBehaviour
 			do
 			{
 				nextWayPoint = pathManager.NextWayPoint(pathID);
-			} while (nextWayPoint == currWayPoint);
+			} while (nextWayPoint == currWayPoint && nextWayPoint != null);
 
 			progress -= 1f;
 			PrepareNextState();
@@ -180,7 +180,12 @@ public class Enemy : MonoBehaviour
 		if (pathID == 0)
         {
 			pathID = GetNewPath();
-			progress = 1;
+			progress = 1f;
+			GameTile nextPoint = pathManager.NextWayPoint(pathID);
+			if(nextPoint != null)
+            {
+				currWayPoint = nextPoint;
+            }				
 		}
 	}
 
@@ -198,11 +203,6 @@ public class Enemy : MonoBehaviour
     {
 
     }
-
-	void GetNextWayPoint()
-	{
-		
-	}
 	#region 改变下一个状态
 	void PrepareNextState()
 	{
