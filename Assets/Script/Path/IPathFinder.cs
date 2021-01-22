@@ -5,7 +5,9 @@ abstract public class IPathFinder
 {
     #region 数据成员
     public List<PathNode> openBlocks = new List<PathNode>();
-    public HashSet<PathNode> clostBlocks = new HashSet<PathNode>();
+    public HashSet<PathNode> closeBlocks = new HashSet<PathNode>();
+
+    public PathNodeStateBuffer blockStates = new PathNodeStateBuffer();
     #endregion
 
     #region 对外接口
@@ -14,7 +16,7 @@ abstract public class IPathFinder
         IPath.SearchResult result = InitSeatch(owner, startPos, goalPos);
         if(result == IPath.SearchResult.Ok || result == IPath.SearchResult.GoalOutOfRange)
         {
-            FinishSearch(path);
+            FinishSearch(path, startPos, goalPos);
         }
 
         return result;
@@ -38,13 +40,13 @@ abstract public class IPathFinder
 
     protected void ResetSearch()
     {
-        clostBlocks.Clear();
+        closeBlocks.Clear();
         openBlocks.Clear();
     }
 
     abstract protected IPath.SearchResult DoSearch(Enemy owner, GameTile goalPos);
 
-    abstract protected void FinishSearch(IPath.Path path);
+    abstract protected void FinishSearch(IPath.Path path, GameTile startPos, GameTile goalPos);
 
     abstract protected bool TestBlock(PathNode parentSquare, GameTile goalTile, Enemy owner, Direction dir);
     #endregion

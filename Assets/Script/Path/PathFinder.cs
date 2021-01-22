@@ -12,7 +12,8 @@ public class PathFinder : IPathFinder
             if (node == null)
                 continue;
 
-            clostBlocks.Add(node);
+
+            closeBlocks.Add(node);
             if (node.tile.Content.Type == GameTileContentType.Destination)
             {
                 isFinded = true;
@@ -25,18 +26,18 @@ public class PathFinder : IPathFinder
         return isFinded ? IPath.SearchResult.Ok : IPath.SearchResult.Error;
     }
 
-    override protected void FinishSearch(IPath.Path foundPath)
+    override protected void FinishSearch(IPath.Path foundPath, GameTile startPos, GameTile goalPos)
     {
-        int i = 0;
-        foreach(var node in clostBlocks)
+        GameTile tile = goalPos;
+        while (true)
         {
-            foundPath.path.Add(node.tile);
-
-            if(++i == clostBlocks.Count)
+            if (tile == null || tile == startPos)
             {
-                foundPath.pathGoal = node.tile;
-                foundPath.pathCost = node.fCost;
+                break;
             }
+
+            foundPath.path.Push(tile);
+            tile = blockStates.parentTile[(int)tile.num];
         }
     }
 
@@ -58,7 +59,14 @@ public class PathFinder : IPathFinder
         float fCost = gCost + hCost;
 
         PathNode openBlock = GetOpenBlocksByTiles(nextTile);
-        if (openBlock == null)
+        if (openBlock != null)
+        {
+            if (gCost >= openBlock.gCost)
+            {
+                return false;
+            }
+        }
+        else
         {
             openBlock = new PathNode();
             openBlock.tile = nextTile;
@@ -67,6 +75,8 @@ public class PathFinder : IPathFinder
 
         openBlock.gCost = gCost;
         openBlock.fCost = fCost;
+
+        blockStates.parentTile[(int)nextTile.num] = parentSquare.tile;
 
         return true;
     }
@@ -154,7 +164,7 @@ public class PathFinder : IPathFinder
 
     bool IsTileInCloseBlocks(GameTile tile)
     {
-        foreach (var tmp in clostBlocks)
+        foreach (var tmp in closeBlocks)
         {
             if (tmp.tile == tile)
             {

@@ -56,8 +56,7 @@ public class PathManager
         GameTile tile = null;
         if (multiPath.path != null && multiPath.path.path.Count > 0)
         {
-            tile = multiPath.path.path[0];
-            multiPath.path.path.RemoveAt(0);
+            tile = multiPath.path.path.Pop();
         }
 
         return tile;

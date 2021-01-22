@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
 
 public class PathNode
 {
     public float fCost;
     public float gCost;
 
-    public GameTile tile = new GameTile();
+    public GameTile tile;
 
     public static bool operator < (PathNode lpn, PathNode rpn)
     {
@@ -41,6 +42,22 @@ public class PathNodeBuffer
     }
 
     private uint idx;
-    private PathNode[] buffer = new PathNode[65535];
+    private PathNode[] buffer = new PathNode[65536];
+}
+
+public class PathNodeStateBuffer
+{
+    public List<float> fCost = new List<float>(Common.BoardCount);
+    public List<float> gCost = new List<float>(Common.BoardCount);
+
+    public List<GameTile> parentTile = new List<GameTile>(Common.BoardCount);
+
+    public PathNodeStateBuffer()
+    {
+        for(int i = 0; i < parentTile.Capacity; ++i)
+        {
+            parentTile.Add(null);
+        }
+    }
 }
 
