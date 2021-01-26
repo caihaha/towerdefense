@@ -75,7 +75,8 @@ public class Game : MonoBehaviour
         if(tile != null)
         {
             board.ToggleWall(tile);
-            enemies.PathFinder();
+            // 不直接重新寻路，因为有可能障碍物不在路径上，就算在障碍物上也有可能会再变化，先避障重新寻路
+            // enemies.PathFinder();
         }
     }
 

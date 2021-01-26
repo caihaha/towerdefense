@@ -107,7 +107,7 @@ public class Enemy : MonoBehaviour
 			}
 		}
 
-		ReRequestPath();
+		ReRequestPath(nowPoint);
 	}
     #endregion
 
@@ -123,10 +123,7 @@ public class Enemy : MonoBehaviour
 				currWayPoint = nextWayPoint;
 			}
 
-			do
-			{
-				nextWayPoint = pathManager.NextWayPoint(pathID);
-			} while (nextWayPoint == currWayPoint && nextWayPoint != null);
+			nextWayPoint = pathManager.NextWayPoint(pathID);
 
 			progress -= 1f;
 			PrepareNextState();
@@ -150,7 +147,9 @@ public class Enemy : MonoBehaviour
 
 	private void HandleObjectCollisions()
     {
-		HandleStaticObjectCollision();
+		// HandleStaticObjectCollision();
+
+		// HandleStaticObjectCollision(this);
 	}
 
 	private void HandleStaticObjectCollision()
@@ -158,10 +157,28 @@ public class Enemy : MonoBehaviour
 
 	}
 
-	private void ReRequestPath()
+	private void HandleStaticObjectCollision(Enemy collider)
+	{
+		bool wantRequestPath = false;
+
+		if (nextWayPoint == null || nextWayPoint.Content.Type != GameTileContentType.Wall)
+		{
+			return;
+		}
+
+		nextWayPoint = currWayPoint.Up;
+		wantRequestPath = true;
+
+		if (wantRequestPath)
+		{
+			ReRequestPath(nextWayPoint);
+		}
+	}
+
+	private void ReRequestPath(GameTile startPoint)
     {
 		StopEngine();
-		StartEngine();
+		StartEngine(startPoint);
     }
 
 	private void StopEngine()
@@ -175,23 +192,23 @@ public class Enemy : MonoBehaviour
 		nextWayPoint = null;
     }
 
-	private void StartEngine()
+	private void StartEngine(GameTile startPoint)
     {
 		if (pathID == 0)
         {
-			pathID = GetNewPath();
+			pathID = GetNewPath(startPoint);
 			progress = 1f;
 			GameTile nextPoint = pathManager.NextWayPoint(pathID);
-			if(nextPoint != null)
+			if (nextPoint != null)
             {
 				currWayPoint = nextPoint;
-            }				
+            }		
 		}
 	}
 
-	private uint GetNewPath()
+	private uint GetNewPath(GameTile startPoint)
     {
-		return pathManager.RequiredPath(this, nowPoint, goalPoint); ;
+		return pathManager.RequiredPath(this, startPoint, goalPoint); ;
     }
 
 	private bool FollowPath()
