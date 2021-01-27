@@ -147,27 +147,49 @@ public class Enemy : MonoBehaviour
 
 	private void HandleObjectCollisions()
     {
-		// HandleStaticObjectCollision();
+		// HandleUnitObjectCollision();
 
-		// HandleStaticObjectCollision(this);
+		HandleStaticObjectCollision(this);
 	}
 
-	private void HandleStaticObjectCollision()
+	private void HandleUnitObjectCollision()
 	{
-
+		
 	}
 
 	private void HandleStaticObjectCollision(Enemy collider)
 	{
-		bool wantRequestPath = false;
-
-		if (nextWayPoint == null || nextWayPoint.Content.Type != GameTileContentType.Wall)
+		if (nextWayPoint == null || 
+			(nextWayPoint.Content.Type != GameTileContentType.Wall && 
+			!DirectionExtensions.IsBlocked(currWayPoint, nextWayPoint, currWayPoint.GetDirectionByTile(nextWayPoint))))
 		{
 			return;
 		}
 
-		nextWayPoint = currWayPoint.Up;
-		wantRequestPath = true;
+		bool wantRequestPath = false;
+		float fCost = float.MaxValue;
+
+		for (Direction dir = Direction.Begin; dir != Direction.End; ++dir)
+        {
+			GameTile nextTile = currWayPoint.GetTileByDirection(dir);
+
+			if(nextTile == null || 
+			   nextTile.Content.Type == GameTileContentType.Wall || 
+			   DirectionExtensions.IsBlocked(currWayPoint, nextTile, dir))
+            {
+				continue;
+            }
+
+			float gCost = PathDefs.CalcG(0, dir);
+			float hCost = PathDefs.Heuristic(goalPoint, nextTile);
+
+			if(gCost + hCost < fCost)
+            {
+				fCost = gCost + hCost;
+				nextWayPoint = nextTile;
+				wantRequestPath = true;
+			}
+		}
 
 		if (wantRequestPath)
 		{
@@ -188,8 +210,6 @@ public class Enemy : MonoBehaviour
 			pathManager.DeletePath(pathID);
 			pathID = 0;
         }
-
-		nextWayPoint = null;
     }
 
 	private void StartEngine(GameTile startPoint)
@@ -197,12 +217,32 @@ public class Enemy : MonoBehaviour
 		if (pathID == 0)
         {
 			pathID = GetNewPath(startPoint);
-			progress = 1f;
+
+			if(startPoint == nextWayPoint)
+            {
+				return;
+            }
+
 			GameTile nextPoint = pathManager.NextWayPoint(pathID);
 			if (nextPoint != null)
             {
 				currWayPoint = nextPoint;
-            }		
+				nextWayPoint = pathManager.NextWayPoint(pathID);
+
+				PrepareNextState();
+
+				// 调整方向
+				if (directionChange != DirectionChange.None)
+				{
+					float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
+					transform.localRotation = Quaternion.Euler(0f, angle, 0f);
+				}
+
+				nowPoint = currWayPoint;
+
+				UpdateOwnerPos();
+				HandleObjectCollisions();
+			}
 		}
 	}
 

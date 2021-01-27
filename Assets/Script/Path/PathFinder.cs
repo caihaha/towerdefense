@@ -54,7 +54,7 @@ public class PathFinder : IPathFinder
         }
 
         // 计算fCost
-        float gCost = PathDefs.CalcG(parentSquare.gCost, nextTile, dir);
+        float gCost = PathDefs.CalcG(parentSquare.gCost, dir);
         float hCost = PathDefs.Heuristic(goalTile, nextTile);
         float fCost = gCost + hCost;
 
@@ -117,45 +117,11 @@ public class PathFinder : IPathFinder
             else
             {
                 GameTile neighbor = tile.GetTileByDirection(dir);
-                if (neighbor == null)
-                    continue;
 
-                bool isCanPath = true;
-
-                switch (dir)
+                if (DirectionExtensions.IsBlocked(tile, neighbor, dir))
                 {
-                    case Direction.UpRight:
-                        {
-                            if (tile.Up.Content.Type == GameTileContentType.Wall &&
-                            tile.Right.Content.Type == GameTileContentType.Wall)
-                                isCanPath = false;
-                            break;
-                        }
-                    case Direction.UpLeft:
-                        {
-                            if (tile.Up.Content.Type == GameTileContentType.Wall &&
-                            tile.Left.Content.Type == GameTileContentType.Wall)
-                                isCanPath = false;
-                            break;
-                        }
-                    case Direction.DownRight:
-                        {
-                            if (tile.Down.Content.Type == GameTileContentType.Wall &&
-                            tile.Right.Content.Type == GameTileContentType.Wall)
-                                isCanPath = false;
-                            break;
-                        }
-                    case Direction.DownLeft:
-                        {
-                            if (tile.Down.Content.Type == GameTileContentType.Wall &&
-                            tile.Left.Content.Type == GameTileContentType.Wall)
-                                isCanPath = false;
-                            break;
-                        }
-                }
-
-                if (!isCanPath)
                     continue;
+                }
 
                 TestBlock(ob, goalPos, owner, dir);
             }
