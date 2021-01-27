@@ -3,36 +3,65 @@
 [System.Serializable]
 public class EnemyCollection
 {
-	List<Enemy> enemies = new List<Enemy>();
+	Dictionary<uint, Enemy> enemies = new Dictionary<uint, Enemy>();
+	uint enemyID;
+
+	Enemy selectedEnemy;
 
 	// 添加敌人
 	public void Add(Enemy enemy)
 	{
-		enemies.Add(enemy);
+		if(enemy != null)
+        {
+			enemies.Add(++enemyID, enemy);
+		}
 	}
 
 	// 更新整个集合
 	public void GameUpdate()
 	{
-		for (int i = 0; i < enemies.Count; i++)
-		{
-			enemies[i].GameUpdate();
+		foreach(var enemy in enemies)
+        {
+			enemy.Value.GameUpdate();
 		}
 	}
 
+	// 设置选中Enemy的目标
 	public void SetDestination(GameTile tile)
     {
-        for (int i = 0; i < enemies.Count; ++i)
-        { 
-			enemies[i].GoalPoint = tile;
-		}
+		if(selectedEnemy == null)
+        {
+			return;
+        }
+
+		selectedEnemy.GoalPoint = tile;
+		selectedEnemy.StartMoving();
+		//foreach (var enemy in enemies)
+		//{
+		//	enemy.Value.GoalPoint = tile;
+		//}
 	}
 
-	public void PathFinder()
+	public bool SelectedEnemy(GameTile tile)
     {
-		for (int i = 0; i < enemies.Count; i++)
+		return (selectedEnemy = GetEnemyBuTile(tile)) != null;
+    }
+
+	public bool IsEnemyInThisTile(GameTile tile)
+    {
+		return GetEnemyBuTile(tile) != null;
+	}
+
+	private Enemy GetEnemyBuTile(GameTile tile)
+    {
+		foreach (var enemy in enemies)
 		{
-			enemies[i].StartMoving();
+			if (enemy.Value.NowPoint == tile)
+			{
+				return enemy.Value;
+			}
 		}
+
+		return null;
 	}
 }

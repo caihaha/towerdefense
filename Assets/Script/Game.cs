@@ -19,6 +19,8 @@ public class Game : MonoBehaviour
 
     [SerializeField, Range(0.1f, 10f)]
     EnemyCollection enemies = new EnemyCollection();
+
+    bool isSelectedEnemy;
     #endregion
 
     #region 内部引用
@@ -26,7 +28,7 @@ public class Game : MonoBehaviour
     {
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
-        SpawnEnemy(board.GetTileByIdx(0));
+        // SpawnEnemy(board.GetTileByIdx(0));
     }
 
     void OnValidate()
@@ -54,11 +56,6 @@ public class Game : MonoBehaviour
             HandleAlternativeTouch();
         }
 
-        //if (Input.GetKeyDown(KeyCode.V))
-        //{
-        //    board.ShowPaths = !board.ShowPaths;
-        //}
-
         if (Input.GetKeyDown(KeyCode.G))
         {
             board.ShowGrid = !board.ShowGrid;
@@ -69,27 +66,47 @@ public class Game : MonoBehaviour
     #endregion
 
     #region 处理点击
+    // 左键
     void HandleTouch()
     {
         GameTile tile = board.GetTile(TouchRay);
         if(tile != null)
         {
-            board.ToggleWall(tile);
-            // 不直接重新寻路，因为有可能障碍物不在路径上，就算在障碍物上也有可能会再变化，先避障重新寻路
-            // enemies.PathFinder();
+            if(Input.GetKey(KeyCode.LeftShift))
+            {
+                board.ToggleWall(tile);
+            }
+            else
+            {
+                isSelectedEnemy = enemies.SelectedEnemy(tile);
+            }
         }
     }
 
+    // 右键
     void HandleAlternativeTouch()
     {
         GameTile tile = board.GetTile(TouchRay);
         if (tile != null)
         {
-            // 目标点
-            if(board.ToggleDestination(tile))
+            if(Input.GetKey(KeyCode.LeftShift))
             {
-                enemies.SetDestination(tile);
-                enemies.PathFinder();
+                // 生成一个enemy
+                if (tile.Content.Type != GameTileContentType.Empty ||
+                    enemies.IsEnemyInThisTile(tile))
+                {
+                    return;
+                }
+
+                SpawnEnemy(tile);
+            }
+            else
+            {
+                // 设置目标点
+                if (isSelectedEnemy && board.ToggleDestination(tile))
+                {
+                    enemies.SetDestination(tile);
+                }
             }
         }
     }
@@ -101,7 +118,6 @@ public class Game : MonoBehaviour
         enemy.SpawnOn(tile);
 
         enemies.Add(enemy);
-        enemy.StartMoving();
     }
     #endregion
 }

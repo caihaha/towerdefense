@@ -32,6 +32,7 @@ public class Enemy : MonoBehaviour
 
 	// 现在的位置
 	GameTile nowPoint;
+	public GameTile NowPoint => nowPoint;
 
 	// 目标点
 	GameTile goalPoint;
