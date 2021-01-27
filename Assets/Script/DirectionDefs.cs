@@ -200,4 +200,19 @@ public static class DirectionExtensions
 
         return false;
     }
+
+    public static Direction GetDirection(this Direction current, int num)
+    {
+        Direction dir = current + num;
+        if(dir < Direction.Begin)
+        {
+            dir += (int)Direction.End;
+        }
+        else if(dir > Direction.End)
+        {
+            dir -= (int)Direction.End;
+        }
+
+        return dir;
+    }
 }

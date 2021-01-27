@@ -159,9 +159,15 @@ public class Enemy : MonoBehaviour
 
 	private void HandleStaticObjectCollision(Enemy collider)
 	{
-		if (nextWayPoint == null || 
-			(nextWayPoint.Content.Type != GameTileContentType.Wall && 
-			!DirectionExtensions.IsBlocked(currWayPoint, nextWayPoint, currWayPoint.GetDirectionByTile(nextWayPoint))))
+		if(nextWayPoint == null || currWayPoint == null)
+        {
+			return;
+        }
+
+		// 下一步可以走
+		Direction direction = currWayPoint.GetDirectionByTile(nextWayPoint);
+		if ((nextWayPoint.Content.Type != GameTileContentType.Wall && 
+			!DirectionExtensions.IsBlocked(currWayPoint, nextWayPoint, direction)))
 		{
 			return;
 		}
@@ -169,8 +175,11 @@ public class Enemy : MonoBehaviour
 		bool wantRequestPath = false;
 		float fCost = float.MaxValue;
 
-		for (Direction dir = Direction.Begin; dir != Direction.End; ++dir)
+		// 从方向余弦为正(<180度)的开始
+		Direction dir = DirectionExtensions.GetDirection(direction, -2);
+		for (int i = 0; i < (int)Direction.End; ++i)
         {
+			dir = DirectionExtensions.GetDirection(dir, i);
 			GameTile nextTile = currWayPoint.GetTileByDirection(dir);
 
 			if(nextTile == null || 
@@ -248,7 +257,7 @@ public class Enemy : MonoBehaviour
 
 	private uint GetNewPath(GameTile startPoint)
     {
-		return pathManager.RequiredPath(this, startPoint, goalPoint); ;
+		return pathManager.RequiredPath(this, startPoint, goalPoint);
     }
 
 	private bool FollowPath()
