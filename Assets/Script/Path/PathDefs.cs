@@ -1,11 +1,5 @@
 ﻿using UnityEngine;
 
-public enum PathFindType
-{
-    DFS,
-    AStart
-}
-
 public static class PathDefs
 {
     public static float Heuristic(GameTile end, GameTile tile)

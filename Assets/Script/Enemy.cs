@@ -115,29 +115,7 @@ public class Enemy : MonoBehaviour
     #region 内部函数
     private void UpdateOwnerSpeedAndHeading()
     {
-		progress += Time.deltaTime;
-		while (progress >= 1f)
-		{
-			// currWayPoint当前位置
-			if (nextWayPoint != null)
-			{
-				currWayPoint = nextWayPoint;
-			}
-
-			nextWayPoint = pathManager.NextWayPoint(pathID);
-
-			progress -= 1f;
-			PrepareNextState();
-		}
-
-		// 调整方向
-		if (directionChange != DirectionChange.None)
-		{
-			float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
-			transform.localRotation = Quaternion.Euler(0f, angle, 0f);
-		}
-
-		nowPoint = currWayPoint;
+		FollowPath();
 	}
 
 	// 更新位置
@@ -181,17 +159,17 @@ public class Enemy : MonoBehaviour
 		Direction dir = DirectionExtensions.GetDirection(direction, -2);
 		for (int i = 0; i < (int)Direction.End; ++i)
         {
-			dir = DirectionExtensions.GetDirection(dir, i);
-			GameTile nextTile = currWayPoint.GetTileByDirection(dir);
+			Direction tmpDir = DirectionExtensions.GetDirection(dir, i);
+			GameTile nextTile = currWayPoint.GetTileByDirection(tmpDir);
 
 			if(nextTile == null || 
 			   nextTile.Content.Type == GameTileContentType.Wall || 
-			   DirectionExtensions.IsBlocked(currWayPoint, nextTile, dir))
+			   DirectionExtensions.IsBlocked(currWayPoint, nextTile, tmpDir))
             {
 				continue;
             }
 
-			float gCost = PathDefs.CalcG(0, dir);
+			float gCost = PathDefs.CalcG(0, tmpDir);
 			float hCost = PathDefs.Heuristic(goalPoint, nextTile);
 
 			if(gCost + hCost < fCost)
@@ -264,13 +242,56 @@ public class Enemy : MonoBehaviour
 
 	private bool FollowPath()
 	{
+		if(WantToStop())
+        {
+			return true;
+        }
+
+		progress += Time.deltaTime;
+		while (progress >= 1f)
+		{
+			// currWayPoint当前位置
+			if (nextWayPoint != null)
+			{
+				currWayPoint = nextWayPoint;
+			}
+
+			nextWayPoint = pathManager.NextWayPoint(pathID);
+
+			progress -= 1f;
+			PrepareNextState();
+		}
+
+		// 动态避障(搜索所有的enemy)
+		GetObstacleAvoidanceDir();
+
+		// 调整方向
+		if (directionChange != DirectionChange.None)
+		{
+			float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
+			transform.localRotation = Quaternion.Euler(0f, angle, 0f);
+		}
+
+		nowPoint = currWayPoint;
+
 		return true;
 	}
 
-	private void ChangeHeading()
-    {
+	private bool WantToStop()
+	{
+		return false;
+	}
 
-    }
+	private void GetObstacleAvoidanceDir()
+	{
+		foreach(var enemy in Common.enemys.Enemys)
+        {
+
+        }
+
+		return;
+	}
+
 	#region 改变下一个状态
 	void PrepareNextState()
 	{

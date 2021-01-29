@@ -208,7 +208,7 @@ public static class DirectionExtensions
         {
             dir += (int)Direction.End;
         }
-        else if(dir > Direction.End)
+        else if(dir >= Direction.End)
         {
             dir -= (int)Direction.End;
         }

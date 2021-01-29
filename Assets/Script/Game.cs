@@ -18,7 +18,7 @@ public class Game : MonoBehaviour
     EnemyFactory enemyFactory = default;
 
     [SerializeField, Range(0.1f, 10f)]
-    EnemyCollection enemies = new EnemyCollection();
+    EnemyCollection enemies = Common.enemys;
 
     bool isSelectedEnemy;
     #endregion

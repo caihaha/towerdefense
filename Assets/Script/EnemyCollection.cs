@@ -8,6 +8,7 @@ public class EnemyCollection
 
 	Enemy selectedEnemy;
 
+	public Dictionary<uint, Enemy> Enemys => enemies;
 	// 添加敌人
 	public void Add(Enemy enemy)
 	{
