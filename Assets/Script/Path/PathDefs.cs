@@ -18,11 +18,21 @@ public static class PathDefs
     {
         return parentgCost + (DirectionExtensions.IsDiagonalDirection(direction) ? 1.4142f : 1f);
     }
+
+    public static float DistenceSquare(GameTile start, GameTile end)
+    {
+        float dx = start.transform.position.x - end.transform.position.x;
+        float dz = start.transform.position.z - end.transform.position.z;
+
+        return dx * dx + dz * dz;
+    }
 }
 
 public static class PathConstants
 {
     public static uint MAX_SEARCHED_NODES = 655536;
+
+    public static float SQUARE_SPEED_AND_RADIUS = 4f;
 }
 
 

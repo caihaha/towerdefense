@@ -143,9 +143,8 @@ public class Enemy : MonoBehaviour
 			return;
         }
 
-		// 下一步可以走
 		Direction nextDir = currWayPoint.GetDirectionByTile(nextWayPoint);
-
+		// 下一步可以走
 		if ((nextWayPoint.Content.Type != GameTileContentType.Wall && 
 			!DirectionExtensions.IsBlocked(currWayPoint, nextWayPoint, nextDir)))
 		{
@@ -284,8 +283,26 @@ public class Enemy : MonoBehaviour
 
 	private void GetObstacleAvoidanceDir()
 	{
-		foreach(var enemy in Common.enemys.Enemys)
+		foreach(var id2Enemy in Common.enemys.Enemys)
         {
+			Enemy enemy = id2Enemy.Value;
+			if(enemy == this)
+            {
+				continue;
+            }
+
+			float distSquare = PathDefs.DistenceSquare(this.currWayPoint, enemy.currWayPoint);
+			if (distSquare >= PathConstants.SQUARE_SPEED_AND_RADIUS) // SQUARE_SPEED_AND_RADIUS = Square(speed + enemy.radius + this.radius)
+			{
+				continue;
+            }
+
+			if (distSquare >= PathDefs.DistenceSquare(currWayPoint, goalPoint))
+            {
+				continue;
+            }
+
+			// TODO 下一个位置修改
 
         }
 
