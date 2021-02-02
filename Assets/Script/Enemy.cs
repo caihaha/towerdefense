@@ -223,12 +223,10 @@ public class Enemy : MonoBehaviour
 				nextWayPoint = pathManager.NextWayPoint(pathID);
 
 				PrepareNextState();
-
-				// 调整方向
 				if (directionChange != DirectionChange.None)
 				{
-					float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
-					transform.localRotation = Quaternion.Euler(0f, angle, 0f);
+					// float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, 1);
+					transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
 				}
 
 				nowPoint = currWayPoint;
@@ -272,8 +270,8 @@ public class Enemy : MonoBehaviour
 		// 调整方向
 		if (directionChange != DirectionChange.None)
 		{
-			float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
-			transform.localRotation = Quaternion.Euler(0f, angle, 0f);
+			// float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
+			transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
 		}
 
 		nowPoint = currWayPoint;
@@ -330,13 +328,15 @@ public class Enemy : MonoBehaviour
 	{
 		positionFrom = positionTo;
 		positionTo = currWayPoint.ExitPoint;
+		directionChange = DirectionChange.None;
 
 		if (currWayPoint != null && currWayPoint != nowPoint)
 		{
-			direction = nowPoint.GetDirectionByTile(currWayPoint);
-			if(direction != Direction.End)
+			Direction nextDir = nowPoint.GetDirectionByTile(currWayPoint);
+			if(nextDir != Direction.End)
             {
-				directionChange = direction.GetDirectionChangeTo(direction);
+				directionChange = direction.GetDirectionChangeTo(nextDir);
+				direction = nextDir;
 			}
 		}
 
@@ -351,7 +351,8 @@ public class Enemy : MonoBehaviour
 			case DirectionChange.TurnAround: PrepareTurnAround(); break;
 			case DirectionChange.TurnAroundLeft: PrepareTurnAroundLeft(); break;
 			case DirectionChange.TurnLeft: PrepareTurnLeft(); break;
-			default: PrepareTurnUpLeft(); break;
+			case DirectionChange.TurnUpLeft: PrepareTurnUpLeft(); break;
+			default: PrepareForward(); break;
 		}
 	}
 
