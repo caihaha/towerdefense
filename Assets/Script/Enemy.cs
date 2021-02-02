@@ -128,7 +128,7 @@ public class Enemy : MonoBehaviour
     {
 		HandleUnitObjectCollision();
 
-		HandleStaticObjectCollision(this);
+		HandleStaticObjectCollision();
 	}
 
 	private void HandleUnitObjectCollision()
@@ -136,7 +136,7 @@ public class Enemy : MonoBehaviour
 		
 	}
 
-	private void HandleStaticObjectCollision(Enemy collider)
+	private void HandleStaticObjectCollision()
 	{
 		if(nextWayPoint == null || currWayPoint == null)
         {
@@ -144,6 +144,11 @@ public class Enemy : MonoBehaviour
         }
 
 		Direction nextDir = currWayPoint.GetDirectionByTile(nextWayPoint);
+		if(nextDir == Direction.End)
+        {
+			return;
+        }
+
 		// 下一步可以走
 		if ((nextWayPoint.Content.Type != GameTileContentType.Wall && 
 			!DirectionExtensions.IsBlocked(currWayPoint, nextWayPoint, nextDir)))
@@ -296,6 +301,7 @@ public class Enemy : MonoBehaviour
 				continue;
             }
 
+			// 处于静止状态，直接挤过
 			if (enemy.AtGoal)
 			{
 				continue;
@@ -312,7 +318,7 @@ public class Enemy : MonoBehaviour
 				continue;
             }
 
-			// TODO 下一个位置修改
+			// TODO 修改nextWayPoint
 
         }
 
@@ -328,7 +334,10 @@ public class Enemy : MonoBehaviour
 		if (currWayPoint != null && currWayPoint != nowPoint)
 		{
 			direction = nowPoint.GetDirectionByTile(currWayPoint);
-			directionChange = direction.GetDirectionChangeTo(direction);
+			if(direction != Direction.End)
+            {
+				directionChange = direction.GetDirectionChangeTo(direction);
+			}
 		}
 
 		directionAngleFrom = directionAngleTo;

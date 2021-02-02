@@ -115,7 +115,8 @@ public class GameTile : MonoBehaviour
             direction == Direction.Right ? right :
             direction == Direction.DownLeft ? downLeft :
             direction == Direction.DownRight ? downRight :
-            down;
+            direction == Direction.Down ? down :
+            null;
     }
 
     public Direction GetDirectionByTile(GameTile tile)
@@ -133,6 +134,7 @@ public class GameTile : MonoBehaviour
             tile == right ? Direction.Right :
             tile == downLeft ? Direction.DownLeft :
             tile == downRight ? Direction.DownRight :
-            Direction.Down;
+            tile == down ? Direction.Down :
+            Direction.End;
     }
 }
