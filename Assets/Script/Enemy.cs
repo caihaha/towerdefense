@@ -45,7 +45,7 @@ public class Enemy : MonoBehaviour
         }
 	}
 
-	bool AtGoal => nowPoint == goalPoint;
+	bool AtGoal => nowPoint == goalPoint || goalPoint == null;
 
 	uint pathID;
 	#endregion
@@ -283,6 +283,11 @@ public class Enemy : MonoBehaviour
 
 	private void GetObstacleAvoidanceDir()
 	{
+		if(AtGoal)
+        {
+			return;
+        }			
+
 		foreach(var id2Enemy in Common.enemys.Enemys)
         {
 			Enemy enemy = id2Enemy.Value;
@@ -290,6 +295,11 @@ public class Enemy : MonoBehaviour
             {
 				continue;
             }
+
+			if (enemy.AtGoal)
+			{
+				continue;
+			}
 
 			float distSquare = PathDefs.DistenceSquare(this.currWayPoint, enemy.currWayPoint);
 			if (distSquare >= PathConstants.SQUARE_SPEED_AND_RADIUS) // SQUARE_SPEED_AND_RADIUS = Square(speed + enemy.radius + this.radius)
