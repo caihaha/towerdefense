@@ -19,6 +19,16 @@ public static class PathDefs
         return parentgCost + (DirectionExtensions.IsDiagonalDirection(direction) ? 1.4142f : 1f);
     }
 
+    public static float CalcG(PathNode parentNode, GameTile nextTile)
+    {
+        return CalcG(parentNode.gCost, parentNode.tile, nextTile);
+    }
+
+    public static float CalcG(float parentgCost, GameTile parentTile, GameTile nextTile)
+    {
+        return parentgCost + Mathf.Sqrt(DistenceSquare(parentTile, nextTile));
+    }
+
     public static float DistenceSquare(GameTile start, GameTile end)
     {
         float dx = start.transform.position.x - end.transform.position.x;

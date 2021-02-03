@@ -12,8 +12,6 @@ public class Enemy : MonoBehaviour
 	Vector3 positionFrom, positionTo;
 	float progress;
 
-	Direction direction;
-	DirectionChange directionChange;
 	float directionAngleFrom, directionAngleTo;
 
 	public EnemyFactory OriginFactory
@@ -25,10 +23,15 @@ public class Enemy : MonoBehaviour
 			originFactory = value;
 		}
 	}
-    #endregion
+	#endregion
 
-    #region 寻路
-    PathManager pathManager;
+	#region 方向改变
+	Vector3 flatFrontDir;
+	float cosAngle;
+	#endregion
+
+	#region 寻路
+	PathManager pathManager;
 
 	// 现在的位置
 	GameTile nowPoint;
@@ -70,10 +73,11 @@ public class Enemy : MonoBehaviour
 	{
 		positionFrom = currWayPoint.transform.localPosition;
 		positionTo = currWayPoint.ExitPoint;
-		direction = Direction.Up;
-		directionChange = DirectionChange.None;
-		directionAngleFrom = directionAngleTo = direction.GetAngle();
-		transform.localRotation = direction.GetRotation();
+		directionAngleFrom = directionAngleTo = 0;
+		transform.localRotation = Quaternion.identity;
+
+		flatFrontDir = new Vector3(0, 0, 1);
+		cosAngle = 2f; // 取值范围(-1 ~ 1)
 	}
 	#endregion
 
@@ -150,8 +154,7 @@ public class Enemy : MonoBehaviour
         }
 
 		// 下一步可以走
-		if ((nextWayPoint.Content.Type != GameTileContentType.Wall && 
-			!DirectionExtensions.IsBlocked(currWayPoint, nextWayPoint, nextDir)))
+		if (!GameTileDefs.IsBlocked(currWayPoint, nextWayPoint))
 		{
 			return;
 		}
@@ -159,30 +162,35 @@ public class Enemy : MonoBehaviour
 		bool wantRequestPath = false;
 		float fCost = float.MaxValue;
 
-		// 从现在方向余弦为正(<180度)的开始
-		Direction dir = DirectionExtensions.GetDirection(direction, -2);
-		for (int i = 0; i < (int)Direction.End; ++i)
+		for(int z = -1; z <= 1; ++z)
         {
-			Direction tmpDir = DirectionExtensions.GetDirection(dir, i);
-			GameTile nextTile = currWayPoint.GetTileByDirection(tmpDir);
-
-			if(nextTile == null || 
-			   nextTile.Content.Type == GameTileContentType.Wall || 
-			   DirectionExtensions.IsBlocked(currWayPoint, nextTile, tmpDir))
+			for(int x = -1; x <= 1; ++x)
             {
-				continue;
-            }
+				if(x == 0 && z == 0)
+                {
+					continue;
+                }
 
-			float gCost = PathDefs.CalcG(0, tmpDir);
-			float hCost = PathDefs.Heuristic(goalPoint, nextTile);
+				GameTile nextTile = GameTileDefs.GetGameTileByIndex(
+					Common.BlockPos2Index(new Vector2Int((int)currWayPoint.ExitPoint.x + x, (int)currWayPoint.ExitPoint.z + z)));
 
-			if(gCost + hCost < fCost)
-            {
-				fCost = gCost + hCost;
-				nextWayPoint = nextTile;
-				wantRequestPath = true;
+				if(nextTile == null || 
+					GameTileDefs.IsBlocked(currWayPoint, nextTile))
+                {
+					continue;
+                }
+
+				float gCost = PathDefs.CalcG(0, currWayPoint, nextTile);
+				float hCost = PathDefs.Heuristic(goalPoint, nextTile);
+
+				if (gCost + hCost < fCost)
+				{
+					fCost = gCost + hCost;
+					nextWayPoint = nextTile;
+					wantRequestPath = true;
+				}
 			}
-		}
+        }
 
 		if (wantRequestPath)
 		{
@@ -223,7 +231,7 @@ public class Enemy : MonoBehaviour
 				nextWayPoint = pathManager.NextWayPoint(pathID);
 
 				PrepareNextState();
-				if (directionChange != DirectionChange.None)
+				if (Common.Sign(cosAngle - 2f) != 0)
 				{
 					// float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, 1);
 					transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
@@ -268,7 +276,7 @@ public class Enemy : MonoBehaviour
 		GetObstacleAvoidanceDir();
 
 		// 调整方向
-		if (directionChange != DirectionChange.None)
+		if (Common.Sign(cosAngle - 2f) != 0)
 		{
 			// float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
 			transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
@@ -328,66 +336,50 @@ public class Enemy : MonoBehaviour
 	{
 		positionFrom = positionTo;
 		positionTo = currWayPoint.ExitPoint;
-		directionChange = DirectionChange.None;
+		cosAngle = 2f;
 
-		if (currWayPoint != null && currWayPoint != nowPoint)
+		if (positionFrom != positionTo)
 		{
-			Direction nextDir = nowPoint.GetDirectionByTile(currWayPoint);
-			if(nextDir != Direction.End)
+			// 使用向量
+			Vector3 nextDir = positionTo - positionFrom;
+			nextDir /= Mathf.Sqrt(Common.SqLength(nextDir));
+
+			if(nextDir != flatFrontDir)
             {
-				directionChange = direction.GetDirectionChangeTo(nextDir);
-				direction = nextDir;
+				cosAngle = Common.Dot(flatFrontDir, nextDir);
+				SetDirectionAngleTo(nextDir);
+
+				flatFrontDir = nextDir;
 			}
 		}
 
 		directionAngleFrom = directionAngleTo;
+	}
 
-		switch (directionChange)
+	void SetDirectionAngleTo(Vector3 nextDir)
+	{
+		if (Common.Sign(cosAngle - 1f) == 0)
 		{
-			case DirectionChange.None: PrepareForward(); break;
-			case DirectionChange.TurnUpRight: PrepareTurnUpRight(); break;
-			case DirectionChange.TurnRight: PrepareTurnRight(); break;
-			case DirectionChange.TurnAroundRight: PrepareTurnAroundRight(); break;
-			case DirectionChange.TurnAround: PrepareTurnAround(); break;
-			case DirectionChange.TurnAroundLeft: PrepareTurnAroundLeft(); break;
-			case DirectionChange.TurnLeft: PrepareTurnLeft(); break;
-			case DirectionChange.TurnUpLeft: PrepareTurnUpLeft(); break;
-			default: PrepareForward(); break;
+			return;
 		}
-	}
 
-	void PrepareForward()
-	{
-		transform.localRotation = direction.GetRotation();
-		directionAngleTo = direction.GetAngle();
-	}
-	void PrepareTurnUpRight()
-	{
-		directionAngleTo = directionAngleFrom + 45f;
-	}
-	void PrepareTurnRight()
-	{
-		directionAngleTo = directionAngleFrom + 90f;
-	}
-	void PrepareTurnAroundRight()
-	{
-		directionAngleTo = directionAngleFrom + 135f;
-	}
-	void PrepareTurnAround()
-	{
-		directionAngleTo = directionAngleFrom + 180f;
-	}
-	void PrepareTurnUpLeft()
-	{
-		directionAngleTo = directionAngleFrom - 45f;
-	}
-	void PrepareTurnLeft()
-	{
-		directionAngleTo = directionAngleFrom - 90f;
-	}
-	void PrepareTurnAroundLeft()
-	{
-		directionAngleTo = directionAngleFrom - 135f;
+		int degree;
+		Vector3 dirCross = Common.Cross(flatFrontDir, nextDir);
+
+		if (Common.Sign(cosAngle + 1f) == 0)
+        {
+			degree = 180;
+        }
+		else if(Common.Sign(dirCross.y) > 0)
+        {
+			degree = Common.Rad2Degree(Mathf.Acos(cosAngle));
+		}
+		else
+        {
+			degree = -Common.Rad2Degree(Mathf.Acos(cosAngle));
+        }
+
+		directionAngleTo = (directionAngleFrom + degree) % 360;
 	}
 
 	#endregion
