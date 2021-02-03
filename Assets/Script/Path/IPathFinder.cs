@@ -48,6 +48,6 @@ abstract public class IPathFinder
 
     abstract protected void FinishSearch(IPath.Path path, GameTile startPos, GameTile goalPos);
 
-    abstract protected bool TestBlock(PathNode parentSquare, GameTile goalTile, Enemy owner, Direction dir);
+    abstract protected bool TestBlock(PathNode parentSquare, GameTile goalTile, GameTile nextTile);
     #endregion
 }

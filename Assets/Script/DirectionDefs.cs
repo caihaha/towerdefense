@@ -159,48 +159,6 @@ public static class DirectionExtensions
         return OPT2DIR[pathOpt];
     }
 
-    public static bool IsBlocked(GameTile tile, GameTile neighbor, Direction direction)
-    {
-        if(tile == null || neighbor == null)
-        {
-            return true;
-        }    
-
-        switch (direction)
-        {
-            case Direction.UpRight:
-                {
-                    if (tile.Up.Content.Type == GameTileContentType.Wall &&
-                    tile.Right.Content.Type == GameTileContentType.Wall)
-                        return true;
-                    break;
-                }
-            case Direction.UpLeft:
-                {
-                    if (tile.Up.Content.Type == GameTileContentType.Wall &&
-                    tile.Left.Content.Type == GameTileContentType.Wall)
-                        return true;
-                    break;
-                }
-            case Direction.DownRight:
-                {
-                    if (tile.Down.Content.Type == GameTileContentType.Wall &&
-                    tile.Right.Content.Type == GameTileContentType.Wall)
-                        return true;
-                    break;
-                }
-            case Direction.DownLeft:
-                {
-                    if (tile.Down.Content.Type == GameTileContentType.Wall &&
-                    tile.Left.Content.Type == GameTileContentType.Wall)
-                        return true;
-                    break;
-                }
-        }
-
-        return false;
-    }
-
     public static Direction GetDirection(this Direction current, int num)
     {
         Direction dir = current + num;

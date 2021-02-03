@@ -93,15 +93,6 @@ public class GameBoard : MonoBehaviour
                 tile.ExitPoint = tile.transform.localPosition;
                 tile.num = i;
 
-                if (x > 0)
-                {
-                    GameTile.MakeRightLeftNightbors(tile, tiles[i - 1]);
-                }
-                if (y > 0)
-                {
-                    GameTile.MakeUpDownNightbors(tile, tiles[i - size.x]);
-                }
-
                 tile.IsAlternative = (x & 1) == 0;
                 if((y & 1) == 0)
                 {
@@ -110,11 +101,6 @@ public class GameBoard : MonoBehaviour
 
                 tile.Content = contentFactory.Get(GameTileContentType.Empty);
             }
-        }
-
-        for(int i = 0; i < tiles.Length; ++i)
-        {
-            GameTile.MakeDiagonalNightbors(tiles[i]);
         }
     }
 

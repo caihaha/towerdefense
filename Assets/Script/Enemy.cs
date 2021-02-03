@@ -147,12 +147,6 @@ public class Enemy : MonoBehaviour
 			return;
         }
 
-		Direction nextDir = currWayPoint.GetDirectionByTile(nextWayPoint);
-		if(nextDir == Direction.End)
-        {
-			return;
-        }
-
 		// 下一步可以走
 		if (!GameTileDefs.IsBlocked(currWayPoint, nextWayPoint))
 		{

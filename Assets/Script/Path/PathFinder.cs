@@ -41,12 +41,8 @@ public class PathFinder : IPathFinder
         }
     }
 
-    override protected bool TestBlock(PathNode parentSquare, GameTile goalTile, Enemy owner, Direction dir)
+    override protected bool TestBlock(PathNode parentSquare, GameTile goalTile, GameTile nextTile)
     {
-        GameTile nextTile = parentSquare.tile.GetTileByDirection(dir);
-        if (nextTile == null || nextTile.Content.Type == GameTileContentType.Wall)
-            return false;
-
         // 在Close列表
         if (IsTileInCloseBlocks(nextTile))
         {
@@ -54,7 +50,7 @@ public class PathFinder : IPathFinder
         }
 
         // 计算fCost
-        float gCost = PathDefs.CalcG(parentSquare.gCost, dir);
+        float gCost = PathDefs.CalcG(parentSquare, nextTile);
         float hCost = PathDefs.Heuristic(goalTile, nextTile);
         float fCost = gCost + hCost;
 
@@ -106,24 +102,25 @@ public class PathFinder : IPathFinder
         if (tile == null)
             return;
 
-        for (Direction dir = Direction.Begin; dir < Direction.End; ++dir)
+        for (int z = -1; z <= 1; ++z)
         {
-            // 上下左右
-            if(((int)dir & 1) == 0)
+            for (int x = -1; x <= 1; ++x)
             {
-                TestBlock(ob, goalPos, owner, dir);
-            }
-            // 对角线
-            else
-            {
-                GameTile neighbor = tile.GetTileByDirection(dir);
-
-                if (GameTileDefs.IsBlocked(tile, neighbor))
+                if (x == 0 && z == 0)
                 {
                     continue;
                 }
 
-                TestBlock(ob, goalPos, owner, dir);
+                GameTile nextTile = GameTileDefs.GetGameTileByIndex(
+                    Common.BlockPos2Index(new Vector2Int((int)tile.ExitPoint.x + x, (int)tile.ExitPoint.z + z)));
+
+                if (nextTile == null ||
+                    GameTileDefs.IsBlocked(tile, nextTile))
+                {
+                    continue;
+                }
+
+                TestBlock(ob, goalPos, nextTile);
             }
         }
     }
