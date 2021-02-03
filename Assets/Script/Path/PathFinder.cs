@@ -118,7 +118,7 @@ public class PathFinder : IPathFinder
             {
                 GameTile neighbor = tile.GetTileByDirection(dir);
 
-                if (DirectionExtensions.IsBlocked(tile, neighbor, dir))
+                if (GameTileDefs.IsBlocked(tile, neighbor))
                 {
                     continue;
                 }
