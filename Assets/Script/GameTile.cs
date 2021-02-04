@@ -61,14 +61,15 @@ public class GameTile : MonoBehaviour
 
         switch(degree % 360)
         {
-            case 0: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x, (int)ExitPoint.y + 1)); break;
-            case 45: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.y + 1)); break;
-            case 90: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.y)); break;
-            case 135: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.y - 1)); break;
-            case 180: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x, (int)ExitPoint.y - 1)); break;
-            case 225: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.y - 1)); break;
-            case 270: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.y)); break;
-            case 315: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.y + 1)); break;
+            case 0: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x, (int)ExitPoint.z + 1)); break;
+            case 45: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.z + 1)); break;
+            case 90: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.z)); break;
+            case 135: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.z - 1)); break;
+            case 180: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x, (int)ExitPoint.z - 1)); break;
+            case 225: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.z - 1)); break;
+            case 270: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.z)); break;
+            case 315: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.z + 1)); break;
+            default: Debug.LogError("<GetNextTileByDegree> Degree Illegal"); break;
         }
 
         return nextTile;

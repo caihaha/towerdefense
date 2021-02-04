@@ -155,6 +155,7 @@ public class Enemy : MonoBehaviour
 
 		bool wantRequestPath = false;
 		float fCost = float.MaxValue;
+		float cos = -1f;
 
 		for(int z = -1; z <= 1; ++z)
         {
@@ -175,11 +176,15 @@ public class Enemy : MonoBehaviour
 
 				float gCost = PathDefs.CalcG(0, currWayPoint, nextTile);
 				float hCost = PathDefs.Heuristic(goalPoint, nextTile);
+				float tmpCos = Common.Dot((nextTile.ExitPoint - currWayPoint.ExitPoint), flatFrontDir);
 
-				if (gCost + hCost < fCost)
+				if (gCost + hCost < fCost || 
+					(Common.Sign(fCost - (gCost + hCost)) == 0 && tmpCos > cos))
 				{
 					fCost = gCost + hCost;
 					nextWayPoint = nextTile;
+
+					cos = tmpCos;
 					wantRequestPath = true;
 				}
 			}
@@ -259,14 +264,13 @@ public class Enemy : MonoBehaviour
 				currWayPoint = nextWayPoint;
 			}
 
+			progress -= 1f;
 			nextWayPoint = pathManager.NextWayPoint(pathID);
 
-			progress -= 1f;
+			// 动态避障(搜索所有的enemy)
+			GetObstacleAvoidanceDir();
 			PrepareNextState();
 		}
-
-		// 动态避障(搜索所有的enemy)
-		GetObstacleAvoidanceDir();
 
 		// 调整方向
 		if (Common.Sign(cosAngle - Common.cosAngleIllegalValue) != 0)
@@ -301,7 +305,7 @@ public class Enemy : MonoBehaviour
             }
 
 			// 处于静止状态，直接挤过
-			if (enemy.AtGoal)
+			if (enemy.AtGoal || enemy.currWayPoint == enemy.goalPoint)
 			{
 				continue;
 			}
@@ -317,9 +321,17 @@ public class Enemy : MonoBehaviour
 				continue;
             }
 
-			// TODO 修改nextWayPoint
-
-        }
+			// 修改currWayPoint
+			for(int i = 1; i < 8; ++i)
+            {
+				GameTile tmpPoint = nowPoint.GetNextTileByDegree((int)directionAngleTo + 45 * i);
+				if (!GameTileDefs.IsBlocked(nowPoint, tmpPoint) && tmpPoint != currWayPoint)
+                {
+					currWayPoint = tmpPoint;
+					break;
+				}
+			}
+		}
 
 		return;
 	}
