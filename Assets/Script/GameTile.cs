@@ -49,4 +49,28 @@ public class GameTile : MonoBehaviour
     {
         arrow.gameObject.SetActive(false);
     }
+
+    public GameTile GetNextTileByDegree(int degree)
+    {
+        GameTile nextTile = null;
+
+        while(degree < 0)
+        {
+            degree += 360;
+        }
+
+        switch(degree % 360)
+        {
+            case 0: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x, (int)ExitPoint.y + 1)); break;
+            case 45: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.y + 1)); break;
+            case 90: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.y)); break;
+            case 135: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.y - 1)); break;
+            case 180: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x, (int)ExitPoint.y - 1)); break;
+            case 225: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.y - 1)); break;
+            case 270: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.y)); break;
+            case 315: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.y + 1)); break;
+        }
+
+        return nextTile;
+    }
 }

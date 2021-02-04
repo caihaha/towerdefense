@@ -111,8 +111,7 @@ public class PathFinder : IPathFinder
                     continue;
                 }
 
-                GameTile nextTile = GameTileDefs.GetGameTileByIndex(
-                    Common.BlockPos2Index(new Vector2Int((int)tile.ExitPoint.x + x, (int)tile.ExitPoint.z + z)));
+                GameTile nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)tile.ExitPoint.x + x, (int)tile.ExitPoint.z + z));
 
                 if (nextTile == null ||
                     GameTileDefs.IsBlocked(tile, nextTile))

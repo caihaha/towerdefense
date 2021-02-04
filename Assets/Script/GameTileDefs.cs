@@ -83,6 +83,11 @@ public static class GameTileDefs
         return GameBoard.Instance.Tiles[index];
     }
 
+    public static GameTile GetGameTileByPos(Vector2Int vec)
+    {
+        return GetGameTileByIndex(Common.BlockPos2Index(vec));
+    }
+
     public static bool IsBlocked(GameTile currTile, GameTile nextTile)
     {
         if(nextTile == null || nextTile.Content.Type == GameTileContentType.Wall)
@@ -96,8 +101,8 @@ public static class GameTileDefs
             return false;
         }
 
-        GameTile upTile = GetGameTileByIndex(Common.BlockPos2Index(new Vector2Int((int)currTile.ExitPoint.x + Common.Sign(diff.x), (int)currTile.ExitPoint.z)));
-        GameTile rightTile = GetGameTileByIndex(Common.BlockPos2Index(new Vector2Int((int)currTile.ExitPoint.x , (int)currTile.ExitPoint.z + Common.Sign(diff.z))));
+        GameTile upTile = GetGameTileByPos(new Vector2Int((int)currTile.ExitPoint.x + Common.Sign(diff.x), (int)currTile.ExitPoint.z));
+        GameTile rightTile = GetGameTileByPos(new Vector2Int((int)currTile.ExitPoint.x , (int)currTile.ExitPoint.z + Common.Sign(diff.z)));
 
         if(upTile.Content.Type == GameTileContentType.Wall && rightTile.Content.Type == GameTileContentType.Wall)
         {
@@ -106,5 +111,6 @@ public static class GameTileDefs
 
         return false;
     }
+
 }
 

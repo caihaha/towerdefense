@@ -165,8 +165,7 @@ public class Enemy : MonoBehaviour
 					continue;
                 }
 
-				GameTile nextTile = GameTileDefs.GetGameTileByIndex(
-					Common.BlockPos2Index(new Vector2Int((int)currWayPoint.ExitPoint.x + x, (int)currWayPoint.ExitPoint.z + z)));
+				GameTile nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)currWayPoint.ExitPoint.x + x, (int)currWayPoint.ExitPoint.z + z));
 
 				if(nextTile == null || 
 					GameTileDefs.IsBlocked(currWayPoint, nextTile))
