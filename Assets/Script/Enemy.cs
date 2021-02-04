@@ -322,13 +322,30 @@ public class Enemy : MonoBehaviour
             }
 
 			// 修改currWayPoint
-			for(int i = 1; i < 8; ++i)
+			float dirCos = -1f; // 自身与原来运动的方向夹角
+			// float pathCos = Common.Dot((nowPoint.ExitPoint - enemy.nowPoint.ExitPoint), flatFrontDir); // 两个enemy所在点的夹角
+
+			for (DirectionChange i = DirectionChange.TurnUpRight; i < DirectionChange.End; ++i)
             {
-				GameTile tmpPoint = nowPoint.GetNextTileByDegree((int)directionAngleTo + 45 * i);
-				if (!GameTileDefs.IsBlocked(nowPoint, tmpPoint) && tmpPoint != currWayPoint)
+				if(i == DirectionChange.TurnAround)
+                {
+					// 往回走
+					continue;
+                }
+
+				GameTile tmpPoint = nowPoint.GetNextTileByDegree((int)directionAngleTo + 45 * (int)i);
+				if(tmpPoint == null)
+                {
+					continue;
+                }
+
+				float tmpDirCos = Common.Dot((tmpPoint.ExitPoint - currWayPoint.ExitPoint), flatFrontDir);
+
+				if (!GameTileDefs.IsBlocked(nowPoint, tmpPoint) &&
+					tmpPoint != currWayPoint &&
+					tmpDirCos < dirCos)
                 {
 					currWayPoint = tmpPoint;
-					break;
 				}
 			}
 		}
