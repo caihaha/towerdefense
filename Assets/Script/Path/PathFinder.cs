@@ -102,7 +102,7 @@ public class PathFinder : IPathFinder
         if (tile == null)
             return;
 
-        for (int z = -1; z <= 1; ++z)
+        for (int z = 1; z >= -1; --z)
         {
             for (int x = -1; x <= 1; ++x)
             {
