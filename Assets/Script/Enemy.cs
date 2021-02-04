@@ -77,7 +77,7 @@ public class Enemy : MonoBehaviour
 		transform.localRotation = Quaternion.identity;
 
 		flatFrontDir = new Vector3(0, 0, 1);
-		cosAngle = 2f; // 取值范围(-1 ~ 1)
+		cosAngle = Common.cosAngleIllegalValue; // 取值范围(-1 ~ 1)
 	}
 	#endregion
 
@@ -224,7 +224,7 @@ public class Enemy : MonoBehaviour
 				nextWayPoint = pathManager.NextWayPoint(pathID);
 
 				PrepareNextState();
-				if (Common.Sign(cosAngle - 2f) != 0)
+				if (Common.Sign(cosAngle - Common.cosAngleIllegalValue) != 0)
 				{
 					// float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, 1);
 					transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
@@ -269,7 +269,7 @@ public class Enemy : MonoBehaviour
 		GetObstacleAvoidanceDir();
 
 		// 调整方向
-		if (Common.Sign(cosAngle - 2f) != 0)
+		if (Common.Sign(cosAngle - Common.cosAngleIllegalValue) != 0)
 		{
 			// float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
 			transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
@@ -329,7 +329,7 @@ public class Enemy : MonoBehaviour
 	{
 		positionFrom = positionTo;
 		positionTo = currWayPoint.ExitPoint;
-		cosAngle = 2f;
+		cosAngle = Common.cosAngleIllegalValue;
 
 		if (positionFrom != positionTo)
 		{

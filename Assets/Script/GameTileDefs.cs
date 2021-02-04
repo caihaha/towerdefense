@@ -12,6 +12,8 @@ public static class Common
 
     public static bool isUseDirection = false;
 
+    public static float cosAngleIllegalValue = 2f;
+
     public static Vector2Int BlockIndex2Pos(int index)
     {
         if(index < 0 || index > Common.BoardCount)
