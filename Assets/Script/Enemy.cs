@@ -322,11 +322,21 @@ public class Enemy : MonoBehaviour
             }
 
 			// 修改currWayPoint
-			Vector3 rightDir = GetRightVector(flatFrontDir);
-			int turnSign = Common.Sign(Common.Dot(nowPoint.ExitPoint, rightDir) - Common.Dot(enemy.nowPoint.ExitPoint, rightDir));
+			Vector3 avoiderRightDir = GetRightVector(flatFrontDir);
+			Vector3 avoideeRightDir = GetRightVector(enemy.flatFrontDir);
+			int avoiderTurnSign = Common.Sign(Common.Dot(nowPoint.ExitPoint, avoiderRightDir) - Common.Dot(enemy.nowPoint.ExitPoint, avoiderRightDir));
+			int avoideeTurnSign = Common.Sign(Common.Dot(enemy.nowPoint.ExitPoint, avoideeRightDir) - Common.Dot(nowPoint.ExitPoint, avoideeRightDir));
+			if(Common.Dot(flatFrontDir, enemy.flatFrontDir) < 0)
+            {
+				avoiderTurnSign = Mathf.Max(avoiderTurnSign, avoideeTurnSign);
+			}
+			avoiderTurnSign = avoiderTurnSign >= 0 ? 1 : -1;
 
 			int tmp = directionAngleFrom % 45;
-			tmp = turnSign > 0 ? tmp : 45 - tmp;
+			if(tmp != 0)
+            {
+				tmp = avoiderTurnSign >= 0 ? tmp : 45 - tmp;
+			}
 
 			for (int i = 0; i < 4; ++i)
             {
@@ -335,7 +345,7 @@ public class Enemy : MonoBehaviour
 					continue;
                 }
 
-				GameTile tmpPoint = nowPoint.GetNextTileByDegree(directionAngleFrom + tmp + 45 * i * turnSign);
+				GameTile tmpPoint = nowPoint.GetNextTileByDegree(directionAngleFrom + tmp + 45 * i * avoiderTurnSign);
 				if(tmpPoint == null)
                 {
 					continue;
