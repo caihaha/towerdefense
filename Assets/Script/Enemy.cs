@@ -328,10 +328,6 @@ public class Enemy : MonoBehaviour
 			// WTF 这是什么骚操作
 			int tmp = directionAngleFrom % 45;
 			tmp = turnSign > 0 ? tmp : 45 - tmp;
-			if (tmp <= 2 || tmp >= 43)
-            {
-				tmp = 0;
-            }
 
 			for (int i = 0; i < 4; ++i)
             {
@@ -405,7 +401,18 @@ public class Enemy : MonoBehaviour
 			degree = -Common.Rad2Degree(Mathf.Acos(cosAngle));
         }
 
-		directionAngleTo = ((directionAngleFrom + degree + 360)) % 360;
+		// 消除误差
+		int tmp = (degree + 180) % 45;
+		if(tmp <= 2)
+        {
+			degree -= tmp;
+        }
+		else if(tmp >= 43)
+        {
+			degree += (45 - tmp);
+        }
+
+		directionAngleTo = ((directionAngleFrom + degree)) % 360;
 	}
 
 	// 二维下
