@@ -325,7 +325,6 @@ public class Enemy : MonoBehaviour
 			Vector3 rightDir = GetRightVector(flatFrontDir);
 			int turnSign = Common.Sign(Common.Dot(nowPoint.ExitPoint, rightDir) - Common.Dot(enemy.nowPoint.ExitPoint, rightDir));
 
-			// WTF 这是什么骚操作
 			int tmp = directionAngleFrom % 45;
 			tmp = turnSign > 0 ? tmp : 45 - tmp;
 
