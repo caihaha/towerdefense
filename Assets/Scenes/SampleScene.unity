@@ -258,6 +258,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arrow: {fileID: 1595972258}
+  num: 0
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,7 +501,6 @@ MonoBehaviour:
   board: {fileID: 1210661076}
   tileContentFactory: {fileID: 11400000, guid: 64a6fb264fb46f44ea65a9be7ca7e085, type: 2}
   enemyFactory: {fileID: 11400000, guid: 73e46d482b8c1f74ca57fb4f0d2bb33c, type: 2}
-  spawnSpeed: 4
 --- !u!4 &1706746325
 Transform:
   m_ObjectHideFlags: 0

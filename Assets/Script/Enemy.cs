@@ -12,7 +12,7 @@ public class Enemy : MonoBehaviour
 	Vector3 positionFrom, positionTo;
 	float progress;
 
-	float directionAngleFrom, directionAngleTo;
+	int directionAngleFrom, directionAngleTo;
 
 	public EnemyFactory OriginFactory
 	{
@@ -322,30 +322,34 @@ public class Enemy : MonoBehaviour
             }
 
 			// 修改currWayPoint
-			float dirCos = -1f; // 自身与原来运动的方向夹角
-			// float pathCos = Common.Dot((nowPoint.ExitPoint - enemy.nowPoint.ExitPoint), flatFrontDir); // 两个enemy所在点的夹角
+			Vector3 rightDir = GetRightVector(flatFrontDir);
+			int turnSign = Common.Sign(Common.Dot(nowPoint.ExitPoint, rightDir) - Common.Dot(enemy.nowPoint.ExitPoint, rightDir));
 
-			for (DirectionChange i = DirectionChange.TurnUpRight; i < DirectionChange.End; ++i)
+			// WTF 这是什么骚操作
+			int tmp = directionAngleFrom % 45;
+			tmp = turnSign > 0 ? tmp : 45 - tmp;
+			if (tmp <= 2 || tmp >= 43)
             {
-				if(i == DirectionChange.TurnAround)
+				tmp = 0;
+            }
+
+			for (int i = 0; i < 4; ++i)
+            {
+				if(i == 0 && tmp == 0)
                 {
-					// 往回走
 					continue;
                 }
 
-				GameTile tmpPoint = nowPoint.GetNextTileByDegree((int)directionAngleTo + 45 * (int)i);
+				GameTile tmpPoint = nowPoint.GetNextTileByDegree(directionAngleFrom + tmp + 45 * i * turnSign);
 				if(tmpPoint == null)
                 {
 					continue;
                 }
 
-				float tmpDirCos = Common.Dot((tmpPoint.ExitPoint - currWayPoint.ExitPoint), flatFrontDir);
-
-				if (!GameTileDefs.IsBlocked(nowPoint, tmpPoint) &&
-					tmpPoint != currWayPoint &&
-					tmpDirCos < dirCos)
+				if (!GameTileDefs.IsBlocked(nowPoint, tmpPoint))
                 {
 					currWayPoint = tmpPoint;
+					break;
 				}
 			}
 		}
@@ -401,9 +405,14 @@ public class Enemy : MonoBehaviour
 			degree = -Common.Rad2Degree(Mathf.Acos(cosAngle));
         }
 
-		directionAngleTo = (directionAngleFrom + degree) % 360;
+		directionAngleTo = ((directionAngleFrom + degree + 360)) % 360;
 	}
 
+	// 二维下
+	Vector3 GetRightVector(Vector3 vec)
+    {
+		return new Vector3(vec.z, 0, -vec.x);
+    }
 	#endregion
 
 	#endregion

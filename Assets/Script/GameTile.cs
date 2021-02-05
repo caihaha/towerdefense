@@ -59,7 +59,8 @@ public class GameTile : MonoBehaviour
             degree += 360;
         }
 
-        switch(degree % 360)
+        // WTF 这是什么骚操作
+        switch ((degree + 2) / 5 * 5 % 360)
         {
             case 0: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x, (int)ExitPoint.z + 1)); break;
             case 45: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.z + 1)); break;
