@@ -410,7 +410,7 @@ public class Enemy : MonoBehaviour
 			degree = -Common.Rad2Degree(Mathf.Acos(cosAngle));
         }
 
-		// 消除误差(有问题)
+		// 消除误差，确保在临近网格行走时角度准确(有问题)
 		int tmp = (degree + 180) % 45;
 		if(tmp != 0)
         {
@@ -424,7 +424,7 @@ public class Enemy : MonoBehaviour
 			}
 		}
 
-		directionAngleTo = ((directionAngleFrom + degree)) % 360;
+		directionAngleTo = (directionAngleFrom + degree) % 360;
 	}
 
 	// 二维下
