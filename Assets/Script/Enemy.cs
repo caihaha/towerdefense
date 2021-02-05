@@ -412,14 +412,17 @@ public class Enemy : MonoBehaviour
 
 		// 消除误差(有问题)
 		int tmp = (degree + 180) % 45;
-		if(tmp <= 2)
+		if(tmp != 0)
         {
-			degree -= tmp;
-        }
-		else if(tmp >= 43)
-        {
-			degree += (45 - tmp);
-        }
+			if (tmp <= 2)
+			{
+				degree -= tmp;
+			}
+			else if (tmp >= 43)
+			{
+				degree += (45 - tmp);
+			}
+		}
 
 		directionAngleTo = ((directionAngleFrom + degree)) % 360;
 	}
