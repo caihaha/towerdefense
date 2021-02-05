@@ -410,7 +410,7 @@ public class Enemy : MonoBehaviour
 			degree = -Common.Rad2Degree(Mathf.Acos(cosAngle));
         }
 
-		// 消除误差
+		// 消除误差(有问题)
 		int tmp = (degree + 180) % 45;
 		if(tmp <= 2)
         {
