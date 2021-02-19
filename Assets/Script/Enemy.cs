@@ -8,6 +8,8 @@ public class Enemy : MonoBehaviour
     #region 移动
     EnemyFactory originFactory;
 
+	public Rigidbody rb;
+
 	GameTile currWayPoint, nextWayPoint;
 	Vector3 positionFrom, positionTo;
 	float progress;
@@ -51,12 +53,12 @@ public class Enemy : MonoBehaviour
 	bool AtGoal => nowPoint == goalPoint || goalPoint == null;
 
 	uint pathID;
-	#endregion
+    #endregion
 
-	#endregion
+    #endregion
 
-	#region 初始化
-	public void SpawnOn(GameTile tile)
+    #region 初始化
+    public void SpawnOn(GameTile tile)
 	{
 		nowPoint = tile;
 		currWayPoint = tile;
@@ -66,15 +68,17 @@ public class Enemy : MonoBehaviour
 		PrepareIntro();
 
 		pathManager = new PathManager();
+		rb = gameObject.GetComponent<Rigidbody>();
 	}
 
-    // 初始化状态
-    void PrepareIntro()
+	// 初始化状态
+	void PrepareIntro()
 	{
 		positionFrom = currWayPoint.transform.localPosition;
 		positionTo = currWayPoint.ExitPoint;
 		directionAngleFrom = directionAngleTo = 0;
 		transform.localRotation = Quaternion.identity;
+		transform.localPosition = positionFrom;
 
 		flatFrontDir = new Vector3(0, 0, 1);
 		cosAngle = Common.cosAngleIllegalValue; // 取值范围(-1 ~ 1)
