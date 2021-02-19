@@ -21,6 +21,8 @@ public class Game : MonoBehaviour
     EnemyCollection enemies = Common.enemys;
 
     bool isSelectedEnemy;
+
+    int activeSlowUpdateUnit;
     #endregion
 
     #region 内部引用
@@ -62,6 +64,13 @@ public class Game : MonoBehaviour
         }
 
         enemies.GameUpdate();
+
+        ++activeSlowUpdateUnit;
+        if (activeSlowUpdateUnit > Common.enemySlowUpdateRate)
+        {
+            activeSlowUpdateUnit = 0;
+            enemies.GameSlowUpdate();
+        }
     }
     #endregion
 

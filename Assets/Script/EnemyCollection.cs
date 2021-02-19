@@ -27,6 +27,14 @@ public class EnemyCollection
 		}
 	}
 
+	public void GameSlowUpdate()
+	{
+		foreach (var enemy in enemies)
+		{
+			enemy.Value.GameSlowUpdate();
+		}
+	}
+
 	// 设置选中Enemy的目标
 	public void SetDestination(GameTile tile)
     {

@@ -5,11 +5,10 @@ using System.Collections.Generic;
 public class Enemy : MonoBehaviour
 {
     #region 数据成员
-    #region 移动
     EnemyFactory originFactory;
-
 	public Rigidbody rb;
 
+	#region 移动
 	GameTile currWayPoint, nextWayPoint;
 	Vector3 positionFrom, positionTo;
 	float progress;
@@ -81,7 +80,7 @@ public class Enemy : MonoBehaviour
 		transform.localPosition = positionFrom;
 
 		flatFrontDir = new Vector3(0, 0, 1);
-		cosAngle = Common.cosAngleIllegalValue; // 取值范围(-1 ~ 1)
+		cosAngle = Common.cosAngleIllegalValue; // 取值范围[-1, 1]
 	}
 	#endregion
 
@@ -94,6 +93,11 @@ public class Enemy : MonoBehaviour
 		HandleObjectCollisions();
 
 		return true;
+    }
+
+	public void GameSlowUpdate()
+    {
+
     }
 
 	public void StartMoving()
