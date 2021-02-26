@@ -127,8 +127,6 @@ public class Game : MonoBehaviour
         enemy.SpawnOn(tile);
 
         enemies.Add(enemy);
-        // test
-        // testdev
     }
     #endregion
 }
