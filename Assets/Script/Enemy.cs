@@ -6,7 +6,6 @@ public class Enemy : MonoBehaviour
 {
     #region 数据成员
     EnemyFactory originFactory;
-	public Rigidbody rb;
 
 	#region 移动
 	GameTile currWayPoint, nextWayPoint;
@@ -67,7 +66,6 @@ public class Enemy : MonoBehaviour
 		PrepareIntro();
 
 		pathManager = new PathManager();
-		rb = gameObject.GetComponent<Rigidbody>();
 	}
 
 	// 初始化状态
