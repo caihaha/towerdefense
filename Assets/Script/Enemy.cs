@@ -316,7 +316,7 @@ public class Enemy : MonoBehaviour
 			}
 
 			float distSquare = PathDefs.DistenceSquare(this.currWayPoint, enemy.currWayPoint);
-			if (distSquare >= PathConstants.SQUARE_SPEED_AND_RADIUS) // SQUARE_SPEED_AND_RADIUS = Square(speed + enemy.radius + this.radius)
+			if (distSquare > PathConstants.SQUARE_SPEED_AND_RADIUS) // SQUARE_SPEED_AND_RADIUS = Square(speed + enemy.radius + this.radius)
 			{
 				continue;
             }
