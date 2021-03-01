@@ -270,18 +270,16 @@ public class Enemy : MonoBehaviour
 				currWayPoint = nextWayPoint;
 			}
 
-			progress -= 1f;
-			nextWayPoint = pathManager.NextWayPoint(pathID);
-
-			// 动态避障(搜索所有的enemy)
+			GetNextWayPoint();
 			GetObstacleAvoidanceDir();
 			PrepareNextState();
+
+			progress -= 1f;
 		}
 
 		// 调整方向
 		if (Common.Sign(cosAngle - Common.cosAngleIllegalValue) != 0)
 		{
-			// float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
 			transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
 		}
 
@@ -300,9 +298,10 @@ public class Enemy : MonoBehaviour
 		if(AtGoal)
         {
 			return;
-        }			
+        }
 
-		foreach(var id2Enemy in Common.enemys.Enemys)
+		// 动态避障(搜索所有的enemy)
+		foreach (var id2Enemy in Common.enemys.Enemys)
         {
 			Enemy enemy = id2Enemy.Value;
 			if(enemy == this)
@@ -369,6 +368,11 @@ public class Enemy : MonoBehaviour
 	}
 
 	#region 改变下一个状态
+	void GetNextWayPoint()
+    {
+		nextWayPoint = pathManager.NextWayPoint(pathID);
+	}
+
 	void PrepareNextState()
 	{
 		positionFrom = positionTo;
