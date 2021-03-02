@@ -340,7 +340,7 @@ public class Enemy : MonoBehaviour
 			int tmp = directionAngleFrom % 45;
 			if(tmp != 0)
             {
-				tmp = avoiderTurnSign >= 0 ? tmp : 45 - tmp;
+				tmp = avoiderTurnSign < 0 ? tmp : 45 - tmp;
 			}
 
 			for (int i = 0; i < 4; ++i)
