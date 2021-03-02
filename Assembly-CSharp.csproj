@@ -75,6 +75,7 @@
     <Compile Include="Assets\Script\GameTileContentFactory.cs" />
     <Compile Include="Assets\Script\GameTileDefs.cs" />
     <Compile Include="Assets\Script\Misc\Heap.cs" />
+    <Compile Include="Assets\Script\MoveAgent.cs" />
     <Compile Include="Assets\Script\Path\IPathFinder.cs" />
     <Compile Include="Assets\Script\Path\Path.cs" />
     <Compile Include="Assets\Script\Path\PathDataTypes.cs" />

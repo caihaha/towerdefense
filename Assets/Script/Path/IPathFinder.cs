@@ -11,7 +11,7 @@ abstract public class IPathFinder
     #endregion
 
     #region 对外接口
-    public IPath.SearchResult GetPath(Enemy owner, GameTile startPos, GameTile goalPos,IPath.Path path)
+    public IPath.SearchResult GetPath(MoveAgent owner, GameTile startPos, GameTile goalPos,IPath.Path path)
     {
         IPath.SearchResult result = InitSeatch(owner, startPos, goalPos);
         if(result == IPath.SearchResult.Ok || result == IPath.SearchResult.GoalOutOfRange)
@@ -24,7 +24,7 @@ abstract public class IPathFinder
     #endregion
 
     #region 内部函数
-    protected IPath.SearchResult InitSeatch(Enemy owner, GameTile startPos, GameTile goalPos)
+    protected IPath.SearchResult InitSeatch(MoveAgent owner, GameTile startPos, GameTile goalPos)
     {
         ResetSearch();
         PathNode ob = new PathNode();
@@ -44,7 +44,7 @@ abstract public class IPathFinder
         openBlocks.Clear();
     }
 
-    abstract protected IPath.SearchResult DoSearch(Enemy owner, GameTile goalPos);
+    abstract protected IPath.SearchResult DoSearch(MoveAgent owner, GameTile goalPos);
 
     abstract protected void FinishSearch(IPath.Path path, GameTile startPos, GameTile goalPos);
 

@@ -13,7 +13,7 @@ public class PathManager
         public GameTile start;
         public GameTile finalGoal;
 
-        public Enemy caller;
+        public MoveAgent caller;
 
         public MultiPath(GameTile startPos)
         {
@@ -23,7 +23,7 @@ public class PathManager
         }
     }
 
-    PathFinder pathFinder;
+    readonly PathFinder pathFinder;
     Dictionary<uint, MultiPath> pathMap = new Dictionary<uint, MultiPath>();
     uint nextPathID;
     #endregion
@@ -63,7 +63,7 @@ public class PathManager
         return null;
     }
 
-    public uint RequiredPath(Enemy caller, GameTile startPos, GameTile goalPos)
+    public uint RequiredPath(MoveAgent caller, GameTile startPos, GameTile goalPos)
     {
         if(!IsFinalized())
         {
@@ -86,7 +86,7 @@ public class PathManager
     #endregion
     
     #region 内部函数
-    IPath.SearchResult ArrangePath(MultiPath newPath, GameTile starePos, GameTile goalPos, Enemy caller)
+    IPath.SearchResult ArrangePath(MultiPath newPath, GameTile starePos, GameTile goalPos, MoveAgent caller)
     {
         IPath.SearchResult result = pathFinder.GetPath(caller, starePos, goalPos, newPath.path);
 

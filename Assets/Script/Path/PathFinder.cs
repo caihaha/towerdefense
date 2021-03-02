@@ -2,7 +2,7 @@
 
 public class PathFinder : IPathFinder
 {
-    override protected IPath.SearchResult DoSearch(Enemy owner, GameTile goalPos)
+    override protected IPath.SearchResult DoSearch(MoveAgent owner, GameTile goalPos)
     {
         bool isFinded = false;
 
@@ -95,7 +95,7 @@ public class PathFinder : IPathFinder
         return resTile;
     }
 
-    void TestNeighborSquares(PathNode ob, Enemy owner, GameTile goalPos)
+    void TestNeighborSquares(PathNode ob, MoveAgent owner, GameTile goalPos)
     {
         GameTile tile = ob.tile;
 

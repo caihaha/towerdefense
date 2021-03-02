@@ -43,29 +43,25 @@ public class EnemyCollection
 			return;
         }
 
-		selectedEnemy.GoalPoint = tile;
+		selectedEnemy.SetGoalPos(tile);
 		selectedEnemy.StartMoving();
-		//foreach (var enemy in enemies)
-		//{
-		//	enemy.Value.GoalPoint = tile;
-		//}
 	}
 
 	public bool SelectedEnemy(GameTile tile)
     {
-		return (selectedEnemy = GetEnemyBuTile(tile)) != null;
+		return (selectedEnemy = GetEnemyByTile(tile)) != null;
     }
 
 	public bool IsEnemyInThisTile(GameTile tile)
     {
-		return GetEnemyBuTile(tile) != null;
+		return GetEnemyByTile(tile) != null;
 	}
 
-	private Enemy GetEnemyBuTile(GameTile tile)
+	private Enemy GetEnemyByTile(GameTile tile)
     {
 		foreach (var enemy in enemies)
 		{
-			if (enemy.Value.NowPoint == tile)
+			if (enemy.Value.Move.NowPoint == tile)
 			{
 				return enemy.Value;
 			}
