@@ -12,7 +12,7 @@ public class MoveAgent
 	float progress;
 
 	int directionAngleFrom, directionAngleTo;
-	public int DirectionAngleTo => directionAngleFrom;
+	public int DirectionAngleTo => directionAngleTo;
 
 	Vector3 flatFrontDir;
 	float cosAngle;
