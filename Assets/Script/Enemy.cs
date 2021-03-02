@@ -343,14 +343,11 @@ public class Enemy : MonoBehaviour
 				tmp = avoiderTurnSign < 0 ? -tmp : 45 - tmp;
 			}
 
-			for (int i = 0; i < 4; ++i)
-            {
-				if(i == 0 && tmp == 0)
-                {
-					continue;
-                }
+			directionAngleFrom += tmp;
 
-				GameTile tmpPoint = nowPoint.GetNextTileByDegree(directionAngleFrom + tmp + 45 * i * avoiderTurnSign);
+			for (int i = (tmp == 0 ? 1 : 0) ; i < 4; ++i)
+            {
+				GameTile tmpPoint = nowPoint.GetNextTileByDegree(directionAngleFrom + 45 * i * avoiderTurnSign);
 				if(tmpPoint == null)
                 {
 					continue;
