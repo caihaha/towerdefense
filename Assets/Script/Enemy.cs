@@ -138,7 +138,7 @@ public class Enemy : MonoBehaviour
     {
 		HandleUnitObjectCollision();
 
-		HandleStaticObjectCollision();
+		// HandleStaticObjectCollision();
 	}
 
 	private void HandleUnitObjectCollision()
@@ -222,30 +222,30 @@ public class Enemy : MonoBehaviour
 		if (pathID == 0)
         {
 			pathID = GetNewPath(startPoint);
+			GetNextWayPoint();
 
-			if(startPoint == nextWayPoint)
-            {
-				return;
-            }
+			//if(startPoint == nextWayPoint)
+   //         {
+			//	return;
+   //         }
 
-			GameTile nextPoint = pathManager.NextWayPoint(pathID);
-			if (nextPoint != null)
-            {
-				currWayPoint = nextPoint;
-				nextWayPoint = pathManager.NextWayPoint(pathID);
+			//GameTile nextPoint = pathManager.NextWayPoint(pathID);
+			//if (nextPoint != null)
+   //         {
+			//	currWayPoint = nextPoint;
+			//	nextWayPoint = pathManager.NextWayPoint(pathID);
 
-				PrepareNextState();
-				if (Common.Sign(cosAngle - Common.cosAngleIllegalValue) != 0)
-				{
-					// float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, 1);
-					transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
-				}
+			//	PrepareNextState();
+			//	if (Common.Sign(cosAngle - Common.cosAngleIllegalValue) != 0)
+			//	{
+			//		transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
+			//	}
 
-				nowPoint = currWayPoint;
+			//	nowPoint = currWayPoint;
 
-				UpdateOwnerPos();
-				HandleObjectCollisions();
-			}
+			//	UpdateOwnerPos();
+			//	HandleObjectCollisions();
+			//}
 		}
 	}
 
@@ -368,6 +368,12 @@ public class Enemy : MonoBehaviour
 	void GetNextWayPoint()
     {
 		nextWayPoint = pathManager.NextWayPoint(pathID);
+
+		if (nextWayPoint != null && currWayPoint!= null && 
+			GameTileDefs.IsBlocked(currWayPoint, nextWayPoint))
+		{
+			ReRequestPath(currWayPoint);
+		}
 	}
 
 	void PrepareNextState()
