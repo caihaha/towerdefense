@@ -6,7 +6,6 @@ public class Enemy : MonoBehaviour
 {
     #region 数据成员
     EnemyFactory originFactory;
-	public Rigidbody rb;
 
 	#region 移动
 	GameTile currWayPoint, nextWayPoint;
@@ -67,7 +66,6 @@ public class Enemy : MonoBehaviour
 		PrepareIntro();
 
 		pathManager = new PathManager();
-		rb = gameObject.GetComponent<Rigidbody>();
 	}
 
 	// 初始化状态
@@ -140,7 +138,7 @@ public class Enemy : MonoBehaviour
     {
 		HandleUnitObjectCollision();
 
-		HandleStaticObjectCollision();
+		// HandleStaticObjectCollision();
 	}
 
 	private void HandleUnitObjectCollision()
@@ -224,30 +222,30 @@ public class Enemy : MonoBehaviour
 		if (pathID == 0)
         {
 			pathID = GetNewPath(startPoint);
+			GetNextWayPoint();
 
-			if(startPoint == nextWayPoint)
-            {
-				return;
-            }
+			//if(startPoint == nextWayPoint)
+   //         {
+			//	return;
+   //         }
 
-			GameTile nextPoint = pathManager.NextWayPoint(pathID);
-			if (nextPoint != null)
-            {
-				currWayPoint = nextPoint;
-				nextWayPoint = pathManager.NextWayPoint(pathID);
+			//GameTile nextPoint = pathManager.NextWayPoint(pathID);
+			//if (nextPoint != null)
+   //         {
+			//	currWayPoint = nextPoint;
+			//	nextWayPoint = pathManager.NextWayPoint(pathID);
 
-				PrepareNextState();
-				if (Common.Sign(cosAngle - Common.cosAngleIllegalValue) != 0)
-				{
-					// float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, 1);
-					transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
-				}
+			//	PrepareNextState();
+			//	if (Common.Sign(cosAngle - Common.cosAngleIllegalValue) != 0)
+			//	{
+			//		transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
+			//	}
 
-				nowPoint = currWayPoint;
+			//	nowPoint = currWayPoint;
 
-				UpdateOwnerPos();
-				HandleObjectCollisions();
-			}
+			//	UpdateOwnerPos();
+			//	HandleObjectCollisions();
+			//}
 		}
 	}
 
@@ -272,18 +270,16 @@ public class Enemy : MonoBehaviour
 				currWayPoint = nextWayPoint;
 			}
 
-			progress -= 1f;
-			nextWayPoint = pathManager.NextWayPoint(pathID);
-
-			// 动态避障(搜索所有的enemy)
+			GetNextWayPoint();
 			GetObstacleAvoidanceDir();
 			PrepareNextState();
+
+			progress -= 1f;
 		}
 
 		// 调整方向
 		if (Common.Sign(cosAngle - Common.cosAngleIllegalValue) != 0)
 		{
-			// float angle = Mathf.LerpUnclamped(directionAngleFrom, directionAngleTo, progress);
 			transform.localRotation = Quaternion.Euler(0f, directionAngleTo, 0f);
 		}
 
@@ -302,9 +298,10 @@ public class Enemy : MonoBehaviour
 		if(AtGoal)
         {
 			return;
-        }			
+        }
 
-		foreach(var id2Enemy in Common.enemys.Enemys)
+		// 动态避障(搜索所有的enemy)
+		foreach (var id2Enemy in Common.enemys.Enemys)
         {
 			Enemy enemy = id2Enemy.Value;
 			if(enemy == this)
@@ -319,7 +316,7 @@ public class Enemy : MonoBehaviour
 			}
 
 			float distSquare = PathDefs.DistenceSquare(this.currWayPoint, enemy.currWayPoint);
-			if (distSquare >= PathConstants.SQUARE_SPEED_AND_RADIUS) // SQUARE_SPEED_AND_RADIUS = Square(speed + enemy.radius + this.radius)
+			if (distSquare > PathConstants.SQUARE_SPEED_AND_RADIUS) // SQUARE_SPEED_AND_RADIUS = Square(speed + enemy.radius + this.radius)
 			{
 				continue;
             }
@@ -343,17 +340,14 @@ public class Enemy : MonoBehaviour
 			int tmp = directionAngleFrom % 45;
 			if(tmp != 0)
             {
-				tmp = avoiderTurnSign >= 0 ? tmp : 45 - tmp;
+				tmp = avoiderTurnSign < 0 ? -tmp : 45 - tmp;
 			}
 
-			for (int i = 0; i < 4; ++i)
-            {
-				if(i == 0 && tmp == 0)
-                {
-					continue;
-                }
+			directionAngleFrom += tmp;
 
-				GameTile tmpPoint = nowPoint.GetNextTileByDegree(directionAngleFrom + tmp + 45 * i * avoiderTurnSign);
+			for (int i = (tmp == 0 ? 1 : 0) ; i < 4; ++i)
+            {
+				GameTile tmpPoint = nowPoint.GetNextTileByDegree(directionAngleFrom + 45 * i * avoiderTurnSign);
 				if(tmpPoint == null)
                 {
 					continue;
@@ -371,6 +365,17 @@ public class Enemy : MonoBehaviour
 	}
 
 	#region 改变下一个状态
+	void GetNextWayPoint()
+    {
+		nextWayPoint = pathManager.NextWayPoint(pathID);
+
+		if (nextWayPoint != null && currWayPoint!= null && 
+			GameTileDefs.IsBlocked(currWayPoint, nextWayPoint))
+		{
+			ReRequestPath(currWayPoint);
+		}
+	}
+
 	void PrepareNextState()
 	{
 		positionFrom = positionTo;

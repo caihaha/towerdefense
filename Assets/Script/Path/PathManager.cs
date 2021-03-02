@@ -51,15 +51,16 @@ public class PathManager
     {
         MultiPath multiPath = GetMultiPath(pathID);
         if (multiPath == null)
-            return null;
-
-        GameTile tile = null;
-        if (multiPath.path != null && multiPath.path.path.Count > 0)
         {
-            tile = multiPath.path.path.Pop();
+            return null;
         }
 
-        return tile;
+        if (multiPath.path != null && multiPath.path.path.Count > 0)
+        {
+            return multiPath.path.path.Pop();
+        }
+
+        return null;
     }
 
     public uint RequiredPath(Enemy caller, GameTile startPos, GameTile goalPos)

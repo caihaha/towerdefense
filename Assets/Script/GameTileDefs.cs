@@ -73,6 +73,11 @@ public static class Common
     {
         return (float)(degree * 1.0 / 180.0 * Mathf.PI);
     }
+
+    public static bool SquareIsBlocked()
+    {
+        return false;
+    }
 }
 
 public static class GameTileDefs
