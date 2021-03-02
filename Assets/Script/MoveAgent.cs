@@ -50,25 +50,12 @@ public class MoveAgent
 		nextWayPoint = null;
 		progress = 0f;
 
-		PrepareIntro();
+		Init();
 		pathManager = new PathManager();
     }
 
 	#region 初始化
-	public void SpawnOn(GameTile tile)
-	{
-		nowPoint = tile;
-		currWayPoint = tile;
-		nextWayPoint = null;
-
-		progress = 0f;
-		PrepareIntro();
-
-		pathManager = new PathManager();
-	}
-
-	// 初始化状态
-	void PrepareIntro()
+	void Init()
 	{
 		positionFrom = currWayPoint.transform.localPosition;
 		positionTo = currWayPoint.ExitPoint;
@@ -91,7 +78,6 @@ public class MoveAgent
 
 	public void GameSlowUpdate()
 	{
-
 	}
 
 	public void StartMoving()
