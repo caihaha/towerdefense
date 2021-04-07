@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour
 	{
 		transform.localRotation = Quaternion.identity;
 		transform.localPosition = tile.transform.localPosition;
-		moveAgent = new MoveAgent(tile);
+		moveAgent = new MoveAgent(this, tile);
 	}
 	#endregion
 
@@ -34,8 +34,8 @@ public class Enemy : MonoBehaviour
     public bool GameUpdate()
     {
 		moveAgent.GameUpdate();
-		transform.localPosition = moveAgent.NowPoint.transform.localPosition;
-		transform.localRotation = Quaternion.Euler(0f, moveAgent.DirectionAngleTo, 0f);
+		transform.localPosition = moveAgent.CurrWayPoint;
+		transform.forward = moveAgent.FrontDir;
 		
 		return true;
     }
@@ -52,7 +52,7 @@ public class Enemy : MonoBehaviour
 
 	public void SetGoalPos(GameTile tile)
     {
-		moveAgent.GoalPoint = tile;
+		moveAgent.GoalTile = tile;
     }
     #endregion
 }
