@@ -9,7 +9,7 @@ public static class Common
     public static Vector3 boardMax = new Vector3(boardRangeX.y + 0.5f, 0, boardRangeZ.y + 0.5f);
     public static int BoardCount => boardSize.x * boardSize.y;
 
-    public static int c = (boardSize.x / 2) + (boardSize.y / 2 * boardSize.x);
+    public static int centerCount = (boardSize.x >> 1) + ((boardSize.y >> 1) * boardSize.x);
 
     public static EnemyCollection enemys = new EnemyCollection();
 
@@ -26,18 +26,18 @@ public static class Common
             return new Vector2Int(int.MaxValue, int.MaxValue);
         }
 
-        return new Vector2Int(index % boardSize.x - boardSize.x / 2, index / boardSize.x - boardSize.y / 2);
+        return new Vector2Int(index % boardSize.x - (boardSize.x >> 1), index / boardSize.x - (boardSize.y >> 1));
     }
 
     public static int BlockPos2Index(Vector2Int pos)
     {
-        if(pos.x < -boardSize.x / 2 || pos.x > (boardSize.x - 1) / 2 || 
-            pos.y < -boardSize.y / 2 || pos.y > (boardSize.y - 1) / 2)
+        if(pos.x < boardRangeX.x || pos.x > boardRangeX.y || 
+            pos.y < boardRangeZ.x || pos.y > boardRangeZ.y)
         {
             return -1;
         }
 
-        return pos.x + boardSize.x * pos.y + c;
+        return pos.x + boardSize.x * pos.y + centerCount;
     }
 
     public static int Sign(float num)
