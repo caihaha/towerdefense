@@ -84,8 +84,8 @@ public static class Common
 
     public static bool GetTileXZUnclamped(Vector3 pos, out int x, out int z)
     {
-        x = ((int)(pos.x + 0.5) >> 1);
-        z = ((int)(pos.z + 0.5) >> 1);
+        x = ((int)(pos.x + Sign(pos.x) * 0.5));
+        z = ((int)(pos.z + Sign(pos.z) * 0.5));
         return x >= boardMin.x && x <= boardMax.x && z >= boardMin.z && z <= boardMax.z;
     }
     public static void GetTileXZ(Vector3 pos, out int x, out int z)
