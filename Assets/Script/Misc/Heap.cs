@@ -1,66 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
 
-/*
-public class Heap<T>
+class PriorityQueue<T>
 {
-    #region 数据成员
-    private int _capacity;
-    private int _size;
-    private T[] _items;
-    #endregion
+    IComparer<T> comparer;
+    T[] heap;
 
-    #region 对外接口
-    public bool Enqueue(T value)
+    public int Count { get; private set; }
+
+    public PriorityQueue() : this(null) { }
+    public PriorityQueue(int capacity) : this(capacity, null) { }
+    public PriorityQueue(IComparer<T> comparer) : this(16, comparer) { }
+    public PriorityQueue(int capacity, IComparer<T> comparer)
     {
-        if(_capacity == _size)
-        {
-            ResizeItemStore(_size * 2);
-        }
-
-        _items[_count++] = value;
-        int position = BubbleUp(_count - 1);
-
-        return (position == 0);
+        this.comparer = (comparer == null) ? Comparer<T>.Default : comparer;
+        this.heap = new T[capacity];
     }
 
-    public T Dequeue()
+    public void Push(T v)
     {
-        return Dequeue(true);
-    }
-    #endregion
-
-    #region 内部接口
-    void ReizeItemStore(int newSize)
-    {
-        if(_count >= newSize)
+        if (Count >= heap.Length)
         {
-            return;
+            Array.Resize(ref heap, Count << 1);
         }
-
-        T[] temp = new T[newSize];
-        Array.Copy(_items, 0, temp, 0, _count);
-        _items = temp;
+        heap[Count] = v;
+        SiftUp(Count++);
     }
 
-    T Dequeue(bool shrink)
+    public T Pop()
     {
-        if(_count == 0)
+        T v = Top();
+        heap[0] = heap[--Count];
+        if (Count > 0)
         {
-            throw new InvalidOperationException();
+            SiftDown(0);
         }
-
-        T result = _items[0];
-        if(_count == 1)
-        {
-            _count = 0;
-            _items[0] = default(T);
-        }
-        else
-        {
-
-        }
+        return v;
     }
-    #endregion
+
+    public T Top()
+    {
+        return Count > 0 ? heap[Count - 1] : throw new InvalidOperationException("Priority is null");
+    }
+
+    private void SiftUp(int n)
+    {
+        T v = heap[n];
+        for (int i = n / 2; n > 0 && comparer.Compare(v, heap[i]) > 0; n = i, i >>= 2)
+        { 
+            heap[n] = heap[i];
+        }
+
+        heap[n] = v;
+    }
+
+    private void SiftDown(int n)
+    {
+        T v = heap[n];
+        for (int i = n * 2; i < Count; n = i, i <<= 1)
+        {
+            if (i + 1 < Count && comparer.Compare(heap[i + 1], heap[i]) > 0)
+            {
+                ++i;
+            }
+            if (comparer.Compare(v, heap[i]) >= 0)
+            {
+                break;
+            }
+            heap[n] = heap[i];
+        }
+        heap[n] = v;
+    }
 }
-*/
