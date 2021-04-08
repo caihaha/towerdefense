@@ -6,7 +6,7 @@ public class Game : MonoBehaviour
 {
     #region 数据成员
     [SerializeField]
-    Vector2Int boardSize = Common.BoardSize;
+    Vector2Int boardSize = Common.boardSize;
 
     [SerializeField]
     GameBoard board = default;

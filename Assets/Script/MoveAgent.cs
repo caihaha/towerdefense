@@ -231,7 +231,7 @@ public class MoveAgent
 
 	private uint GetNewPath()
 	{
-		return pathManager.RequiredPath(this, goalPos);
+		return pathManager.RequiredPath(this, pos, goalPos, goalRadius);
 	}
 
 	private bool FollowPath()
@@ -382,7 +382,6 @@ public class MoveAgent
 		
 	}
 
-	// 二维下
 	private Vector3 GetRightVector(Vector3 vec)
 	{
 		return new Vector3(vec.z, 0, -vec.x);

@@ -2,8 +2,11 @@
 
 public static class Common
 {
-    private static Vector2Int boardSize = new Vector2Int(11, 11);
-    public static Vector2Int BoardSize => boardSize;
+    public static Vector2Int boardSize = new Vector2Int(11, 11);
+    public static Vector2Int boardRangeX = new Vector2Int(-boardSize.x >> 1, (boardSize.x - 1) >> 1);
+    public static Vector2Int boardRangeZ = new Vector2Int(-boardSize.y >> 1, (boardSize.y - 1) >> 1);
+    public static Vector3 boardMin = new Vector3(boardRangeX.x - 0.5f, 0, boardRangeZ.x - 0.5f);
+    public static Vector3 boardMax = new Vector3(boardRangeX.y + 0.5f, 0, boardRangeZ.y + 0.5f);
     public static int BoardCount => boardSize.x * boardSize.y;
 
     public static int c = (boardSize.x / 2) + (boardSize.y / 2 * boardSize.x);
@@ -78,9 +81,22 @@ public static class Common
     {
         return false;
     }
+
+    public static bool GetTileXZUnclamped(Vector3 pos, out int x, out int z)
+    {
+        x = ((int)(pos.x + 0.5) >> 1);
+        z = ((int)(pos.z + 0.5) >> 1);
+        return x >= boardMin.x && x <= boardMax.x && z >= boardMin.z && z <= boardMax.z;
+    }
+    public static void GetTileXZ(Vector3 pos, out int x, out int z)
+    {
+        GetTileXZUnclamped(pos, out x, out z);
+        x = Mathf.Clamp(x, boardRangeX.x, boardRangeX.y);
+        z = Mathf.Clamp(z, boardRangeZ.x, boardRangeZ.y);
+    }
 }
 
-public static class GameTileDefs
+public static class GameDefs
 {
     public static GameTile GetGameTileByIndex(int index)
     {
@@ -120,6 +136,5 @@ public static class GameTileDefs
 
         return false;
     }
-
 }
 

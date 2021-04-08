@@ -71,12 +71,6 @@ public class GameBoard : MonoBehaviour
                 tile.ExitPoint = tile.transform.localPosition;
                 tile.num = i;
 
-                tile.IsAlternative = (x & 1) == 0;
-                if((y & 1) == 0)
-                {
-                    tile.IsAlternative = !tile.IsAlternative;
-                }
-
                 tile.Content = contentFactory.Get(GameTileContentType.Empty);
             }
         }

@@ -63,7 +63,7 @@ public class PathManager
         return null;
     }
 
-    public uint RequiredPath(MoveAgent caller, Vector3 goalPos)
+    public uint RequiredPath(MoveAgent caller, Vector3 startPos, Vector3 goalPos, float goalRadius)
     {
         if(!IsFinalized())
         {
@@ -86,30 +86,30 @@ public class PathManager
     #endregion
     
     #region 内部函数
-    IPath.SearchResult ArrangePath(MultiPath newPath, GameTile starePos, GameTile goalPos, MoveAgent caller)
+    private IPath.SearchResult ArrangePath(MultiPath newPath, GameTile starePos, GameTile goalPos, MoveAgent caller)
     {
         IPath.SearchResult result = pathFinder.GetPath(caller, starePos, goalPos, newPath.path);
 
         return result;
     }
 
-    uint Store(MultiPath path)
+    private uint Store(MultiPath path)
     {
         pathMap.Add(++nextPathID, path);
         return nextPathID;
     }
 
-    static void FinalizePath(MultiPath path, GameTile startPos, GameTile goalPos, bool cantGetCloser)
+    private static void FinalizePath(MultiPath path, GameTile startPos, GameTile goalPos, bool cantGetCloser)
     {
 
     }
 
-    bool IsFinalized()
+    private bool IsFinalized()
     {
         return pathFinder != null;
     }
 
-    MultiPath GetMultiPath(uint pathID)
+    private MultiPath GetMultiPath(uint pathID)
     {
         if(pathMap.ContainsKey(pathID))
         {

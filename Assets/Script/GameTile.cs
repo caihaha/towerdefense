@@ -27,9 +27,6 @@ public class GameTile : MonoBehaviour
 
     public bool IsDestination => Content.Type == GameTileContentType.Destination;
 
-    // 用于交替搜索优先级
-    public bool IsAlternative { get; set; }
-
     public GameTileContent Content
     {
         get => content;
@@ -43,35 +40,5 @@ public class GameTile : MonoBehaviour
             content = value;
             content.transform.localPosition = transform.localPosition;
         }
-    }
-
-    public void HidePath()
-    {
-        arrow.gameObject.SetActive(false);
-    }
-
-    public GameTile GetNextTileByDegree(int degree)
-    {
-        GameTile nextTile = null;
-
-        while(degree < 0)
-        {
-            degree += 360;
-        }
-
-        switch (degree % 360)
-        {
-            case 0: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x, (int)ExitPoint.z + 1)); break;
-            case 45: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.z + 1)); break;
-            case 90: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.z)); break;
-            case 135: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x + 1, (int)ExitPoint.z - 1)); break;
-            case 180: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x, (int)ExitPoint.z - 1)); break;
-            case 225: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.z - 1)); break;
-            case 270: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.z)); break;
-            case 315: nextTile = GameTileDefs.GetGameTileByPos(new Vector2Int((int)ExitPoint.x - 1, (int)ExitPoint.z + 1)); break;
-            default: Debug.LogError("<GetNextTileByDegree> Degree Illegal"); break;
-        }
-
-        return nextTile;
     }
 }
