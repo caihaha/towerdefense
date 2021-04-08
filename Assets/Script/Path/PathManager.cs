@@ -63,25 +63,25 @@ public class PathManager
         return null;
     }
 
-    public uint RequiredPath(MoveAgent caller, GameTile startPos, GameTile goalPos)
+    public uint RequiredPath(MoveAgent caller, Vector3 goalPos)
     {
         if(!IsFinalized())
         {
             return 0;
         }
 
-        MultiPath newPath = new MultiPath(startPos);
-        newPath.finalGoal = goalPos;
-        newPath.caller = caller;
+        //MultiPath newPath = new MultiPath(startPos);
+        //newPath.finalGoal = goalPos;
+        //newPath.caller = caller;
 
-        IPath.SearchResult result = ArrangePath(newPath, startPos, goalPos, caller);
+        //IPath.SearchResult result = ArrangePath(newPath, startPos, goalPos, caller);
 
-        uint pathID;
-        FinalizePath(newPath, startPos, goalPos, result == IPath.SearchResult.CantGetCloser);
-        newPath.searchResult = result;
-        pathID = Store(newPath);
+        //uint pathID;
+        //FinalizePath(newPath, startPos, goalPos, result == IPath.SearchResult.CantGetCloser);
+        //newPath.searchResult = result;
+        //pathID = Store(newPath);
 
-        return pathID;
+        return 0;
     }
     #endregion
     
