@@ -106,11 +106,6 @@ public static class DirectionExtensions
 
     public static bool IsDiagonalDirection(Direction dir)
     {
-        //return dir == Direction.DownLeft ||
-        //    dir == Direction.DownRight ||
-        //    dir == Direction.UpLeft ||
-        //    dir == Direction.UpRight;
-
         return (((int)dir & 1) != 0);
     }
 

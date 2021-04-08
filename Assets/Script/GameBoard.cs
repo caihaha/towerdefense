@@ -44,28 +44,6 @@ public class GameBoard : MonoBehaviour
             }
         }
     }
-    public bool ShowPaths
-    {
-        get => showPaths;
-        set
-        {
-            showPaths = value;
-            if (showPaths)
-            {
-                foreach (GameTile tile in tiles)
-                {
-                    // tile.ShowPath();
-                }
-            }
-            else
-            {
-                foreach (GameTile tile in tiles)
-                {
-                    tile.HidePath();
-                }
-            }
-        }
-    }
     #endregion
 
     public static GameBoard Instance { get; private set; }
@@ -119,7 +97,7 @@ public class GameBoard : MonoBehaviour
 
     public GameTile GetTileByIdx(int index)
     {
-        if (tiles.Length < index)
+        if (tiles.Length < index || index < 0)
             return null;
 
         return tiles[index];
