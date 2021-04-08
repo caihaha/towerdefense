@@ -15,10 +15,10 @@ public class Enemy : MonoBehaviour
 			originFactory = value;
 		}
 	}
-
+	
+	UnitDef unitDef;
 	MoveAgent moveAgent;
-	public MoveAgent Move => moveAgent;
-
+	public MoveAgent UnitMove => moveAgent;
     #endregion
 
     #region 初始化
@@ -26,12 +26,14 @@ public class Enemy : MonoBehaviour
 	{
 		transform.localRotation = Quaternion.identity;
 		transform.localPosition = tile.transform.localPosition;
-		moveAgent = new MoveAgent(this, tile);
+
+		unitDef = new UnitDef();
+		moveAgent = new MoveAgent(this, tile, unitDef);
 	}
 	#endregion
 
-    #region 对外接口
-    public bool GameUpdate()
+	#region 对外接口
+	public bool GameUpdate()
     {
 		moveAgent.GameUpdate();
 		transform.localPosition = moveAgent.CurrWayPoint;

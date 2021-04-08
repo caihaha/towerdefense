@@ -2,6 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class UnitDef
+{
+	public int teamID; //enemy can't push
+	public float mass; //calc push distance
+	public float radius;
+	public float maxSpeed;
+	public float maxAcc;
+	public float maxDec;
+	public bool isPushResistant;
+
+	public UnitDef()
+    {
+		teamID = 1;
+		mass = 1.0f;
+		radius = 0.6f;
+		maxSpeed = 1.0f;
+		maxAcc = 1.0f;
+		maxDec = 1.0f;
+		isPushResistant = true;
+    }
+}
+
 public class MoveAgent
 {
 	#region 数据成员
@@ -45,19 +67,23 @@ public class MoveAgent
 
 	private int numIdlingUpdates;
 	private int numIdlingSlowUpdates;
+
+	private float maxSpeed;
 	#endregion
 
-	public MoveAgent(Enemy enemy, GameTile startPoint)
+	public MoveAgent(Enemy enemy, GameTile startPoint, UnitDef unitDef)
     {
 		owner = enemy;
 		Init(startPoint);
 		pathManager = new PathManager();
+
+		
     }
 
 	#region 初始化
 	void Init(GameTile startPoint)
 	{
-		currentSpeed = 0.01f;
+		currentSpeed = 0f;
 		currWayPoint = startPoint.ExitPoint;
 		nextWayPoint = startPoint.ExitPoint;
 
@@ -71,7 +97,7 @@ public class MoveAgent
 	public bool GameUpdate()
 	{
 		currWayPoint = nextWayPoint;
-		nextWayPoint = currWayPoint + (currentSpeed * flatFrontDir); 
+		nextWayPoint += (currentSpeed * flatFrontDir * Time.deltaTime); 
 
 		UpdateOwnerSpeedAndHeading();
 		//UpdateOwnerPos();
@@ -244,10 +270,10 @@ public class MoveAgent
 	{
 		if (WantToStop())
 		{
-			currWayPoint.y = -1.0f;
-			nextWayPoint.y = -1.0f;
+			currWayPoint.y = -0.1f;
+			nextWayPoint.y = -0.1f;
 			SetMainHeading();
-			ChangeSpeed(0);
+			ChangeSpeed(0.0f);
 			return false;
 		}
         else
@@ -287,16 +313,15 @@ public class MoveAgent
     }
 	private void ChangeSpeed(float newWantedSpeed)
 	{
-		wantedSpeed = newWantedSpeed;
 		if (wantedSpeed <= 0.0f && currentSpeed < 0.01f)
         {
 			currentSpeed = 0.0f;
 			deltaSpeed = 0.0f;
-
 			return;
         }
 
-		if(newWantedSpeed > 0.0f)
+		float targetSpeed = maxSpeed;
+		if (newWantedSpeed > 0.0f)
         {
 			// TODO
 			wantedSpeed = newWantedSpeed;
@@ -323,8 +348,8 @@ public class MoveAgent
         // 动态避障(搜索所有的enemy)
         foreach (var id2Enemy in Common.enemys.Enemys)
         {
-            MoveAgent enemy = id2Enemy.Value.Move;
-            if (enemy == this)
+            MoveAgent moveAgent = id2Enemy.Value.UnitMove;
+            if (moveAgent == this)
             {
                 continue;
             }
