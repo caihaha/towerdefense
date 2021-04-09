@@ -36,6 +36,11 @@ public static class PathDefs
 
         return dx * dx + dz * dz;
     }
+
+    public static bool IsGoal(Vector3 pos, Vector3 goalPos)
+    {
+        return false;
+    }
 }
 
 public static class PathConstants

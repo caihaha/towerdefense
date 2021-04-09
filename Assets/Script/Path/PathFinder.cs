@@ -13,12 +13,6 @@ public class PathFinder : IPathFinder
                 continue;
 
             closeBlocks.Add(node);
-            //if (node.tile.Content.Type == GameTileContentType.Destination)
-            //{
-            //    foundGoal = true;
-            //    break;
-            //}
-
             TestNeighborSquares(node, owner, goalPos);
         }
 
@@ -27,15 +21,16 @@ public class PathFinder : IPathFinder
 
     override protected void FinishSearch(IPath.Path foundPath, Vector3 startPos, Vector3 goalPos)
     {
+        Vector3 tmp = goalPos;
         while (true)
         {
-            if (goalPos == null || goalPos == startPos)
+            if (tmp == null || tmp == startPos)
             {
                 break;
             }
 
-            foundPath.path.Push(goalPos);
-            // goalPos = blockStates.parentTile[(int)tile.num];
+            foundPath.path.Push(tmp);
+            tmp = blockStates.parentTile[Common.PosToTileIndex(tmp)];
         }
     }
 
@@ -70,7 +65,7 @@ public class PathFinder : IPathFinder
         openBlock.gCost = gCost;
         openBlock.fCost = fCost;
 
-        //blockStates.parentTile[(int)nextTile.num] = parentSquare.pos;
+        blockStates.parentTile[Common.PosToTileIndex(nextPos)] = parentSquare.pos;
 
         return true;
     }

@@ -27,10 +27,12 @@ abstract public class IPathFinder
     protected IPath.SearchResult InitSearch(MoveAgent owner, Vector3 startPos, Vector3 goalPos)
     {
         ResetSearch();
-        PathNode ob = new PathNode();
-        ob.fCost = 0f;
-        ob.gCost = 0f;
-        ob.pos = startPos;
+        PathNode ob = new PathNode()
+        {
+            fCost = 0f,
+            gCost = 0f,
+            pos = startPos
+        };
         openBlocks.Push(ob);
 
         IPath.SearchResult search = DoSearch(owner, goalPos);

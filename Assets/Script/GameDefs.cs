@@ -19,6 +19,7 @@ public static class Common
 
     public static int enemySlowUpdateRate = 15;
 
+    // 根据网格索引获取网格X,Z
     public static Vector2Int BlockIndex2Pos(int index)
     {
         if(index < 0 || index > Common.BoardCount)
@@ -29,6 +30,7 @@ public static class Common
         return new Vector2Int(index % boardSize.x - (boardSize.x >> 1), index / boardSize.x - (boardSize.y >> 1));
     }
 
+    // 根据网格x,z获取网格索引
     public static int BlockPos2Index(Vector2Int pos)
     {
         if(pos.x < boardRangeX.x || pos.x > boardRangeX.y || 
@@ -57,6 +59,11 @@ public static class Common
         return vec.x * vec.x + vec.y * vec.y + vec.z * vec.z;
     }
 
+    public static float SqDistance2D(Vector3 vec)
+    {
+        return vec.x * vec.x  + vec.z * vec.z;
+    }
+
     public static float Dot(Vector3 a, Vector3 b)
     {
         return a.x * b.x + a.y * b.y + a.z * b.z;
@@ -77,22 +84,27 @@ public static class Common
         return (float)(degree * 1.0 / 180.0 * Mathf.PI);
     }
 
-    public static bool SquareIsBlocked()
-    {
-        return false;
-    }
-
     public static bool GetTileXZUnclamped(Vector3 pos, out int x, out int z)
     {
         x = ((int)(pos.x + Sign(pos.x) * 0.5));
         z = ((int)(pos.z + Sign(pos.z) * 0.5));
         return x >= boardMin.x && x <= boardMax.x && z >= boardMin.z && z <= boardMax.z;
     }
+    // 位置获得网格的X,Z
     public static void GetTileXZ(Vector3 pos, out int x, out int z)
     {
         GetTileXZUnclamped(pos, out x, out z);
         x = Mathf.Clamp(x, boardRangeX.x, boardRangeX.y);
         z = Mathf.Clamp(z, boardRangeZ.x, boardRangeZ.y);
+    }
+
+    public static int PosToTileIndex(Vector3 pos)
+    {
+        if (GetTileXZUnclamped(pos, out int x, out int z))
+        {
+            return BlockPos2Index(new Vector2Int(x, z));
+        }
+        return -1;
     }
 
     public static Vector3 illegalPos = new Vector3(float.MinValue, 0, float.MinValue);
