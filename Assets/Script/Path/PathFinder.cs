@@ -107,7 +107,6 @@ public class PathFinder : IPathFinder
                 return true;
             }
         }
-
         return false;
     }
 
@@ -120,7 +119,6 @@ public class PathFinder : IPathFinder
                 return tmp;
             }
         }
-
         return null;
     }
     #endregion

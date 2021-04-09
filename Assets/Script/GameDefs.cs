@@ -59,9 +59,12 @@ public static class Common
         return vec.x * vec.x + vec.y * vec.y + vec.z * vec.z;
     }
 
-    public static float SqDistance2D(Vector3 vec)
+    public static float SqDistance2D(Vector3 vec1, Vector3 vec2)
     {
-        return vec.x * vec.x  + vec.z * vec.z;
+        float dx = vec1.x - vec2.x;
+        float dz = vec1.z - vec2.z;
+
+        return dx * dx + dz * dz;
     }
 
     public static float Dot(Vector3 a, Vector3 b)
