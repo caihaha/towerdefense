@@ -21,8 +21,8 @@ namespace IPath
 
         public Stack<Vector3> path = new Stack<Vector3>();
 
-        public GameTile desiredGoal;
-        public GameTile pathGoal;
+        public Vector3 desiredGoal;
+        public Vector3 pathGoal;
 
         public float pathCost;
         public float goalRadius;
