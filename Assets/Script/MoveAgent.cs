@@ -73,7 +73,6 @@ public class MoveAgent
 	private Vector3 oldSlowUpdatePos;
 	private Vector3 currentVelocity;
 
-	public Vector3 GoalPos { get => goalPos; set => goalPos = value; }
 	public Vector3 CurrWayPoint { get => currWayPoint; set => currWayPoint = value; }
 	public Vector3 NextWayPoint { get => nextWayPoint; set => nextWayPoint = value; }
 	public Vector3 FrontDir { get => flatFrontDir; set => flatFrontDir = value; }
@@ -117,14 +116,34 @@ public class MoveAgent
 	#region 对外接口
 	public bool GameUpdate()
 	{
-		currWayPoint = nextWayPoint;
-		nextWayPoint += (currentSpeed * flatFrontDir * Time.deltaTime); 
+		//currWayPoint = nextWayPoint;
+		//nextWayPoint += (currentSpeed * flatFrontDir * Time.deltaTime); 
 
+		oldPos = pos;
+		Vector3 oldDir = flatFrontDir;
 		UpdateOwnerSpeedAndHeading();
 		UpdateOwnerPos(currentVelocity, flatFrontDir * (currentSpeed + deltaSpeed));
 		HandleObjectCollisions();
-
+		this.pos.y = 0.0f;
+		OwnerMoved(oldPos, oldDir);
 		return true;
+	}
+
+	public void OwnerMoved(Vector3 oldPos, Vector3 oldForward)
+	{
+		if ((oldPos - pos).sqrMagnitude < 0.00001f)
+		{
+			currentVelocity = Vector3.zero;
+			currentSpeed = 0.0f;
+			idling = true;
+			idling &= (currWayPoint.y != -0.1f && nextWayPoint.y != -0.1f);
+			return;
+		}
+		Vector3 ffd = flatFrontDir * Common.SqDistance2D(oldPos, pos) * 0.5f;
+		Vector3 wpd = wayPointDir;
+		idling = true;
+		
+		idling &= Common.SqDistance2D(oldPos, pos) < currentSpeed * 0.5f * currentSpeed * 0.5f;
 	}
 
 	public void GameSlowUpdate()
@@ -153,6 +172,15 @@ public class MoveAgent
 
 		// ReRequestPath(nowPoint);
 	}
+
+	public void SetGoalPos(Vector3 goalPos)
+    {
+		if(goalPos != currWayPoint)
+        {
+			this.goalPos = goalPos;
+			atGoal = false;
+        }
+    }
 	#endregion
 
 	#region 内部函数
@@ -164,6 +192,14 @@ public class MoveAgent
 	// 更新位置
 	private void UpdateOwnerPos(Vector3 oldVelocity, Vector3 newVelocity)
 	{
+		if (newVelocity != Vector3.zero)
+		{
+			Vector3 newPos = pos + newVelocity;
+			pos = newPos;
+		}
+		currentVelocity = newVelocity;
+		currentSpeed = newVelocity.magnitude;
+		deltaSpeed = 0.0f;
 	}
 
 	private void HandleObjectCollisions()
@@ -292,7 +328,7 @@ public class MoveAgent
     }
 	private void ChangeHeading(Vector3 wantedForward)
 	{
-		return;
+		flatFrontDir = wantedForward;
 	}
 	private void ChangeSpeed(float newWantedSpeed)
 	{
@@ -360,7 +396,6 @@ public class MoveAgent
             {
                 continue;
             }
-
         }
 
         return wantedForward;
@@ -368,16 +403,6 @@ public class MoveAgent
 
 	#region 改变下一个状态
 	private void GetNextWayPoint()
-	{
-		
-	}
-
-	private void PrepareNextState()
-	{
-		
-	}
-
-	private void SetDirectionAngleTo(Vector3 nextDir)
 	{
 		
 	}

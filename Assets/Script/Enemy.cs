@@ -54,7 +54,7 @@ public class Enemy : MonoBehaviour
 
 	public void SetGoalPos(GameTile tile)
     {
-		moveAgent.GoalPos = tile.ExitPoint;
+		moveAgent.SetGoalPos(tile.ExitPoint);
     }
     #endregion
 }
