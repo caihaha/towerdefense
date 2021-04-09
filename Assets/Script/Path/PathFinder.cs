@@ -87,14 +87,13 @@ public class PathFinder : IPathFinder
                     continue;
                 }
 
-                //GameTile nextTile = GameDefs.GetGameTileByPos(new Vector2Int((int)pos.x + x, (int)pos.z + z));
-                //if (nextTile == null ||
-                //    GameDefs.IsBlocked(pos, nextTile))
-                //{
-                //    continue;
-                //}
+                Vector3 nextPos = new Vector3(pos.x + x, 0, pos.z + z);
+                if (GameDefs.IsBlocked(pos, nextPos))
+                {
+                    continue;
+                }
 
-                //TestBlock(ob, goalPos, nextTile);
+                TestBlock(ob, goalPos, nextPos);
             }
         }
     }

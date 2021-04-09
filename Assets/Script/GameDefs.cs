@@ -151,7 +151,7 @@ public static class GameDefs
         return false;
     }
 
-    public static bool IsBlocked(Vector3 currTile, Vector3 nextTile)
+    public static bool IsBlocked(Vector3 currPos, Vector3 nextPos)
     {
         return false;
     }
