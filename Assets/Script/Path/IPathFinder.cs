@@ -13,7 +13,7 @@ abstract public class IPathFinder
     #region 对外接口
     public IPath.SearchResult GetPath(MoveAgent owner, Vector3 startPos, Vector3 goalPos,IPath.Path path)
     {
-        IPath.SearchResult result = InitSeatch(owner, startPos, goalPos);
+        IPath.SearchResult result = InitSearch(owner, startPos, goalPos);
         if(result == IPath.SearchResult.Ok || result == IPath.SearchResult.GoalOutOfRange)
         {
             FinishSearch(path, startPos, goalPos);
@@ -24,7 +24,7 @@ abstract public class IPathFinder
     #endregion
 
     #region 内部函数
-    protected IPath.SearchResult InitSeatch(MoveAgent owner, Vector3 startPos, Vector3 goalPos)
+    protected IPath.SearchResult InitSearch(MoveAgent owner, Vector3 startPos, Vector3 goalPos)
     {
         ResetSearch();
         PathNode ob = new PathNode();

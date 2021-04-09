@@ -8,10 +8,9 @@ public class PathFinder : IPathFinder
 
         while (openBlocks.Count > 0)
         {
-            PathNode node = GetLeastFCostNode();
+            PathNode node = openBlocks.Pop();
             if (node == null)
                 continue;
-
 
             closeBlocks.Add(node);
             //if (node.tile.Content.Type == GameTileContentType.Destination)
@@ -77,14 +76,6 @@ public class PathFinder : IPathFinder
     }
 
     #region 内部函数
-    PathNode GetLeastFCostNode()
-    {
-        if (openBlocks == null)
-            return null;
-
-        return openBlocks.Pop();
-    }
-
     void TestNeighborSquares(PathNode ob, MoveAgent owner, Vector3 goalPos)
     {
         Vector3 pos = ob.pos;
