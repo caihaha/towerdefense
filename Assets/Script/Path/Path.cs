@@ -19,7 +19,7 @@ namespace IPath
             pathCost = -1f;
         }
 
-        public Stack<GameTile> path = new Stack<GameTile>();
+        public Stack<Vector3> path = new Stack<Vector3>();
 
         public GameTile desiredGoal;
         public GameTile pathGoal;

@@ -2,10 +2,10 @@
 
 public static class PathDefs
 {
-    public static float Heuristic(GameTile end, GameTile tile)
+    public static float Heuristic(Vector3 end, Vector3 tile)
     {
-        float dx = Mathf.Abs(tile.transform.position.x - end.transform.position.x);
-        float dz = Mathf.Abs(tile.transform.position.z - end.transform.position.z);
+        float dx = Mathf.Abs(tile.x - end.x);
+        float dz = Mathf.Abs(tile.z - end.z);
 
         // return Mathf.Sqrt(dx * dx + dz * dz);
         const float c1 = 1f;
@@ -19,20 +19,20 @@ public static class PathDefs
         return parentgCost + (DirectionExtensions.IsDiagonalDirection(direction) ? 1.4142f : 1f);
     }
 
-    public static float CalcG(PathNode parentNode, GameTile nextTile)
+    public static float CalcG(PathNode parentNode, Vector3 nextPos)
     {
-        return CalcG(parentNode.gCost, parentNode.tile, nextTile);
+        return CalcG(parentNode.gCost, parentNode.pos, nextPos);
     }
 
-    public static float CalcG(float parentgCost, GameTile parentTile, GameTile nextTile)
+    public static float CalcG(float parentgCost, Vector3 parentPos, Vector3 nextPos)
     {
-        return parentgCost + Mathf.Sqrt(DistenceSquare(parentTile, nextTile));
+        return parentgCost + Mathf.Sqrt(DistenceSquare(parentPos, nextPos));
     }
 
-    public static float DistenceSquare(GameTile start, GameTile end)
+    public static float DistenceSquare(Vector3 start, Vector3 end)
     {
-        float dx = start.transform.position.x - end.transform.position.x;
-        float dz = start.transform.position.z - end.transform.position.z;
+        float dx = start.x - end.x;
+        float dz = start.z - end.z;
 
         return dx * dx + dz * dz;
     }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-class PriorityQueue<T>
+public class PriorityQueue<T>
 {
     IComparer<T> comparer;
     T[] heap;
 
     public int Count { get; private set; }
+    public T[] Elements { get => heap; }
 
     public PriorityQueue() : this(null) { }
     public PriorityQueue(int capacity) : this(capacity, null) { }
@@ -70,5 +71,11 @@ class PriorityQueue<T>
             heap[n] = heap[i];
         }
         heap[n] = v;
+    }
+
+    public void Clear()
+    {
+        Array.Clear(heap, 0, Count);
+        Count = 0;
     }
 }

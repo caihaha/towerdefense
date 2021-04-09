@@ -2,9 +2,9 @@
 
 public class PathFinder : IPathFinder
 {
-    override protected IPath.SearchResult DoSearch(MoveAgent owner, GameTile goalPos)
+    override protected IPath.SearchResult DoSearch(MoveAgent owner, Vector3 goalPos)
     {
-        bool isFinded = false;
+        bool foundGoal = false;
 
         while (openBlocks.Count > 0)
         {
@@ -14,47 +14,46 @@ public class PathFinder : IPathFinder
 
 
             closeBlocks.Add(node);
-            if (node.tile.Content.Type == GameTileContentType.Destination)
-            {
-                isFinded = true;
-                break;
-            }
+            //if (node.tile.Content.Type == GameTileContentType.Destination)
+            //{
+            //    foundGoal = true;
+            //    break;
+            //}
 
             TestNeighborSquares(node, owner, goalPos);
         }
 
-        return isFinded ? IPath.SearchResult.Ok : IPath.SearchResult.Error;
+        return foundGoal ? IPath.SearchResult.Ok : IPath.SearchResult.Error;
     }
 
-    override protected void FinishSearch(IPath.Path foundPath, GameTile startPos, GameTile goalPos)
+    override protected void FinishSearch(IPath.Path foundPath, Vector3 startPos, Vector3 goalPos)
     {
-        GameTile tile = goalPos;
         while (true)
         {
-            if (tile == null || tile == startPos)
+            if (goalPos == null || goalPos == startPos)
             {
                 break;
             }
 
-            foundPath.path.Push(tile);
-            tile = blockStates.parentTile[(int)tile.num];
+            foundPath.path.Push(goalPos);
+            // goalPos = blockStates.parentTile[(int)tile.num];
         }
     }
 
-    override protected bool TestBlock(PathNode parentSquare, GameTile goalTile, GameTile nextTile)
+    override protected bool TestBlock(PathNode parentSquare, Vector3 goalPos, Vector3 nextPos)
     {
         // 在Close列表
-        if (IsTileInCloseBlocks(nextTile))
+        if (IsTileInCloseBlocks(nextPos))
         {
             return false;
         }
 
         // 计算fCost
-        float gCost = PathDefs.CalcG(parentSquare, nextTile);
-        float hCost = PathDefs.Heuristic(goalTile, nextTile);
+        float gCost = PathDefs.CalcG(parentSquare, nextPos);
+        float hCost = PathDefs.Heuristic(goalPos, nextPos);
         float fCost = gCost + hCost;
 
-        PathNode openBlock = GetOpenBlocksByTiles(nextTile);
+        PathNode openBlock = GetOpenBlocksByPos(nextPos);
         if (openBlock != null)
         {
             if (gCost >= openBlock.gCost)
@@ -65,14 +64,14 @@ public class PathFinder : IPathFinder
         else
         {
             openBlock = new PathNode();
-            openBlock.tile = nextTile;
-            openBlocks.Add(openBlock);
+            openBlock.pos = nextPos;
+            openBlocks.Push(openBlock);
         }
 
         openBlock.gCost = gCost;
         openBlock.fCost = fCost;
 
-        blockStates.parentTile[(int)nextTile.num] = parentSquare.tile;
+        //blockStates.parentTile[(int)nextTile.num] = parentSquare.pos;
 
         return true;
     }
@@ -83,23 +82,14 @@ public class PathFinder : IPathFinder
         if (openBlocks == null)
             return null;
 
-        PathNode resTile = openBlocks[0];
-
-        for (int i = 1; i < openBlocks.Count; ++i)
-        {
-            if (resTile.fCost > openBlocks[i].fCost)
-                resTile = openBlocks[i];
-        }
-
-        openBlocks.Remove(resTile);
-        return resTile;
+        return openBlocks.Pop();
     }
 
-    void TestNeighborSquares(PathNode ob, MoveAgent owner, GameTile goalPos)
+    void TestNeighborSquares(PathNode ob, MoveAgent owner, Vector3 goalPos)
     {
-        GameTile tile = ob.tile;
+        Vector3 pos = ob.pos;
 
-        if (tile == null)
+        if (pos == null)
             return;
 
         for (int z = 1; z >= -1; --z)
@@ -111,24 +101,23 @@ public class PathFinder : IPathFinder
                     continue;
                 }
 
-                GameTile nextTile = GameDefs.GetGameTileByPos(new Vector2Int((int)tile.ExitPoint.x + x, (int)tile.ExitPoint.z + z));
+                //GameTile nextTile = GameDefs.GetGameTileByPos(new Vector2Int((int)pos.x + x, (int)pos.z + z));
+                //if (nextTile == null ||
+                //    GameDefs.IsBlocked(pos, nextTile))
+                //{
+                //    continue;
+                //}
 
-                if (nextTile == null ||
-                    GameDefs.IsBlocked(tile, nextTile))
-                {
-                    continue;
-                }
-
-                TestBlock(ob, goalPos, nextTile);
+                //TestBlock(ob, goalPos, nextTile);
             }
         }
     }
 
-    bool IsTileInCloseBlocks(GameTile tile)
+    bool IsTileInCloseBlocks(Vector3 pos)
     {
         foreach (var tmp in closeBlocks)
         {
-            if (tmp.tile == tile)
+            if (tmp.pos == pos)
             {
                 return true;
             }
@@ -137,11 +126,11 @@ public class PathFinder : IPathFinder
         return false;
     }
 
-    PathNode GetOpenBlocksByTiles(GameTile tile)
+    PathNode GetOpenBlocksByPos(Vector3 pos)
     {
-        foreach (var tmp in openBlocks)
+        foreach (var tmp in openBlocks.Elements)
         {
-            if (tmp.tile == tile)
+            if (tmp.pos == pos)
             {
                 return tmp;
             }

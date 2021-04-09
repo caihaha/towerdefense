@@ -10,16 +10,26 @@ public class PathManager
         public IPath.Path path = new IPath.Path();
         public IPath.SearchResult searchResult;
 
-        public GameTile start;
-        public GameTile finalGoal;
-
+        public Vector3 start;
+        public Vector3 finalGoal;
         public MoveAgent caller;
 
-        public MultiPath(GameTile startPos)
+        public Vector3 goalPos;
+        float goalRadius;
+
+        public MultiPath()
         {
-            searchResult = IPath.SearchResult.Error;
-            start = startPos;
             caller = null;
+        }
+
+        public MultiPath(Vector3 startPos, Vector3 goalPos, float radius)
+        {
+            this.start = startPos;
+            this.goalPos = goalPos;
+            this.goalRadius = radius;
+            
+            this.caller = null;
+            this.searchResult = IPath.SearchResult.Error;
         }
     }
 
@@ -47,12 +57,12 @@ public class PathManager
         }
     }
 
-    public GameTile NextWayPoint(uint pathID)
+    public Vector3 NextWayPoint(uint pathID)
     {
         MultiPath multiPath = GetMultiPath(pathID);
         if (multiPath == null)
         {
-            return null;
+            return Common.illegalPos;
         }
 
         if (multiPath.path != null && multiPath.path.path.Count > 0)
@@ -60,7 +70,7 @@ public class PathManager
             return multiPath.path.path.Pop();
         }
 
-        return null;
+        return Common.illegalPos;
     }
 
     public uint RequiredPath(MoveAgent caller, Vector3 startPos, Vector3 goalPos, float goalRadius)
@@ -70,23 +80,25 @@ public class PathManager
             return 0;
         }
 
-        //MultiPath newPath = new MultiPath(startPos);
-        //newPath.finalGoal = goalPos;
-        //newPath.caller = caller;
+        Common.GetTileXZ(startPos, out var startX, out var startZ);
+        Common.GetTileXZ(goalPos, out var goalX, out var goalZ);
 
-        //IPath.SearchResult result = ArrangePath(newPath, startPos, goalPos, caller);
+        MultiPath newPath = new MultiPath(startPos, goalPos, goalRadius);
+        newPath.finalGoal = goalPos;
+        newPath.caller = caller;
 
-        //uint pathID;
-        //FinalizePath(newPath, startPos, goalPos, result == IPath.SearchResult.CantGetCloser);
-        //newPath.searchResult = result;
-        //pathID = Store(newPath);
+        IPath.SearchResult result = ArrangePath(newPath, startPos, goalPos, caller);
 
-        return 0;
+        FinalizePath(newPath, startPos, goalPos, result == IPath.SearchResult.CantGetCloser);
+        newPath.searchResult = result;
+        uint pathID = Store(newPath);
+
+        return pathID;
     }
     #endregion
     
     #region 内部函数
-    private IPath.SearchResult ArrangePath(MultiPath newPath, GameTile starePos, GameTile goalPos, MoveAgent caller)
+    private IPath.SearchResult ArrangePath(MultiPath newPath, Vector3 starePos, Vector3 goalPos, MoveAgent caller)
     {
         IPath.SearchResult result = pathFinder.GetPath(caller, starePos, goalPos, newPath.path);
 
@@ -99,7 +111,7 @@ public class PathManager
         return nextPathID;
     }
 
-    private static void FinalizePath(MultiPath path, GameTile startPos, GameTile goalPos, bool cantGetCloser)
+    private static void FinalizePath(MultiPath path, Vector3 startPos, Vector3 goalPos, bool cantGetCloser)
     {
 
     }

@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 abstract public class IPathFinder
 {
     #region 数据成员
-    public List<PathNode> openBlocks = new List<PathNode>();
+    public PriorityQueue<PathNode> openBlocks = new PriorityQueue<PathNode>(new PathNodeComparer());
     public HashSet<PathNode> closeBlocks = new HashSet<PathNode>();
 
     public PathNodeStateBuffer blockStates = new PathNodeStateBuffer();
     #endregion
 
     #region 对外接口
-    public IPath.SearchResult GetPath(MoveAgent owner, GameTile startPos, GameTile goalPos,IPath.Path path)
+    public IPath.SearchResult GetPath(MoveAgent owner, Vector3 startPos, Vector3 goalPos,IPath.Path path)
     {
         IPath.SearchResult result = InitSeatch(owner, startPos, goalPos);
         if(result == IPath.SearchResult.Ok || result == IPath.SearchResult.GoalOutOfRange)
@@ -24,14 +24,14 @@ abstract public class IPathFinder
     #endregion
 
     #region 内部函数
-    protected IPath.SearchResult InitSeatch(MoveAgent owner, GameTile startPos, GameTile goalPos)
+    protected IPath.SearchResult InitSeatch(MoveAgent owner, Vector3 startPos, Vector3 goalPos)
     {
         ResetSearch();
         PathNode ob = new PathNode();
         ob.fCost = 0f;
         ob.gCost = 0f;
-        ob.tile = startPos;
-        openBlocks.Add(ob);
+        ob.pos = startPos;
+        openBlocks.Push(ob);
 
         IPath.SearchResult search = DoSearch(owner, goalPos);
 
@@ -44,10 +44,10 @@ abstract public class IPathFinder
         openBlocks.Clear();
     }
 
-    abstract protected IPath.SearchResult DoSearch(MoveAgent owner, GameTile goalPos);
+    abstract protected IPath.SearchResult DoSearch(MoveAgent owner, Vector3 goalPos);
 
-    abstract protected void FinishSearch(IPath.Path path, GameTile startPos, GameTile goalPos);
+    abstract protected void FinishSearch(IPath.Path path, Vector3 startPos, Vector3 goalPos);
 
-    abstract protected bool TestBlock(PathNode parentSquare, GameTile goalTile, GameTile nextTile);
+    abstract protected bool TestBlock(PathNode parentSquare, Vector3 goalTile, Vector3 nextTile);
     #endregion
 }

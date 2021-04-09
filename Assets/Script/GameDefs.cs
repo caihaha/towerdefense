@@ -94,6 +94,8 @@ public static class Common
         x = Mathf.Clamp(x, boardRangeX.x, boardRangeX.y);
         z = Mathf.Clamp(z, boardRangeZ.x, boardRangeZ.y);
     }
+
+    public static Vector3 illegalPos = new Vector3(float.MinValue, 0, float.MinValue);
 }
 
 public static class GameDefs
@@ -134,6 +136,11 @@ public static class GameDefs
             return true;
         }
 
+        return false;
+    }
+
+    public static bool IsBlocked(Vector3 currTile, Vector3 nextTile)
+    {
         return false;
     }
 }
