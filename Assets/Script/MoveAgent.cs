@@ -63,6 +63,8 @@ public class MoveAgent
 	private float goalRadius;
 	private uint posTileIdx;
 
+	float deltaTime;
+
 	public Vector3 CurrWayPoint { get => currWayPoint; set => currWayPoint = value; }
 	public Vector3 NextWayPoint { get => nextWayPoint; set => nextWayPoint = value; }
 	public Vector3 FrontDir { get => flatFrontDir; set => flatFrontDir = value; }
@@ -104,12 +106,21 @@ public class MoveAgent
 		pushResistant = unitDef.isPushResistant;
 		flatFrontDir = new Vector3(0, 0, 1);
 		posTileIdx = (uint)Common.PosToTileIndex(pos);
+
+		deltaTime = 0.0f;
 	}
 	#endregion
 
 	#region 对外接口
 	public bool GameUpdate()
 	{
+		deltaTime += Time.deltaTime;
+		if (deltaTime < 1)
+        {
+			return false;
+        }
+
+		deltaTime -= 1;
 		oldPos = pos;
 		Vector3 oldDir = flatFrontDir;
 		UpdateOwnerSpeedAndHeading();

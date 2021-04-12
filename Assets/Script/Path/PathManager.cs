@@ -82,6 +82,8 @@ public class PathManager
 
         Common.GetTileXZ(startPos, out var startX, out var startZ);
         Common.GetTileXZ(goalPos, out var goalX, out var goalZ);
+        startPos = new Vector3(startX, 0, startZ);
+        goalPos = new Vector3(goalX, 0, goalZ);
 
         MultiPath newPath = new MultiPath(startPos, goalPos, goalRadius);
         newPath.finalGoal = goalPos;
