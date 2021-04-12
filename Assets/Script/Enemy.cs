@@ -18,6 +18,7 @@ public class Enemy : MonoBehaviour
 	
 	UnitDef unitDef;
 	MoveAgent moveAgent;
+	float deltaTime;
 	public MoveAgent UnitMove => moveAgent;
     #endregion
 
@@ -29,12 +30,20 @@ public class Enemy : MonoBehaviour
 
 		unitDef = new UnitDef();
 		moveAgent = new MoveAgent(this, tile, unitDef);
+		deltaTime = 0.0f;
 	}
 	#endregion
 
 	#region 对外接口
 	public bool GameUpdate()
     {
+		deltaTime += Time.deltaTime;
+		if (deltaTime < 1)
+		{
+			return false;
+		}
+		
+		deltaTime -= 1;
 		moveAgent.GameUpdate();
 		transform.localPosition = moveAgent.CurrWayPoint;
 		transform.forward = moveAgent.FrontDir;

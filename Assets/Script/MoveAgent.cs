@@ -114,13 +114,6 @@ public class MoveAgent
 	#region 对外接口
 	public bool GameUpdate()
 	{
-		deltaTime += Time.deltaTime;
-		if (deltaTime < 1)
-        {
-			return false;
-        }
-
-		deltaTime -= 1;
 		oldPos = pos;
 		Vector3 oldDir = flatFrontDir;
 		UpdateOwnerSpeedAndHeading();
