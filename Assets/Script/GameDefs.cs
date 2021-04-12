@@ -111,6 +111,11 @@ public static class Common
     }
 
     public static Vector3 illegalPos = new Vector3(float.MinValue, 0, float.MinValue);
+
+    public static bool isIllegalPos(Vector3 pos)
+    {
+        return pos.x < boardMin.x || pos.z < boardMin.z || pos.x > boardMax.x || pos.z > boardMax.z;
+    }
 }
 
 public static class GameDefs
@@ -156,6 +161,10 @@ public static class GameDefs
 
     public static bool IsBlocked(Vector3 currPos, Vector3 nextPos)
     {
+        if (Common.isIllegalPos(nextPos))
+        {
+            return true;
+        }
         return false;
     }
 }

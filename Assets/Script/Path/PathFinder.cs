@@ -13,6 +13,11 @@ public class PathFinder : IPathFinder
                 continue;
 
             closeBlocks.Add(node);
+            if (node.pos == goalPos)
+            {
+                break;
+            }
+
             TestNeighborSquares(node, owner, goalPos);
         }
 
@@ -54,19 +59,20 @@ public class PathFinder : IPathFinder
             {
                 return false;
             }
+
+            openBlock.gCost = gCost;
+            openBlock.fCost = fCost;
         }
         else
         {
             openBlock = new PathNode();
+            openBlock.gCost = gCost;
+            openBlock.fCost = fCost;
             openBlock.pos = nextPos;
             openBlocks.Push(openBlock);
         }
 
-        openBlock.gCost = gCost;
-        openBlock.fCost = fCost;
-
         blockStates.parentTile[Common.PosToTileIndex(nextPos)] = parentSquare.pos;
-
         return true;
     }
 
@@ -114,7 +120,7 @@ public class PathFinder : IPathFinder
     {
         foreach (var tmp in openBlocks.Elements)
         {
-            if (tmp.pos == pos)
+            if (tmp != null && tmp.pos == pos)
             {
                 return tmp;
             }

@@ -19,31 +19,31 @@ public class PathNode
         return lpn.fCost > rpn.fCost;
     }
 
-    public static bool operator ==(PathNode lpn, PathNode rpn)
-    {
-        if (rpn == null)
-        {
-            return false;
-        }
-        return lpn.pos == rpn.pos;
-    }
+    //public static bool operator ==(PathNode lpn, PathNode rpn)
+    //{
+    //    if (rpn == null)
+    //    {
+    //        return false;
+    //    }
+    //    return lpn.pos == rpn.pos;
+    //}
 
 
-    public static bool operator !=(PathNode lpn, PathNode rpn)
-    {
-        if (rpn == null)
-        {
-            return true;
-        }
-        return lpn.pos != rpn.pos;
-    }
+    //public static bool operator !=(PathNode lpn, PathNode rpn)
+    //{
+    //    if (rpn == null)
+    //    {
+    //        return true;
+    //    }
+    //    return lpn.pos != rpn.pos;
+    //}
 }
 
 sealed class PathNodeComparer : IComparer<PathNode>
 {
     public int Compare(PathNode lpn, PathNode rpn)
     {
-        return lpn.fCost < rpn.fCost ? -1 : (lpn.fCost == rpn.fCost ? 0 : 1);
+        return lpn.fCost > rpn.fCost ? -1 : (lpn.fCost == rpn.fCost ? 0 : 1);
     }
 }
 
