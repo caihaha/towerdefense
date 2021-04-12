@@ -59,14 +59,15 @@ public class MoveAgent
 	private Vector3 pos;
 	private Vector3 goalPos;
 	private Vector3 oldPos;
-	private Vector3 oldSlowUpdatePos;
 	private Vector3 currentVelocity;
 	
 	private float goalRadius;
+	private uint posTileIdx;
 
 	public Vector3 CurrWayPoint { get => currWayPoint; set => currWayPoint = value; }
 	public Vector3 NextWayPoint { get => nextWayPoint; set => nextWayPoint = value; }
 	public Vector3 FrontDir { get => flatFrontDir; set => flatFrontDir = value; }
+	public uint PosTileIdx { get => posTileIdx; set => posTileIdx = value; }
 	#endregion
 
 	public MoveAgent(Enemy enemy, GameTile startPoint, UnitDef unitDef)
@@ -84,6 +85,7 @@ public class MoveAgent
 		currWayPoint = startPoint.ExitPoint;
 		nextWayPoint = currWayPoint;
 		goalPos = currWayPoint;
+
 		maxSpeed = unitDef.maxSpeed;
 		accRate = Mathf.Max(0.001f, unitDef.maxAcc);
 		decRate = Mathf.Max(0.001f, unitDef.maxDec);
@@ -102,15 +104,13 @@ public class MoveAgent
 
 		pushResistant = unitDef.isPushResistant;
 		flatFrontDir = new Vector3(0, 0, 1);
+		posTileIdx = (uint)Common.PosToTileIndex(pos);
 	}
 	#endregion
 
 	#region 对外接口
 	public bool GameUpdate()
 	{
-		//currWayPoint = nextWayPoint;
-		//nextWayPoint += (currentSpeed * flatFrontDir * Time.deltaTime); 
-
 		oldPos = pos;
 		Vector3 oldDir = flatFrontDir;
 		UpdateOwnerSpeedAndHeading();
@@ -220,6 +220,7 @@ public class MoveAgent
 		{
 			Vector3 newPos = pos + newVelocity;
 			pos = newPos;
+			posTileIdx = (uint)Common.PosToTileIndex(pos);
 		}
 		currentVelocity = newVelocity;
 		currentSpeed = newVelocity.magnitude;

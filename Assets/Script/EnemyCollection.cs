@@ -61,11 +61,11 @@ public class EnemyCollection
     {
 		foreach (var enemy in enemies)
 		{
-			//if (enemy.Value.Move.NowPoint == tile)
-			//{
-			//	return enemy.Value;
-			//}
-		}
+            if (enemy.Value.UnitMove.PosTileIdx == tile.num)
+            {
+                return enemy.Value;
+            }
+        }
 
 		return null;
 	}
