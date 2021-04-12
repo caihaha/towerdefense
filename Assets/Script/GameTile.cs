@@ -12,18 +12,7 @@ public class GameTile : MonoBehaviour
 
     GameTileContent content;
     public Vector3 ExitPoint { get; set; }
-
     #endregion
-
-    public void ClearPath()
-    {
-        ExitPoint = transform.localPosition;
-    }
-
-    public void BecomeDestination()
-    {
-        ExitPoint = transform.localPosition;
-    }
 
     public bool IsDestination => Content.Type == GameTileContentType.Destination;
 

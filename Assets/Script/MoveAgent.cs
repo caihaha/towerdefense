@@ -173,25 +173,22 @@ public class MoveAgent
 		}
 	}
 
-	public void StartMoving()
+	public void StartMoving(float moveGoalRadius)
 	{
 		if (currWayPoint == null || goalPos == null)
 			return;
 
+		atGoal = Common.SqDistance2D(pos, goalPos) < moveGoalRadius * moveGoalRadius;
 		if (atGoal)
+        {
 			return;
-
-		foreach (GameTile tile in GameBoard.Instance.Tiles)
-		{
-			if (tile.Content.Type == GameTileContentType.Destination)
-			{
-				tile.BecomeDestination();
-			}
-			else
-			{
-				tile.ClearPath();
-			}
 		}
+
+		atEndOfPath = false;
+		goalRadius = moveGoalRadius;
+		progressState = ProgressState.Active;
+		numIdlingUpdates = 0;
+		numIdlingSlowUpdates = 0;
 
 		ReRequestPath(true);
 	}
@@ -279,7 +276,7 @@ public class MoveAgent
 		{
 			atGoal = false;
 			atEndOfPath = false;
-            currWayPoint = pathManager.NextWayPoint(pathID);
+            // currWayPoint = pathManager.NextWayPoint(pathID);
             nextWayPoint = pathManager.NextWayPoint(pathID);
         }
 		else

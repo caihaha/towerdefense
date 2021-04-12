@@ -49,7 +49,7 @@ public class Enemy : MonoBehaviour
 
 	public void StartMoving()
     {
-		moveAgent.StartMoving();
+		moveAgent.StartMoving(0.01f);
 	}
 
 	public void SetGoalPos(GameTile tile)
