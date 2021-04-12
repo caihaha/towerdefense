@@ -38,16 +38,14 @@ public class Enemy : MonoBehaviour
 	public bool GameUpdate()
     {
 		deltaTime += Time.deltaTime;
-		if (deltaTime < 1)
+		if (deltaTime > 1)
 		{
-			return false;
+			moveAgent.GameUpdate();
+			deltaTime -= 1;
 		}
 		
-		moveAgent.GameUpdate();
 		transform.localPosition = Vector3.Lerp(transform.localPosition, moveAgent.CurrWayPoint, deltaTime);
 		transform.forward = Vector3.Lerp(transform.forward, moveAgent.FrontDir, deltaTime);
-		deltaTime -= 1;
-
 		return true;
     }
 
