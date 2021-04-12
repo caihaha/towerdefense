@@ -43,11 +43,11 @@ public class Enemy : MonoBehaviour
 			return false;
 		}
 		
-		deltaTime -= 1;
 		moveAgent.GameUpdate();
-		transform.localPosition = moveAgent.CurrWayPoint;
-		transform.forward = moveAgent.FrontDir;
-		
+		transform.localPosition = Vector3.Lerp(transform.localPosition, moveAgent.CurrWayPoint, deltaTime);
+		transform.forward = Vector3.Lerp(transform.forward, moveAgent.FrontDir, deltaTime);
+		deltaTime -= 1;
+
 		return true;
     }
 
