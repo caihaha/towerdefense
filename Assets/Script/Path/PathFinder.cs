@@ -15,6 +15,7 @@ public class PathFinder : IPathFinder
             closeBlocks.Add(node);
             if (node.pos == goalPos)
             {
+                foundGoal = true;
                 break;
             }
 
@@ -29,12 +30,11 @@ public class PathFinder : IPathFinder
         Vector3 tmp = goalPos;
         while (true)
         {
-            if (tmp == null || tmp == startPos)
+            foundPath.path.Push(tmp);
+            if (tmp == startPos)
             {
                 break;
             }
-
-            foundPath.path.Push(tmp);
             tmp = blockStates.parentTile[Common.PosToTileIndex(tmp)];
         }
     }

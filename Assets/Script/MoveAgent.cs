@@ -37,7 +37,6 @@ public class MoveAgent
 	private Vector3 wayPointDir;
 	private Vector3 flatFrontDir;
 
-	private float wantedSpeed;
 	private float currentSpeed;
 	private float deltaSpeed;
 
@@ -267,7 +266,6 @@ public class MoveAgent
 			currentVelocity = Vector3.zero;
 			currentSpeed = 0;
 		}
-		wantedSpeed = 0.0f;
 	}
 
 	private void StartEngine()
@@ -357,7 +355,7 @@ public class MoveAgent
 	}
 	private void ChangeSpeed(float newWantedSpeed)
 	{
-		if (wantedSpeed <= 0.0f && currentSpeed < 0.01f)
+		if (newWantedSpeed <= 0.0f && currentSpeed < 0.01f)
         {
 			currentSpeed = 0.0f;
 			deltaSpeed = 0.0f;

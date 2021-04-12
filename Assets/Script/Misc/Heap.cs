@@ -41,7 +41,7 @@ public class PriorityQueue<T>
 
     public T Top()
     {
-        return Count > 0 ? heap[Count - 1] : throw new InvalidOperationException("Priority is null");
+        return Count > 0 ? heap[0] : throw new InvalidOperationException("Priority is null");
     }
 
     private void SiftUp(int n)
