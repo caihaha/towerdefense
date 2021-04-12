@@ -281,9 +281,9 @@ public class MoveAgent
 		{
 			atGoal = false;
 			atEndOfPath = false;
-			// currWayPoint = pathManager.NextWayPoint(this, ref this.path, pos, Mathf.Max(currentSpeed * 1.05f, 1.25f * manager.TileSize));
-			// nextWayPoint = pathManager.NextWayPoint(this, ref this.path, currWayPoint, Mathf.Max(currentSpeed * 1.05f, 1.25f * manager.TileSize));
-		}
+            currWayPoint = pathManager.NextWayPoint(pathID);
+            nextWayPoint = pathManager.NextWayPoint(pathID);
+        }
 		else
 		{
 			Fail();
@@ -429,13 +429,31 @@ public class MoveAgent
 	#region 改变下一个状态
 	private void GetNextWayPoint()
 	{
-		
+		if (CanGetNextWayPoint())
+        {
+			currWayPoint = nextWayPoint;
+			nextWayPoint = pathManager.NextWayPoint(pathID);
+		}
 	}
 
 	private bool CanGetNextWayPoint()
     {
-		return false;
-    }
+		if (pathID == 0)
+		{
+			return false;
+		}
+		if (currWayPoint.y != -1.0f && nextWayPoint.y != -1.0f)
+		{
+			atEndOfPath = Common.SqDistance2D(currWayPoint, goalPos) <= goalRadius * goalRadius;
+			if (atEndOfPath)
+			{
+				currWayPoint = goalPos;
+				nextWayPoint = goalPos;
+				return false;
+			}
+		}
+		return true;
+	}
 
 	private Vector3 GetRightVector(Vector3 vec)
 	{

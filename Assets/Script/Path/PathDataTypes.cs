@@ -21,13 +21,21 @@ public class PathNode
 
     public static bool operator ==(PathNode lpn, PathNode rpn)
     {
+        if (rpn == null)
+        {
+            return false;
+        }
         return lpn.pos == rpn.pos;
     }
 
 
     public static bool operator !=(PathNode lpn, PathNode rpn)
     {
-        return lpn.pos == rpn.pos;
+        if (rpn == null)
+        {
+            return true;
+        }
+        return lpn.pos != rpn.pos;
     }
 }
 
