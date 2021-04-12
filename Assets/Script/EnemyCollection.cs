@@ -43,8 +43,7 @@ public class EnemyCollection
 			return;
         }
 
-		selectedEnemy.SetGoalPos(tile);
-		selectedEnemy.StartMoving();
+		selectedEnemy.StartMoving(tile);
 	}
 
 	public bool SelectedEnemy(GameTile tile)

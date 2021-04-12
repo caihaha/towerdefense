@@ -173,8 +173,9 @@ public class MoveAgent
 		}
 	}
 
-	public void StartMoving(float moveGoalRadius)
+	public void StartMoving(Vector3 moveGoalPos, float moveGoalRadius)
 	{
+		goalPos = new Vector3(moveGoalPos.x, 0, moveGoalPos.z);
 		if (currWayPoint == null || goalPos == null)
 			return;
 
