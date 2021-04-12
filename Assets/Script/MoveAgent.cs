@@ -27,6 +27,8 @@ public class UnitDef
 public class MoveAgent
 {
 	#region 数据成员
+	private enum ProgressState { Done = 0, Active = 1, Failed = 2 };
+	private ProgressState progressState;
 	private PathManager pathManager;
 
 	private Enemy owner;
@@ -39,39 +41,28 @@ public class MoveAgent
 	private float currentSpeed;
 	private float deltaSpeed;
 
-	private bool atGoal;
-	private bool atEndOfPath;
-	private bool wantRepath;
-
-	private float currWayPointDist;
-	private float prevWayPointDist;
-	private float goalRadius;
-
-	private bool reversing;
-	private bool idling;
-	private bool pushResistant; 
-	private bool canReverses;
-	private bool useMainHeading;
-	private bool useRawMovement;
-
-	private float skidRotSpeed;
-	private float skidRotAccel;
-
-	private uint pathID;
-	private uint nextObstacleAvoidanceFrame;
-
-	private int numIdlingUpdates;
-	private int numIdlingSlowUpdates;
-
 	private float maxSpeed;
 	private float accRate;
 	private float decRate;
+
+	private bool atGoal;
+	private bool atEndOfPath;
+	private bool wantRepath;
+	private bool pushResistant;
+
+	private bool idling;
+	private uint pathID;
+
+	private int numIdlingUpdates;
+	private int numIdlingSlowUpdates;
 
 	private Vector3 pos;
 	private Vector3 goalPos;
 	private Vector3 oldPos;
 	private Vector3 oldSlowUpdatePos;
 	private Vector3 currentVelocity;
+	
+	private float goalRadius;
 
 	public Vector3 CurrWayPoint { get => currWayPoint; set => currWayPoint = value; }
 	public Vector3 NextWayPoint { get => nextWayPoint; set => nextWayPoint = value; }
@@ -97,14 +88,15 @@ public class MoveAgent
 		accRate = Mathf.Max(0.001f, unitDef.maxAcc);
 		decRate = Mathf.Max(0.001f, unitDef.maxDec);
 
+		progressState = ProgressState.Done;
 		pos = owner.transform.position;
+
 		goalRadius = 0.0f;
 		deltaSpeed = 0.0f;
 		numIdlingUpdates = 0;
 		numIdlingSlowUpdates = 0;
 
 		wantRepath = false;
-		idling = true;
 		atEndOfPath = true;
 		atGoal = true;
 
@@ -135,19 +127,51 @@ public class MoveAgent
 		{
 			currentVelocity = Vector3.zero;
 			currentSpeed = 0.0f;
-			idling = true;
-			idling &= (currWayPoint.y != -0.1f && nextWayPoint.y != -0.1f);
+			//idling = true;
+			idling = (currWayPoint.y != -0.1f && nextWayPoint.y != -0.1f);
 			return;
 		}
-		Vector3 ffd = flatFrontDir * Common.SqDistance2D(oldPos, pos) * 0.5f;
-		Vector3 wpd = wayPointDir;
-		idling = true;
-		
-		idling &= Common.SqDistance2D(oldPos, pos) < currentSpeed * 0.5f * currentSpeed * 0.5f;
+		//Vector3 ffd = flatFrontDir * Common.SqDistance2D(oldPos, pos) * 0.5f;
+		//Vector3 wpd = wayPointDir;
+		//idling = true;
+		idling = Common.SqDistance2D(oldPos, pos) < currentSpeed * 0.5f * currentSpeed * 0.5f;
 	}
 
 	public void GameSlowUpdate()
 	{
+		if (progressState == ProgressState.Active)
+		{
+			if (pathID != 0)
+			{
+				if (idling)
+				{
+					numIdlingSlowUpdates = Mathf.Min(numIdlingSlowUpdates + 1, 16);
+				}
+				else
+				{
+					numIdlingSlowUpdates = Mathf.Max(numIdlingSlowUpdates - 1, 0);
+				}
+				if (numIdlingUpdates > 32768)
+				{
+					if (numIdlingSlowUpdates < 16)
+					{
+						ReRequestPath(true);
+					}
+					else
+					{
+						Fail();
+					}
+				}
+			}
+			else
+			{
+				ReRequestPath(true);
+			}
+			if (wantRepath)
+			{
+				ReRequestPath(true);
+			}
+		}
 	}
 
 	public void StartMoving()
@@ -170,7 +194,7 @@ public class MoveAgent
 			}
 		}
 
-		// ReRequestPath(nowPoint);
+		ReRequestPath(true);
 	}
 
 	public void SetGoalPos(Vector3 goalPos)
@@ -407,6 +431,11 @@ public class MoveAgent
 		
 	}
 
+	private bool CanGetNextWayPoint()
+    {
+		return false;
+    }
+
 	private Vector3 GetRightVector(Vector3 vec)
 	{
 		return new Vector3(vec.z, 0, -vec.x);
@@ -415,12 +444,17 @@ public class MoveAgent
 
 	private void Arrived()
     {
-
-    }
+		if (progressState == ProgressState.Active)
+		{
+			StopEngine(false);
+			progressState = ProgressState.Done;
+		}
+	}
 
 	private void Fail()
     {
-
-    }
+		StopEngine(false);
+		progressState = ProgressState.Failed;
+	}
 	#endregion
 }
