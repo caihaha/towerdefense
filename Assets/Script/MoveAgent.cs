@@ -304,8 +304,8 @@ public class MoveAgent
 		}
         else
         {
-			float curGoalDistSq = (owner.transform.position - goalPos).sqrMagnitude;
-			atGoal |= curGoalDistSq <= goalRadius * goalRadius;
+			float curGoalDistSq = Common.SqLength2D(pos - goalPos);
+			atGoal |= (curGoalDistSq <= goalRadius * goalRadius);
 
 			if (!atGoal)
 			{

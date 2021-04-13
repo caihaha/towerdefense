@@ -54,9 +54,9 @@ public static class Common
         }
     }
 
-    public static float SqLength(Vector3 vec)
+    public static float SqLength2D(Vector3 vec)
     {
-        return vec.x * vec.x + vec.y * vec.y + vec.z * vec.z;
+        return vec.x * vec.x + vec.z * vec.z;
     }
 
     public static float SqDistance2D(Vector3 vec1, Vector3 vec2)
