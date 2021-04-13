@@ -25,7 +25,7 @@ public static class PathDefs
 
     public static bool IsGoal(Vector3 pos, Vector3 goalPos)
     {
-        return false;
+        return Common.SqDistance2D(pos, goalPos) < 0.0001;
     }
 }
 
@@ -36,4 +36,13 @@ public static class PathConstants
     public static float SQUARE_SPEED_AND_RADIUS = 4f;
 }
 
+public enum BlockTypes
+{
+    BLOCK_NONE = 0,
+    BLOCK_MOVING = 1,
+    BLOCK_MOBILE = 2,
+    BLOCK_MOBILE_BUSY = 4,
+    BLOCK_STRUCTURE = 8,
+    BLOCK_IMPASSABLE = 24 // := 16 | BLOCK_STRUCTURE; 不可逾越
+};
 

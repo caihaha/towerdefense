@@ -84,12 +84,14 @@ public class PathManager
         Common.GetTileXZ(goalPos, out var goalX, out var goalZ);
         startPos = new Vector3(startX, 0, startZ);
         goalPos = new Vector3(goalX, 0, goalZ);
+        var startBlock = new Vector2Int(startX, startZ);
+        var goalBlock = new Vector2Int(goalX, goalZ);
 
         MultiPath newPath = new MultiPath(startPos, goalPos, goalRadius);
         newPath.finalGoal = goalPos;
         newPath.caller = caller;
 
-        IPath.SearchResult result = ArrangePath(newPath, startPos, goalPos, caller);
+        IPath.SearchResult result = ArrangePath(newPath, startPos, goalPos, startBlock, caller);
 
         FinalizePath(newPath, startPos, goalPos, result == IPath.SearchResult.CantGetCloser);
         newPath.searchResult = result;
@@ -100,9 +102,9 @@ public class PathManager
     #endregion
     
     #region 内部函数
-    private IPath.SearchResult ArrangePath(MultiPath newPath, Vector3 starePos, Vector3 goalPos, MoveAgent caller)
+    private IPath.SearchResult ArrangePath(MultiPath newPath, Vector3 startPos, Vector3 goalPos, Vector2Int startBlock, MoveAgent caller)
     {
-        IPath.SearchResult result = pathFinder.GetPath(caller, starePos, goalPos, newPath.path);
+        IPath.SearchResult result = pathFinder.GetPath(caller, startPos, goalPos, startBlock, newPath.path);
 
         return result;
     }

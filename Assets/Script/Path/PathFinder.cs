@@ -4,25 +4,54 @@ public class PathFinder : IPathFinder
 {
     override protected IPath.SearchResult DoSearch(MoveAgent owner, Vector3 goalPos)
     {
-        bool foundGoal = false;
+        bool fundGoal = false;
 
-        while (openBlocks.Count > 0)
+        while(openBlocks.Count > 0)
         {
-            PathNode node = openBlocks.Pop();
-            if (node == null)
-                continue;
-
-            closeBlocks.Add(node);
-            if (node.pos == goalPos)
+            PathNode openSquare = openBlocks.Pop();
+            if (blockStates.fCost[openSquare.nodeNum] != openSquare.fCost)
             {
-                foundGoal = true;
+                continue;
+            }
+
+            if (PathDefs.IsGoal(new(mStartBlock.x, 0, mStartBlock.y), goalPos))
+            {
+                mGoalBlockIdx = openSquare.nodeNum;
+                mGoalHeuristic = 0.0f;
+                fundGoal = true;
                 break;
             }
 
-            TestNeighborSquares(node, owner, goalPos);
+            TestNeighborSquares(openSquare, owner, goalPos);
         }
 
-        return foundGoal ? IPath.SearchResult.Ok : IPath.SearchResult.Error;
+        //while (openBlocks.Count > 0)
+        //{
+        //    PathNode node = openBlocks.Pop();
+        //    if (node == null)
+        //        continue;
+
+        //    closeBlocks.Add(node);
+        //    if (node.pos == goalPos)
+        //    {
+        //        foundGoal = true;
+        //        break;
+        //    }
+
+        //    TestNeighborSquares(node, owner, goalPos);
+        //}
+
+        if (fundGoal)
+        {
+            return IPath.SearchResult.Ok;
+        }
+
+        if(openBlocks.Count <= 0)
+        {
+            return IPath.SearchResult.GoalOutOfRange;
+        }
+
+        return IPath.SearchResult.Error;
     }
 
     override protected void FinishSearch(IPath.Path foundPath, Vector3 startPos, Vector3 goalPos)
@@ -77,6 +106,14 @@ public class PathFinder : IPathFinder
     }
 
     #region 内部函数
+
+    struct SquareState
+    {
+        BlockType blockMask = CMoveMath::BLOCK_IMPASSABLE;
+        float speedMod = 0.0f;
+        bool inSearch = false;
+    };
+
     void TestNeighborSquares(PathNode ob, MoveAgent owner, Vector3 goalPos)
     {
         Vector3 pos = ob.pos;

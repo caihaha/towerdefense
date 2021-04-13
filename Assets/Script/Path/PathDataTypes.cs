@@ -8,6 +8,8 @@ public class PathNode
     public float gCost;
 
     public Vector3 pos;
+    public int nodeNum;
+    public Vector2Int block;
 
     public static bool operator < (PathNode lpn, PathNode rpn)
     {
@@ -54,17 +56,17 @@ public class PathNodeBuffer
         idx = 0;
     }
 
-    void SetSize(uint i)
+    public void SetSize(uint i)
     {
         idx = i;
     }
 
-    uint GetSize()
+    public uint GetSize()
     {
         return idx;
     }
 
-    PathNode GetNode(uint i)
+    public PathNode GetNode(uint i)
     {
         return buffer[i];
     }
@@ -79,6 +81,7 @@ public class PathNodeStateBuffer
     public List<float> gCost = new List<float>(Common.BoardCount);
 
     public List<Vector3> parentTile = new List<Vector3>(Common.BoardCount);
+    public int []nodeMask = new int[Common.BoardCount];
 
     public PathNodeStateBuffer()
     {

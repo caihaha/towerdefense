@@ -5,14 +5,25 @@ abstract public class IPathFinder
 {
     #region 数据成员
     public PriorityQueue<PathNode> openBlocks = new PriorityQueue<PathNode>(new PathNodeComparer());
+    // 上次搜索中更改的块列表
     public HashSet<PathNode> closeBlocks = new HashSet<PathNode>();
 
-    public PathNodeStateBuffer blockStates = new PathNodeStateBuffer();
+    public PathNodeStateBuffer blockStates;
+    public PathNodeBuffer openBlockBuffer;
+    public List<int> dirtyBlocks;
+
+    public Vector2Int mStartBlock;
+    public int mStartBlockIdx;
+    public int mGoalBlockIdx;
+    public float mGoalHeuristic;
     #endregion
 
     #region 对外接口
-    public IPath.SearchResult GetPath(MoveAgent owner, Vector3 startPos, Vector3 goalPos,IPath.Path path)
+    public IPath.SearchResult GetPath(MoveAgent owner, Vector3 startPos, Vector3 goalPos, Vector2Int startBlock, IPath.Path path)
     {
+        mStartBlock = startBlock;
+        mStartBlockIdx = Common.BlockPos2Index(startBlock);
+
         IPath.SearchResult result = InitSearch(owner, startPos, goalPos);
         if(result == IPath.SearchResult.Ok || result == IPath.SearchResult.GoalOutOfRange)
         {
@@ -27,14 +38,22 @@ abstract public class IPathFinder
     protected IPath.SearchResult InitSearch(MoveAgent owner, Vector3 startPos, Vector3 goalPos)
     {
         ResetSearch();
-        PathNode ob = new PathNode()
-        {
-            fCost = 0f,
-            gCost = 0f,
-            pos = startPos
-        };
+        blockStates.nodeMask[mStartBlockIdx] &= (int)PATHOPT.OBSOLETE;
+        blockStates.nodeMask[mStartBlockIdx] |= (int)PATHOPT.OBSOLETE;
+        blockStates.fCost[mStartBlockIdx] = 0.0f;
+        blockStates.gCost[mStartBlockIdx] = 0.0f;
+        openBlockBuffer.SetSize(0);
+
+        PathNode ob = openBlockBuffer.GetNode(openBlockBuffer.GetSize());
+        ob.fCost = 0f;
+        ob.gCost = 0f;
+        ob.pos = startPos;
+        ob.nodeNum = mStartBlockIdx;
+        ob.block = mStartBlock;
         openBlocks.Push(ob);
 
+        // 将起点标记为最佳位置
+        mGoalBlockIdx = mStartBlockIdx;
         IPath.SearchResult search = DoSearch(owner, goalPos);
 
         return search;
