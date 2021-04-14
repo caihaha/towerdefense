@@ -90,5 +90,14 @@ public class PathNodeStateBuffer
             parentTile.Add(Common.illegalPos);
         }
     }
+
+    public void ClearSquare(int idx)
+    {
+        // assert(idx >= 0 && idx < fCost.size());
+        fCost[idx] = float.MaxValue;
+        gCost[idx] = float.MaxValue;
+        // clear all bits except PATHOPT_OBSOLETE 清除除PATHOPT_OBSOLETE以外的所有位
+        nodeMask[idx] &= (int)PATHOPT.OBSOLETE;
+    }
 }
 

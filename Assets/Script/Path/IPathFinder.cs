@@ -62,6 +62,13 @@ abstract public class IPathFinder
 
     protected void ResetSearch()
     {
+        int i = dirtyBlocks.Count;
+        while (i > 0)
+        {
+            --i;
+            blockStates.ClearSquare(dirtyBlocks[i]);
+        }
+        dirtyBlocks.Clear();
         openBlocks.Clear();
     }
 
