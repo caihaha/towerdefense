@@ -14,7 +14,7 @@ public class PathFinder : IPathFinder
                 continue;
             }
 
-            if (PathDefs.IsGoal(new(mStartBlock.x, 0, mStartBlock.y), goalPos))
+            if (PathDefs.IsGoal(new Vector3(mStartBlock.x, 0, mStartBlock.y), goalPos))
             {
                 mGoalBlockIdx = openSquare.nodeNum;
                 mGoalHeuristic = 0.0f;
@@ -109,9 +109,6 @@ public class PathFinder : IPathFinder
 
     struct SquareState
     {
-        BlockType blockMask = CMoveMath::BLOCK_IMPASSABLE;
-        float speedMod = 0.0f;
-        bool inSearch = false;
     };
 
     void TestNeighborSquares(PathNode ob, MoveAgent owner, Vector3 goalPos)
