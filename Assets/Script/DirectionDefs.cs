@@ -2,37 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public enum Direction
-{
-    Begin,
+public enum PATHDIR {
+    LEFT = 0, // +x (LEFT *TO* RIGHT)
+    LEFT_UP = 1, // +x+z
+    UP = 2, // +z (UP *TO* DOWN)
+    RIGHT_UP = 3, // -x+z
 
-    Up = Begin,
-    UpRight,
-    Right,
-    DownRight,
-    Down,
-    DownLeft,
-    Left,
-    UpLeft,
+    RIGHT = 4, // -x (RIGHT *TO* LEFT)
+    RIGHT_DOWN = 5, // -x-z
+    DOWN = 6, // -z (DOWN *TO* UP)
+    LEFT_DOWN = 7, // +x-z
 
-    End
-}
-
-public enum DirectionChange
-{
-    Begin,
-
-    None = Begin,
-    TurnUpRight,
-    TurnRight,
-    TurnAroundRight,
-    TurnAround,
-    TurnAroundLeft,
-    TurnLeft,
-    TurnUpLeft,
-
-    End
-}
+    DIRECTIONS = 8,
+};
 
 public enum PATHOPT
 {
@@ -48,124 +30,92 @@ public enum PATHOPT
     SIZE = 255, // size of PATHOPT bitmask
 }
 
-public static class DirectionExtensions
+static public class DirectionDefs
 {
-    static Quaternion[] rotations = {
-        Quaternion.identity,
-        Quaternion.Euler(0f, 45f, 0f),
-        Quaternion.Euler(0f, 90f, 0f),
-        Quaternion.Euler(0f, 135f, 0f),
-        Quaternion.Euler(0f, 180f, 0f),
-        Quaternion.Euler(0f, 225f, 0f),
-        Quaternion.Euler(0f, 270f, 0f),
-        Quaternion.Euler(0f, 315f, 0f)
-    };
+    static public uint PATHOPT_CARDINALS = (uint)(PATHOPT.RIGHT | PATHOPT.LEFT | PATHOPT.UP | PATHOPT.DOWN);
+    static public uint [] PATHDIR_CARDINALS = {(uint)PATHDIR.LEFT, (uint)PATHDIR.RIGHT, (uint)PATHDIR.UP, (uint)PATHDIR.DOWN };
+    static public uint PATH_DIRECTION_VERTICES = (int)PATHDIR.DIRECTIONS >> 1;
+    public static int PATH_NODE_SPACING = 2;
 
-    public static Quaternion GetRotation(this Direction direction)
+    static public uint[] GetPathDir2PathOpt()
     {
-        return rotations[(int)direction];
-    }
+        uint []a = new uint[(int)PATHDIR.DIRECTIONS];
 
-    public static DirectionChange GetDirectionChangeTo(this Direction current, Direction next)
-    {
-        if (current == next)
-        {
-            return DirectionChange.None;
-        }
-        else if (current + (int)Direction.UpRight == next || current - (Direction.End - Direction.UpRight) == next)
-        {
-            return DirectionChange.TurnUpRight;
-        }
-        else if (current + (int)Direction.Right == next || current - (Direction.End - Direction.Right) == next)
-        {
-            return DirectionChange.TurnRight;
-        }
-        else if (current + (int)Direction.DownRight == next || current - (Direction.End - Direction.DownRight) == next)
-        {
-            return DirectionChange.TurnAroundRight;
-        }
-        else if (current + (int)Direction.Down == next || current - (Direction.End - Direction.Down) == next)
-        {
-            return DirectionChange.TurnAround;
-        }
-        else if (current + (int)Direction.DownLeft == next || current - (Direction.End - Direction.DownLeft) == next)
-        {
-            return DirectionChange.TurnAroundLeft;
-        }
-        else if (current + (int)Direction.Left == next || current - (Direction.End - Direction.Left) == next)
-        {
-            return DirectionChange.TurnLeft;
-        }
-        return DirectionChange.TurnUpLeft;
-    }
-
-    public static float GetAngle(this Direction direction)
-    {
-        return (float)direction * 45f;
-    }
-
-    public static bool IsDiagonalDirection(Direction dir)
-    {
-        return (((int)dir & 1) != 0);
-    }
-
-    public static uint[] GetPathDir2PathOpt()
-    {
-        uint []a = new uint[(uint)Direction.End];
-
-        a[(uint)Direction.Up] = (uint)PATHOPT.UP;
-        a[(uint)Direction.Right] = (uint)PATHOPT.RIGHT;
-        a[(uint)Direction.Down] = (uint)PATHOPT.DOWN;
-        a[(uint)Direction.Left] = (uint)PATHOPT.LEFT;
-        a[(uint)Direction.UpRight] = (uint)(PATHOPT.RIGHT | PATHOPT.UP);
-        a[(uint)Direction.UpLeft] = (uint)(PATHOPT.LEFT | PATHOPT.UP);
-        a[(uint)Direction.DownRight] = (uint)(PATHOPT.RIGHT | PATHOPT.DOWN);
-        a[(uint)Direction.DownLeft] = (uint)(PATHOPT.LEFT | PATHOPT.DOWN);
+        a[(int)PATHDIR.LEFT] = (uint)PATHOPT.LEFT;
+        a[(int)PATHDIR.RIGHT] = (uint)PATHOPT.RIGHT;
+        a[(int)PATHDIR.UP] = (uint)PATHOPT.UP;
+        a[(int)PATHDIR.DOWN] = (uint)PATHOPT.DOWN;
+        a[(int)PATHDIR.LEFT_UP] = (uint)(PATHOPT.LEFT | PATHOPT.UP);
+        a[(int)PATHDIR.RIGHT_UP] = (uint)(PATHOPT.RIGHT | PATHOPT.UP);
+        a[(int)PATHDIR.RIGHT_DOWN] = (uint)(PATHOPT.RIGHT | PATHOPT.DOWN);
+        a[(int)PATHDIR.LEFT_DOWN] = (uint)(PATHOPT.LEFT | PATHOPT.DOWN);
 
         return a;
     }
 
-    public static uint[] GetPathOpt2PathDir()
+    static public uint[] GetPathOpt2PathDir()
     {
         uint[] a = new uint[15];
 
-        a[(uint)PATHOPT.LEFT] = (uint)Direction.Left;
-        a[(uint)PATHOPT.RIGHT] = (uint)Direction.Right;
-        a[(uint)PATHOPT.UP] = (uint)Direction.Up;
-        a[(uint)PATHOPT.DOWN] = (uint)Direction.Down;
+        a[(int)PATHOPT.LEFT] = (uint)PATHDIR.LEFT;
+        a[(int)PATHOPT.RIGHT] = (uint)PATHDIR.RIGHT;
+        a[(int)PATHOPT.UP] = (uint)PATHDIR.UP;
+        a[(int)PATHOPT.DOWN] = (uint)PATHDIR.DOWN;
 
-        a[(uint)(PATHOPT.LEFT | PATHOPT.UP)] = (uint)Direction.UpLeft;
-        a[(uint)(PATHOPT.RIGHT | PATHOPT.UP)] = (uint)Direction.UpRight;
-        a[(uint)(PATHOPT.RIGHT | PATHOPT.DOWN)] = (uint)Direction.DownRight;
-        a[(uint)(PATHOPT.LEFT | PATHOPT.DOWN)] = (uint)Direction.DownLeft;
+        a[(int)(PATHOPT.LEFT | PATHOPT.UP)] = (uint)PATHDIR.LEFT_UP;
+        a[(int)(PATHOPT.RIGHT | PATHOPT.UP)] = (uint)PATHDIR.RIGHT_UP;
+        a[(int)(PATHOPT.RIGHT | PATHOPT.DOWN)] = (uint)PATHDIR.RIGHT_DOWN;
+        a[(int)(PATHOPT.LEFT | PATHOPT.DOWN)] = (uint)PATHDIR.LEFT_DOWN;
         return a;
     }
 
-    public static uint[] DIR2OPT = GetPathDir2PathOpt();
-    public static uint[] OPT2DIR = GetPathOpt2PathDir();
+    static public uint[] DIR2OPT = GetPathDir2PathOpt();
+    static public uint[] OPT2DIR = GetPathOpt2PathDir();
 
-    public static uint PathDir2PathOpt(uint pathDir)
-    {
-        return DIR2OPT[pathDir];
-    }
+    static public uint PathDir2PathOpt(uint pathDir) { return DIR2OPT[pathDir]; }
+    static public uint PathOpt2PathDir(uint pathOptDir) { return OPT2DIR[pathOptDir]; }
 
-    public static uint PathOpt2PathDir(uint pathOpt)
+    static public int GetBlockVertexOffset(uint pathDir, uint numBlocks)
     {
-        return OPT2DIR[pathOpt];
-    }
+        int bvo = (int)pathDir;
+        int tmp = (int)PATH_DIRECTION_VERTICES;
 
-    public static Direction GetDirection(this Direction current, int num)
-    {
-        Direction dir = current + num;
-        if(dir < Direction.Begin)
+        switch ((PATHDIR)pathDir)
         {
-            dir += (int)Direction.End;
-        }
-        else if(dir >= Direction.End)
-        {
-            dir -= (int)Direction.End;
+            case PATHDIR.RIGHT: { bvo = (int)(PATHDIR.LEFT) - tmp; } break;
+            case PATHDIR.RIGHT_DOWN: { bvo = (int)(PATHDIR.LEFT_UP) - (int)(numBlocks * tmp) - tmp; } break;
+            case PATHDIR.DOWN: { bvo = (int)(PATHDIR.UP) - (int)(numBlocks * tmp); } break;
+            case PATHDIR.LEFT_DOWN: { bvo = (int)(PATHDIR.RIGHT_UP) - (int)(numBlocks * tmp) + tmp; } break;
+            default: { } break;
         }
 
-        return dir;
+        return bvo;
     }
+
+    public static Vector2Int[] PF_DIRECTION_VECTORS_2D = new Vector2Int[(int)PATHDIR.DIRECTIONS << 1]
+    {
+    new Vector2Int(0, 0),
+    new Vector2Int(+1 * PATH_NODE_SPACING, 0 * PATH_NODE_SPACING), // PATHOPT_LEFT
+    new Vector2Int(-1 * PATH_NODE_SPACING, 0 * PATH_NODE_SPACING), // PATHOPT_RIGHT
+    new Vector2Int(0, 0), // PATHOPT_LEFT | PATHOPT_RIGHT
+    new Vector2Int(0 * PATH_NODE_SPACING, +1 * PATH_NODE_SPACING), // PATHOPT_UP
+    new Vector2Int(+1 * PATH_NODE_SPACING, +1 * PATH_NODE_SPACING), // PATHOPT_LEFT | PATHOPT_UP
+    new Vector2Int(-1 * PATH_NODE_SPACING, +1 * PATH_NODE_SPACING), // PATHOPT_RIGHT | PATHOPT_UP
+    new Vector2Int(0, 0), // PATHOPT_LEFT | PATHOPT_RIGHT | PATHOPT_UP
+    new Vector2Int(0 * PATH_NODE_SPACING, -1 * PATH_NODE_SPACING), // PATHOPT_DOWN
+    new Vector2Int(+1 * PATH_NODE_SPACING, -1 * PATH_NODE_SPACING), // PATHOPT_LEFT | PATHOPT_DOWN
+    new Vector2Int(-1 * PATH_NODE_SPACING, -1 * PATH_NODE_SPACING), // PATHOPT_RIGHT | PATHOPT_DOWN
+    new Vector2Int(0, 0),
+    new Vector2Int(0, 0),
+    new Vector2Int(0, 0),
+    new Vector2Int(0, 0),
+    new Vector2Int(0, 0),
+    };
+}
+
+public enum NODE_COST
+{
+    F = 0,
+    G = 1,
+    H = 2,
 }

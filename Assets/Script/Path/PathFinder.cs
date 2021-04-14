@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PathFinder : IPathFinder
 {
@@ -24,22 +25,6 @@ public class PathFinder : IPathFinder
 
             TestNeighborSquares(openSquare, owner, goalPos);
         }
-
-        //while (openBlocks.Count > 0)
-        //{
-        //    PathNode node = openBlocks.Pop();
-        //    if (node == null)
-        //        continue;
-
-        //    closeBlocks.Add(node);
-        //    if (node.pos == goalPos)
-        //    {
-        //        foundGoal = true;
-        //        break;
-        //    }
-
-        //    TestNeighborSquares(node, owner, goalPos);
-        //}
 
         if (fundGoal)
         {
@@ -68,98 +53,92 @@ public class PathFinder : IPathFinder
         }
     }
 
-    override protected bool TestBlock(PathNode parentSquare, Vector3 goalPos, Vector3 nextPos)
+    override protected bool TestBlock(PathNode parentSquare, MoveAgent owner,uint pathOptDir, uint blockStatus, Vector2Int square, int sqrIdx, Vector3 goalPos)
     {
-        // 在Close列表
-        if (IsTileInCloseBlocks(nextPos))
+        if ((blockStatus & (uint)BlockTypes.BLOCK_STRUCTURE) != 0)
         {
             return false;
         }
+
+        Vector3 nextPos = new Vector3(square.x, 0, square.y);
 
         // 计算fCost
         float gCost = PathDefs.CalcG(parentSquare, nextPos);
         float hCost = PathDefs.Heuristic(goalPos, nextPos);
         float fCost = gCost + hCost;
 
-        PathNode openBlock = GetOpenBlocksByPos(nextPos);
-        if (openBlock != null)
+        if ((blockStates.nodeMask[sqrIdx] & (uint)PATHOPT.OPEN) != 0)
         {
-            if (gCost >= openBlock.gCost)
-            {
-                return false;
-            }
+            if (blockStates.fCost[sqrIdx] <= fCost)
+                return true;
 
-            openBlock.gCost = gCost;
-            openBlock.fCost = fCost;
-        }
-        else
-        {
-            openBlock = new PathNode();
-            openBlock.gCost = gCost;
-            openBlock.fCost = fCost;
-            openBlock.pos = nextPos;
-            openBlocks.Push(openBlock);
+            blockStates.nodeMask[sqrIdx] &= ~((int)DirectionDefs.PATHOPT_CARDINALS); // 除了上下左右置0, 其他位置为1
         }
 
-        blockStates.parentTile[Common.PosToTileIndex(nextPos)] = parentSquare.pos;
+        // hCost更接近
+        if(hCost < mGoalHeuristic)
+        {
+            mGoalBlockIdx = sqrIdx;
+            mGoalHeuristic = hCost;
+        }
+
+        openBlockBuffer.SetSize(openBlockBuffer.GetSize() + 1);
+        var openBlock = openBlockBuffer.GetNode(openBlockBuffer.GetSize());
+        openBlock.gCost = gCost;
+        openBlock.fCost = fCost;
+        openBlock.pos = nextPos;
+        openBlock.nodePos = square;
+        openBlock.nodeNum = sqrIdx;
+        openBlocks.Push(openBlock);
+
+        blockStates.fCost[sqrIdx] = openBlock.fCost;
+        blockStates.gCost[sqrIdx] = openBlock.gCost;
+        blockStates.nodeMask[sqrIdx] |= (int)((uint)PATHOPT.OPEN | pathOptDir);
+
+        dirtyBlocks.Add(sqrIdx);
         return true;
     }
 
     #region 内部函数
 
-    struct SquareState
+    public class SquareState
     {
+        public BlockTypes blockMask;
+        public float speedMod;
+        public bool inSearch;
+
+        public SquareState()
+        {
+            speedMod = 0.0f;
+            inSearch = false;
+            blockMask = BlockTypes.BLOCK_IMPASSABLE;
+        }
     };
 
-    void TestNeighborSquares(PathNode ob, MoveAgent owner, Vector3 goalPos)
+    void TestNeighborSquares(PathNode square, MoveAgent owner, Vector3 goalPos)
     {
-        Vector3 pos = ob.pos;
+        SquareState []ngbStates = new SquareState[(int)PATHDIR.DIRECTIONS];
 
-        if (pos == null)
-            return;
-
-        for (int z = 1; z >= -1; --z)
+        for(uint dir = 0; dir < (uint)PATHDIR.DIRECTIONS; ++dir)
         {
-            for (int x = -1; x <= 1; ++x)
+            uint optDir = DirectionDefs.PathDir2PathOpt(dir);
+            Vector2Int ngbSquareCoors = square.nodePos + DirectionDefs.PF_DIRECTION_VECTORS_2D[optDir];
+            int ngbSquareIdx = Common.BlockPos2Index(ngbSquareCoors);
+            if (ngbSquareIdx < 0) // 非法位置
             {
-                if (x == 0 && z == 0)
-                {
-                    continue;
-                }
-
-                Vector3 nextPos = new Vector3(pos.x + x, 0, pos.z + z);
-                if (GameDefs.IsBlocked(pos, nextPos))
-                {
-                    continue;
-                }
-
-                TestBlock(ob, goalPos, nextPos);
+                continue;
             }
-        }
-    }
 
-    bool IsTileInCloseBlocks(Vector3 pos)
-    {
-        foreach (var tmp in closeBlocks)
-        {
-            if (tmp.pos == pos)
+            if ((blockStates.nodeMask[ngbSquareIdx] & (int)(PATHOPT.CLOSED | PATHOPT.BLOCKED)) != 0) // 阻塞或者已经在路径中
             {
-                return true;
+                continue;
             }
-        }
-        return false;
-    }
 
-    PathNode GetOpenBlocksByPos(Vector3 pos)
-    {
-        foreach (var tmp in openBlocks.Elements)
-        {
-            if (tmp != null && tmp.pos == pos)
-            {
-                return tmp;
-            }
+            TestBlock(square, owner, DirectionDefs.PathDir2PathOpt(dir), (uint)ngbStates[dir].blockMask, ngbSquareCoors, ngbSquareIdx, goalPos);
         }
-        return null;
+
+        blockStates.nodeMask[square.nodeNum] |= (int)PATHOPT.CLOSED;
+        dirtyBlocks.Add(square.nodeNum);
     }
     #endregion
 }

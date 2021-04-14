@@ -9,7 +9,7 @@ public class PathNode
 
     public Vector3 pos;
     public int nodeNum;
-    public Vector2Int block;
+    public Vector2Int nodePos;
 
     public static bool operator < (PathNode lpn, PathNode rpn)
     {

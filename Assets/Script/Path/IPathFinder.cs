@@ -6,7 +6,6 @@ abstract public class IPathFinder
     #region 数据成员
     public PriorityQueue<PathNode> openBlocks = new PriorityQueue<PathNode>(new PathNodeComparer());
     // 上次搜索中更改的块列表
-    public HashSet<PathNode> closeBlocks = new HashSet<PathNode>();
 
     public PathNodeStateBuffer blockStates;
     public PathNodeBuffer openBlockBuffer;
@@ -24,8 +23,10 @@ abstract public class IPathFinder
         mStartBlock = startBlock;
         mStartBlockIdx = Common.BlockPos2Index(startBlock);
 
+        // start up a new search
         IPath.SearchResult result = InitSearch(owner, startPos, goalPos);
-        if(result == IPath.SearchResult.Ok || result == IPath.SearchResult.GoalOutOfRange)
+        // if search was successful, generate new path
+        if (result == IPath.SearchResult.Ok || result == IPath.SearchResult.GoalOutOfRange)
         {
             FinishSearch(path, startPos, goalPos);
         }
@@ -49,7 +50,7 @@ abstract public class IPathFinder
         ob.gCost = 0f;
         ob.pos = startPos;
         ob.nodeNum = mStartBlockIdx;
-        ob.block = mStartBlock;
+        ob.nodePos = mStartBlock;
         openBlocks.Push(ob);
 
         // 将起点标记为最佳位置
@@ -61,7 +62,6 @@ abstract public class IPathFinder
 
     protected void ResetSearch()
     {
-        closeBlocks.Clear();
         openBlocks.Clear();
     }
 
@@ -69,6 +69,6 @@ abstract public class IPathFinder
 
     abstract protected void FinishSearch(IPath.Path path, Vector3 startPos, Vector3 goalPos);
 
-    abstract protected bool TestBlock(PathNode parentSquare, Vector3 goalTile, Vector3 nextTile);
+    abstract protected bool TestBlock(PathNode parentSquare, MoveAgent owner, uint pathOptDir, uint blockStatus, Vector2Int square, int sqrIdx, Vector3 goalPos);
     #endregion
 }
