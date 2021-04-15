@@ -18,7 +18,7 @@ public class PathFinder : IPathFinder
             if (PathDefs.IsGoal(new Vector3(mStartBlock.x, 0, mStartBlock.y), goalPos))
             {
                 mGoalBlockIdx = openSquare.nodeNum;
-                mGoalHeuristic = 0.0f;
+                mGoalFCost = 0.0f;
                 fundGoal = true;
                 break;
             }
@@ -41,16 +41,29 @@ public class PathFinder : IPathFinder
 
     override protected void FinishSearch(IPath.Path foundPath, Vector3 startPos, Vector3 goalPos)
     {
-        Vector3 tmp = goalPos;
+        Vector2Int square = Common.BlockIndex2Pos(mGoalBlockIdx);
+        int blockIdx = mGoalBlockIdx;
+
         while (true)
         {
-            foundPath.path.Push(tmp);
-            if (tmp == startPos)
+            foundPath.squares.Add(square);
+            foundPath.path.Add(new Vector3(square.x, 0, square.y));
+
+            if (blockIdx == mStartBlockIdx)
             {
                 break;
             }
-            tmp = blockStates.parentTile[Common.PosToTileIndex(tmp)];
+
+            square -= DirectionDefs.PF_DIRECTION_VECTORS_2D[blockStates.nodeMask[blockIdx] & (int)DirectionDefs.PATHOPT_CARDINALS];
+            blockIdx = Common.BlockPos2Index(square);
         }
+
+        if (foundPath.path.Count > 0)
+        {
+            foundPath.pathGoal = foundPath.path[0];
+        }
+
+        foundPath.pathCost = blockStates.fCost[mGoalBlockIdx];
     }
 
     override protected bool TestBlock(PathNode parentSquare, MoveAgent owner,uint pathOptDir, uint blockStatus, Vector2Int square, int sqrIdx, Vector3 goalPos)
@@ -75,11 +88,11 @@ public class PathFinder : IPathFinder
             blockStates.nodeMask[sqrIdx] &= ~((int)DirectionDefs.PATHOPT_CARDINALS); // 除了上下左右置0, 其他位置为1
         }
 
-        // hCost更接近
-        if(hCost < mGoalHeuristic)
+        // fCost更接近
+        if(fCost < mGoalFCost)
         {
             mGoalBlockIdx = sqrIdx;
-            mGoalHeuristic = hCost;
+            mGoalFCost = fCost;
         }
 
         openBlockBuffer.SetSize(openBlockBuffer.GetSize() + 1);
@@ -89,7 +102,7 @@ public class PathFinder : IPathFinder
         openBlock.pos = nextPos;
         openBlock.nodePos = square;
         openBlock.nodeNum = sqrIdx;
-        openBlocks.Push(openBlock);
+        openBlocks.Push(openBlock); // 相同节点会重复push ??
 
         blockStates.fCost[sqrIdx] = openBlock.fCost;
         blockStates.gCost[sqrIdx] = openBlock.gCost;

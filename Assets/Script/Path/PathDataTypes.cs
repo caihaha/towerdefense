@@ -81,7 +81,7 @@ public class PathNodeStateBuffer
     public List<float> gCost = new List<float>(Common.BoardCount);
 
     public List<Vector3> parentTile = new List<Vector3>(Common.BoardCount);
-    public int []nodeMask = new int[Common.BoardCount];
+    public int []nodeMask = new int[Common.BoardCount]; // 记录open/colse状态、不可走、父节点方向
 
     public PathNodeStateBuffer()
     {

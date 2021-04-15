@@ -14,7 +14,7 @@ abstract public class IPathFinder
     public Vector2Int mStartBlock;
     public int mStartBlockIdx;
     public int mGoalBlockIdx;
-    public float mGoalHeuristic;
+    public float mGoalFCost;
     #endregion
 
     #region 对外接口
@@ -38,16 +38,27 @@ abstract public class IPathFinder
     #region 内部函数
     protected IPath.SearchResult InitSearch(MoveAgent owner, Vector3 startPos, Vector3 goalPos)
     {
+        Vector2Int square = mStartBlock;
+
+        bool isStartGoal = PathDefs.IsGoal(new Vector3(square.x, 0 , square.y), goalPos);
+        bool startInGoal = false;// pfDef.startInGoalRadius;
+        // 尽管我们的起始正方形可能在目标半径内，但起始坐标可能在目标半径外。 在这种情况下，我们不想返回CantGetCloser，而是返回到我们的起始正方形的路径。
+        // although our starting square may be inside the goal radius, the starting coordinate may be outside.
+        // in this case we do not want to return CantGetCloser, but instead a path to our starting square.
+        if (isStartGoal && startInGoal)
+            return IPath.SearchResult.CantGetCloser;
+
         ResetSearch();
         blockStates.nodeMask[mStartBlockIdx] &= (int)PATHOPT.OBSOLETE;
-        blockStates.nodeMask[mStartBlockIdx] |= (int)PATHOPT.OBSOLETE;
+        blockStates.nodeMask[mStartBlockIdx] |= (int)PATHOPT.OPEN;
         blockStates.fCost[mStartBlockIdx] = 0.0f;
         blockStates.gCost[mStartBlockIdx] = 0.0f;
-        openBlockBuffer.SetSize(0);
+        dirtyBlocks.Add(mStartBlockIdx);
 
+        openBlockBuffer.SetSize(0);
         PathNode ob = openBlockBuffer.GetNode(openBlockBuffer.GetSize());
-        ob.fCost = 0f;
-        ob.gCost = 0f;
+        ob.fCost = 0.0f;
+        ob.gCost = 0.0f;
         ob.pos = startPos;
         ob.nodeNum = mStartBlockIdx;
         ob.nodePos = mStartBlock;
@@ -55,9 +66,19 @@ abstract public class IPathFinder
 
         // 将起点标记为最佳位置
         mGoalBlockIdx = mStartBlockIdx;
-        IPath.SearchResult search = DoSearch(owner, goalPos);
+        mGoalFCost = PathDefs.Heuristic(new Vector3(square.x, 0, square.y), goalPos);
+        IPath.SearchResult ipfResult = DoSearch(owner, goalPos);
 
-        return search;
+        if (ipfResult == IPath.SearchResult.Ok)
+            return ipfResult;
+
+        if (mGoalBlockIdx != mStartBlockIdx)
+            return ipfResult;
+
+        // if start and goal are within the same block, but distinct squares
+        // or considered a single point for search purposes, then we probably
+        // can not get closer 如果开始和目标在同一块内，但有不同的正方形或出于搜索目的被视为单个点，那么我们可能无法接近
+        return (!isStartGoal || startInGoal) ? IPath.SearchResult.CantGetCloser : ipfResult;
     }
 
     protected void ResetSearch()
