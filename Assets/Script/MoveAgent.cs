@@ -453,6 +453,7 @@ public class MoveAgent
 			{
 				currWayPoint = goalPos;
 				nextWayPoint = goalPos;
+				atGoal = true;
 				return false;
 			}
 		}
