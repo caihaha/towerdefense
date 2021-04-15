@@ -40,7 +40,7 @@ abstract public class IPathFinder
     {
         Vector2Int square = mStartBlock;
 
-        bool isStartGoal = PathDefs.IsGoal(new Vector3(square.x, 0 , square.y), goalPos);
+        bool isStartGoal = PathDefs.IsGoal(startPos, goalPos);
         bool startInGoal = false;// pfDef.startInGoalRadius;
         // 尽管我们的起始正方形可能在目标半径内，但起始坐标可能在目标半径外。 在这种情况下，我们不想返回CantGetCloser，而是返回到我们的起始正方形的路径。
         // although our starting square may be inside the goal radius, the starting coordinate may be outside.
@@ -65,7 +65,7 @@ abstract public class IPathFinder
 
         // 将起点标记为最佳位置
         mGoalBlockIdx = mStartBlockIdx;
-        mGoalFCost = PathDefs.Heuristic(new Vector3(square.x, 0, square.y), goalPos);
+        mGoalFCost = PathDefs.Heuristic(startPos, goalPos);
         IPath.SearchResult ipfResult = DoSearch(owner, goalPos);
 
         if (ipfResult == IPath.SearchResult.Ok)

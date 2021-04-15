@@ -471,6 +471,7 @@ public class MoveAgent
 		{
 			StopEngine(false);
 			progressState = ProgressState.Done;
+			atGoal = true;
 		}
 	}
 

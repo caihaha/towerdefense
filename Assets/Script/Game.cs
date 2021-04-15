@@ -30,7 +30,6 @@ public class Game : MonoBehaviour
     {
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
-        // SpawnEnemy(board.GetTileByIdx(0));
     }
 
     void OnValidate()

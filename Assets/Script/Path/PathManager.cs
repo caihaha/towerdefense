@@ -85,7 +85,6 @@ public class PathManager
         startPos = new Vector3(startX, 0, startZ);
         goalPos = new Vector3(goalX, 0, goalZ);
         var startBlock = new Vector2Int(startX, startZ);
-        var goalBlock = new Vector2Int(goalX, goalZ);
 
         MultiPath newPath = new MultiPath(startPos, goalPos, goalRadius);
         newPath.finalGoal = goalPos;
