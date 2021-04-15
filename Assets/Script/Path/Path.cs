@@ -20,8 +20,8 @@ namespace IPath
             pathCost = -1f;
         }
 
-        public List<Vector3> path;
-        public List<Vector2Int> squares; 
+        public Stack<Vector3> path = new Stack<Vector3>();
+        public Stack<Vector2Int> squares; 
 
         public Vector3 desiredGoal;
         public Vector3 pathGoal;

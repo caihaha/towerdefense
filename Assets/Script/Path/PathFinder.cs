@@ -42,12 +42,13 @@ public class PathFinder : IPathFinder
     override protected void FinishSearch(IPath.Path foundPath, Vector3 startPos, Vector3 goalPos)
     {
         Vector2Int square = Common.BlockIndex2Pos(mGoalBlockIdx);
+        goalPos = new Vector3(square.x, 0, square.y);
         int blockIdx = mGoalBlockIdx;
 
         while (true)
         {
-            foundPath.squares.Add(square);
-            foundPath.path.Add(new Vector3(square.x, 0, square.y));
+            foundPath.squares.Push(square);
+            foundPath.path.Push(new Vector3(square.x, 0, square.y));
 
             if (blockIdx == mStartBlockIdx)
             {
@@ -60,7 +61,7 @@ public class PathFinder : IPathFinder
 
         if (foundPath.path.Count > 0)
         {
-            foundPath.pathGoal = foundPath.path[0];
+            foundPath.pathGoal = goalPos;
         }
 
         foundPath.pathCost = blockStates.fCost[mGoalBlockIdx];
