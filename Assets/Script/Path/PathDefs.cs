@@ -15,7 +15,7 @@ public static class PathDefs
 
     public static float CalcG(PathNode parentNode, Vector3 nextPos)
     {
-        return CalcG(parentNode.gCost, parentNode.pos, nextPos);
+        return CalcG(parentNode.gCost, new Vector3(parentNode.nodePos.x, 0, parentNode.nodePos.y), nextPos);
     }
 
     public static float CalcG(float parentgCost, Vector3 parentPos, Vector3 nextPos)

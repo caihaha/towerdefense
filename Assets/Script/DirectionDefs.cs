@@ -35,7 +35,7 @@ static public class DirectionDefs
     static public uint PATHOPT_CARDINALS = (uint)(PATHOPT.RIGHT | PATHOPT.LEFT | PATHOPT.UP | PATHOPT.DOWN);
     static public uint [] PATHDIR_CARDINALS = {(uint)PATHDIR.LEFT, (uint)PATHDIR.RIGHT, (uint)PATHDIR.UP, (uint)PATHDIR.DOWN };
     static public uint PATH_DIRECTION_VERTICES = (int)PATHDIR.DIRECTIONS >> 1;
-    public static int PATH_NODE_SPACING = 2;
+    public static int PATH_NODE_SPACING = 1;
 
     static public uint[] GetPathDir2PathOpt()
     {

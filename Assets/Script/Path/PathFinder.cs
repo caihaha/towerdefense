@@ -15,7 +15,7 @@ public class PathFinder : IPathFinder
                 continue;
             }
 
-            if (PathDefs.IsGoal(new Vector3(mStartBlock.x, 0, mStartBlock.y), goalPos))
+            if (PathDefs.IsGoal(new Vector3(openSquare.nodePos.x, 0, openSquare.nodePos.y), goalPos))
             {
                 mGoalBlockIdx = openSquare.nodeNum;
                 mGoalFCost = 0.0f;
@@ -100,7 +100,6 @@ public class PathFinder : IPathFinder
         var openBlock = openBlockBuffer.GetNode(openBlockBuffer.GetSize());
         openBlock.gCost = gCost;
         openBlock.fCost = fCost;
-        openBlock.pos = nextPos;
         openBlock.nodePos = square;
         openBlock.nodeNum = sqrIdx;
         openBlocks.Push(openBlock); // 相同节点会重复push ??
@@ -125,7 +124,7 @@ public class PathFinder : IPathFinder
         {
             speedMod = 0.0f;
             inSearch = false;
-            blockMask = BlockTypes.BLOCK_IMPASSABLE;
+            blockMask = BlockTypes.BLOCK_NONE;
         }
     };
 

@@ -59,7 +59,6 @@ abstract public class IPathFinder
         PathNode ob = openBlockBuffer.GetNode(openBlockBuffer.GetSize());
         ob.fCost = 0.0f;
         ob.gCost = 0.0f;
-        ob.pos = startPos;
         ob.nodeNum = mStartBlockIdx;
         ob.nodePos = mStartBlock;
         openBlocks.Push(ob);

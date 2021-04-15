@@ -7,7 +7,6 @@ public class PathNode
     public float fCost;
     public float gCost;
 
-    public Vector3 pos;
     public int nodeNum;
     public Vector2Int nodePos;
 

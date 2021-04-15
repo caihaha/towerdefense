@@ -21,7 +21,7 @@ namespace IPath
         }
 
         public Stack<Vector3> path = new Stack<Vector3>();
-        public Stack<Vector2Int> squares; 
+        public Stack<Vector2Int> squares = new Stack<Vector2Int>(); 
 
         public Vector3 desiredGoal;
         public Vector3 pathGoal;
