@@ -459,11 +459,6 @@ public class MoveAgent
 		}
 		return true;
 	}
-
-	private Vector3 GetRightVector(Vector3 vec)
-	{
-		return new Vector3(vec.z, 0, -vec.x);
-	}
 	#endregion
 
 	private void Arrived()
