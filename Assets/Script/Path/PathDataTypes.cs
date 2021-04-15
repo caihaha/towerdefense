@@ -54,6 +54,10 @@ public class PathNodeBuffer
     public PathNodeBuffer()
     {
         idx = 0;
+        for(int i = 0; i < 56636; ++i)
+        {
+            buffer[i] = new PathNode();
+        }
     }
 
     public void SetSize(uint i)
@@ -77,19 +81,10 @@ public class PathNodeBuffer
 
 public class PathNodeStateBuffer
 {
-    public List<float> fCost = new List<float>(Common.BoardCount);
-    public List<float> gCost = new List<float>(Common.BoardCount);
+    public float[] fCost = new float[Common.BoardCount];
+    public float[] gCost = new float[Common.BoardCount];
 
-    public List<Vector3> parentTile = new List<Vector3>(Common.BoardCount);
     public int []nodeMask = new int[Common.BoardCount]; // 记录open/colse状态、不可走、父节点方向
-
-    public PathNodeStateBuffer()
-    {
-        for(int i = 0; i < parentTile.Capacity; ++i)
-        {
-            parentTile.Add(Common.illegalPos);
-        }
-    }
 
     public void ClearSquare(int idx)
     {

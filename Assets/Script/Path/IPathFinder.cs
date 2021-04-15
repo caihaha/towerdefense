@@ -7,9 +7,9 @@ abstract public class IPathFinder
     public PriorityQueue<PathNode> openBlocks = new PriorityQueue<PathNode>(new PathNodeComparer());
     // 上次搜索中更改的块列表
 
-    public PathNodeStateBuffer blockStates;
-    public PathNodeBuffer openBlockBuffer;
-    public List<int> dirtyBlocks;
+    public PathNodeStateBuffer blockStates = new PathNodeStateBuffer();
+    public PathNodeBuffer openBlockBuffer = new PathNodeBuffer();
+    public List<int> dirtyBlocks = new List<int>();
 
     public Vector2Int mStartBlock;
     public int mStartBlockIdx;
@@ -83,7 +83,7 @@ abstract public class IPathFinder
 
     protected void ResetSearch()
     {
-        int i = dirtyBlocks.Count;
+        var i = dirtyBlocks.Count;
         while (i > 0)
         {
             --i;

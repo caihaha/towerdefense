@@ -278,9 +278,16 @@ public class MoveAgent
 		{
 			atGoal = false;
 			atEndOfPath = false;
-            // currWayPoint = pathManager.NextWayPoint(pathID);
-            nextWayPoint = pathManager.NextWayPoint(pathID);
-        }
+			Vector3 tmp = pathManager.NextWayPoint(pathID);
+			if (tmp == Common.illegalPos)
+            {
+				Fail();
+			}
+			else
+            {
+				nextWayPoint = tmp;
+			}
+		}
 		else
 		{
 			Fail();

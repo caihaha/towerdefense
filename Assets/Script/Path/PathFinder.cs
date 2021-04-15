@@ -132,6 +132,10 @@ public class PathFinder : IPathFinder
     void TestNeighborSquares(PathNode square, MoveAgent owner, Vector3 goalPos)
     {
         SquareState []ngbStates = new SquareState[(int)PATHDIR.DIRECTIONS];
+        for (int i = 0; i < (int)PATHDIR.DIRECTIONS; ++i)
+        {
+            ngbStates[i] = new SquareState();
+        }
 
         for(uint dir = 0; dir < (uint)PATHDIR.DIRECTIONS; ++dir)
         {
