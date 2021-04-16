@@ -312,6 +312,7 @@ public class MoveAgent
         {
 			float curGoalDistSq = Common.SqLength2D(pos - goalPos);
 			atGoal |= (curGoalDistSq <= goalRadius * goalRadius);
+			atEndOfPath = atGoal;
 
 			if (!atGoal)
 			{
