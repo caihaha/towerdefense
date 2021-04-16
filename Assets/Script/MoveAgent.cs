@@ -277,15 +277,20 @@ public class MoveAgent
 		{
 			atGoal = false;
 			atEndOfPath = false;
-			Vector3 tmp = pathManager.NextWayPoint(pathID);
-			if (tmp == Common.illegalPos)
+			Vector3 tmp1 = pathManager.NextWayPoint(pathID);
+			if (tmp1 == Common.illegalPos)
             {
 				Fail();
 			}
 			else
             {
-				nextWayPoint = tmp;
+				currWayPoint = tmp1;
 			}
+			Vector3 tmp2 = pathManager.NextWayPoint(pathID);
+			if (tmp2 != Common.illegalPos)
+            {
+				nextWayPoint = tmp2;
+            }
 		}
 		else
 		{
