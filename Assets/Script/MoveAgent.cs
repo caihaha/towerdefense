@@ -270,7 +270,8 @@ public class MoveAgent
 	{
 		if (newVelocity != Vector3.zero)
 		{
-			pos += newVelocity;
+			var tmp = (float)Common.SqDistance2D(currWayPoint, pos) - 1.0f;
+			pos += (newVelocity * (Common.Sign(tmp) == 0 ? 1 : Mathf.Sqrt(2)));
 			posTileIdx = (uint)Common.PosToTileIndex(pos);
 		}
 		currentVelocity = newVelocity;
@@ -453,6 +454,12 @@ public class MoveAgent
 		{
 			return false;
 		}
+
+		if (Common.SqDistance2D(currWayPoint, pos) > goalRadius * goalRadius)
+        {
+			return false;
+        }
+
 		if (currWayPoint.y != -1.0f && nextWayPoint.y != -1.0f)
 		{
 			atEndOfPath = Common.SqDistance2D(currWayPoint, goalPos) <= goalRadius * goalRadius;
