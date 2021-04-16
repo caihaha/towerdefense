@@ -64,7 +64,7 @@ public class MoveAgent
 	private uint posTileIdx;
 
 
-	public Vector3 CurrWayPoint { get => currWayPoint; set => currWayPoint = value; }
+	public Vector3 Pos { get => pos; }
 	public float Speed { get => currentSpeed; set => currentSpeed = value; }
 	public Vector3 FrontDir { get => flatFrontDir; set => flatFrontDir = value; }
 	public uint PosTileIdx { get => posTileIdx; set => posTileIdx = value; }
@@ -216,8 +216,7 @@ public class MoveAgent
 	{
 		if (newVelocity != Vector3.zero)
 		{
-			Vector3 newPos = pos + newVelocity;
-			pos = newPos;
+			pos += newVelocity;
 			posTileIdx = (uint)Common.PosToTileIndex(pos);
 		}
 		currentVelocity = newVelocity;

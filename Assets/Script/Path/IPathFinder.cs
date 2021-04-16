@@ -22,6 +22,11 @@ abstract public class IPathFinder
     {
         mStartBlock = startBlock;
         mStartBlockIdx = Common.BlockPos2Index(startBlock);
+        if(mStartBlockIdx < 0)
+        {
+            return 0;
+            Debug.LogError("startPos illegal");
+        }
 
         // start up a new search
         IPath.SearchResult result = InitSearch(owner, startPos, goalPos);
