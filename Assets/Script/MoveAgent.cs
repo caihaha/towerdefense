@@ -211,6 +211,60 @@ public class MoveAgent
 		FollowPath();
 	}
 
+	private bool FollowPath()
+	{
+		if (WantToStop())
+		{
+			currWayPoint.y = -0.1f;
+			nextWayPoint.y = -0.1f;
+			SetMainHeading();
+			ChangeSpeed(0.0f);
+			return false;
+		}
+		else
+		{
+			float curGoalDistSq = Common.SqLength2D(pos - goalPos);
+			atGoal |= (curGoalDistSq <= goalRadius * goalRadius);
+			atEndOfPath = atGoal;
+
+			if (!atGoal)
+			{
+				if (idling)
+				{
+					numIdlingUpdates = Mathf.Min(numIdlingUpdates + 1, 32768);
+				}
+				else
+				{
+					numIdlingUpdates = Mathf.Max(numIdlingUpdates - 1, 0);
+				}
+			}
+			if (!atEndOfPath)
+			{
+				GetNextWayPoint();
+			}
+			else
+			{
+				if (atGoal)
+				{
+					Arrived();
+				}
+				else
+				{
+					ReRequestPath(true);
+				}
+			}
+			if (Mathf.Abs(currWayPoint.x - pos.x) > 0.00001f || Mathf.Abs(currWayPoint.z - pos.z) > 0.00001f)
+			{
+				wayPointDir = new Vector3(currWayPoint.x - pos.x, 0.0f, currWayPoint.z - pos.z).normalized;
+			}
+			Vector3 wantedForward = !atGoal ? wayPointDir : flatFrontDir;
+			wantedForward = GetObstacleAvoidanceDir(wantedForward);
+			ChangeHeading(wantedForward);
+			ChangeSpeed(maxSpeed);
+		}
+		return true;
+	}
+
 	// 更新位置
 	private void UpdateOwnerPos(Vector3 oldVelocity, Vector3 newVelocity)
 	{
@@ -303,59 +357,7 @@ public class MoveAgent
 		return pathManager.RequiredPath(this, pos, goalPos, goalRadius);
 	}
 
-	private bool FollowPath()
-	{
-		if (WantToStop())
-		{
-			currWayPoint.y = -0.1f;
-			nextWayPoint.y = -0.1f;
-			SetMainHeading();
-			ChangeSpeed(0.0f);
-			return false;
-		}
-        else
-        {
-			float curGoalDistSq = Common.SqLength2D(pos - goalPos);
-			atGoal |= (curGoalDistSq <= goalRadius * goalRadius);
-			atEndOfPath = atGoal;
-
-			if (!atGoal)
-			{
-				if (idling)
-				{
-					numIdlingUpdates = Mathf.Min(numIdlingUpdates + 1, 32768);
-				}
-				else
-				{
-					numIdlingUpdates = Mathf.Max(numIdlingUpdates - 1, 0);
-				}
-			}
-			if (!atEndOfPath)
-			{
-				GetNextWayPoint();
-			}
-			else
-			{
-				if (atGoal)
-				{
-					Arrived();
-				}
-				else
-				{
-					ReRequestPath(true);
-				}
-			}
-			if (Mathf.Abs(currWayPoint.x - pos.x) > 0.00001f || Mathf.Abs(currWayPoint.z - pos.z) > 0.00001f)
-			{
-				wayPointDir = new Vector3(currWayPoint.x - pos.x, 0.0f, currWayPoint.z - pos.z).normalized;
-			}
-			Vector3 wantedForward = !atGoal ? wayPointDir : flatFrontDir;
-			wantedForward = GetObstacleAvoidanceDir(wantedForward);
-			ChangeHeading(wantedForward);
-			ChangeSpeed(maxSpeed);
-		}
-		return true;
-	}
+	
 	private void SetMainHeading()
     {
 		return;
