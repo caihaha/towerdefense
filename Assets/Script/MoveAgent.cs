@@ -103,7 +103,7 @@ public class MoveAgent
 		atGoal = true;
 
 		pushResistant = unitDef.isPushResistant;
-		flatFrontDir = new Vector3(0, 0, 1);
+		flatFrontDir = Vector3.forward;
 		posTileIdx = (uint)Common.PosToTileIndex(pos);
 	}
 	#endregion

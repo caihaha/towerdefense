@@ -44,8 +44,8 @@ public class Enemy : MonoBehaviour
 			deltaTime -= 1;
 		}
 		
-		// transform.localPosition = Vector3.LerpUnclamped(transform.localPosition, moveAgent.CurrWayPoint, deltaTime);
-		transform.localPosition = new Vector3(moveAgent.Pos.x, 0, moveAgent.Pos.z);
+		transform.localPosition = Vector3.Lerp(transform.localPosition, moveAgent.Pos, deltaTime);
+		transform.localPosition = new Vector3(transform.localPosition.x, 0, transform.localPosition.z);
 		transform.forward = moveAgent.FrontDir;
 		return true;
     }
