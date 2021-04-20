@@ -23,6 +23,7 @@ public class Game : MonoBehaviour
     bool isSelectedEnemy;
 
     int activeSlowUpdateUnit;
+    int enemyNum;
     #endregion
 
     #region 内部引用
@@ -30,6 +31,7 @@ public class Game : MonoBehaviour
     {
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
+        enemyNum = 0;
     }
 
     void OnValidate()
@@ -122,9 +124,10 @@ public class Game : MonoBehaviour
     // 产生Enemy
     void SpawnEnemy(GameTile tile)
     {
+        ++enemyNum;
         Enemy enemy = enemyFactory.Get();
-        enemy.SpawnOn(tile);
-
+        
+        enemy.SpawnOn(tile, enemyNum);
         enemies.Add(enemy);
     }
     #endregion

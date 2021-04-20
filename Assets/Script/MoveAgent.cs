@@ -16,7 +16,7 @@ public class UnitDef
     {
 		teamID = 1;
 		mass = 1.0f;
-		radius = 0.6f;
+		radius = 0.5f;
 		maxSpeed = 1.0f;
 		maxAcc = 1.0f;
 		maxDec = 1.0f;
@@ -281,18 +281,29 @@ public class MoveAgent
 
 	private void HandleObjectCollisions()
 	{
-		HandleUnitObjectCollision();
-		HandleStaticObjectCollision();
+		HandleUnitCollisions(this, currentSpeed, owner.unitDef.radius);
+		HandleFeatureCollisions(this, currentSpeed, owner.unitDef.radius);
+
+		bool squareChange = (Common.PosToTileIndex(pos + currentVelocity) != Common.PosToTileIndex(pos));
+		if(squareChange)
+        {
+			HandleStaticObjectCollision();
+		}
 	}
 
-	private void HandleUnitObjectCollision()
+	private void HandleUnitCollisions(MoveAgent collider, float colliderSpeed, float colliderRadius)
 	{
-
+		float searchRadius = colliderSpeed + (colliderRadius * 2);
 	}
 
 	private void HandleStaticObjectCollision()
 	{
 		
+	}
+
+	private void HandleFeatureCollisions(MoveAgent collider, float colliderSpeed, float colliderRadius)
+	{
+		float searchRadius = colliderSpeed + (colliderRadius * 2);
 	}
 
 	private void ReRequestPath(bool forceRequest)

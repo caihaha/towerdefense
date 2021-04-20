@@ -15,16 +15,19 @@ public class Enemy : MonoBehaviour
 			originFactory = value;
 		}
 	}
-	
-	UnitDef unitDef;
-	MoveAgent moveAgent;
+
+	int id;
 	float deltaTime;
+	public UnitDef unitDef;
+	MoveAgent moveAgent;
 	public MoveAgent UnitMove => moveAgent;
+	public int ID => id;
     #endregion
 
     #region 初始化
-    public void SpawnOn(GameTile tile)
+    public void SpawnOn(GameTile tile, int id)
 	{
+		this.id = id;
 		transform.localRotation = Quaternion.identity;
 		transform.localPosition = tile.transform.localPosition;
 
