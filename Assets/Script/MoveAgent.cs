@@ -17,9 +17,9 @@ public class UnitDef
 		teamID = 1;
 		mass = 1.0f;
 		radius = 0.5f;
-		maxSpeed = 1.0f;
-		maxAcc = 1.0f;
-		maxDec = 1.0f;
+		maxSpeed = 0.2f;
+		maxAcc = 0.2f;
+		maxDec = 0.2f;
 		isPushResistant = true;
     }
 }
@@ -63,6 +63,8 @@ public class MoveAgent
 	private float goalRadius;
 	private uint posTileIdx;
 
+	private float currWayPointDist;
+	private float prevWayPointDist;
 
 	public Vector3 Pos { get => pos; }
 	public float Speed { get => currentSpeed; set => currentSpeed = value; }
@@ -105,6 +107,9 @@ public class MoveAgent
 		pushResistant = unitDef.isPushResistant;
 		flatFrontDir = Vector3.forward;
 		posTileIdx = (uint)Common.PosToTileIndex(pos);
+
+		currWayPointDist = 0.0f;
+		prevWayPointDist = 0.0f;
 	}
 	#endregion
 
@@ -177,20 +182,26 @@ public class MoveAgent
 	public void StartMoving(Vector3 moveGoalPos, float moveGoalRadius)
 	{
 		goalPos = new Vector3(moveGoalPos.x, 0, moveGoalPos.z);
-		if (currWayPoint == null || goalPos == null)
+		if (currWayPoint == goalPos)
+        {
 			return;
+		}
 
 		atGoal = Common.SqDistance2D(pos, goalPos) < moveGoalRadius * moveGoalRadius;
 		if (atGoal)
         {
 			return;
 		}
-
-		atEndOfPath = false;
+		
 		goalRadius = moveGoalRadius;
+		atEndOfPath = false;
 		progressState = ProgressState.Active;
+
 		numIdlingUpdates = 0;
 		numIdlingSlowUpdates = 0;
+
+		currWayPointDist = 0.0f;
+		prevWayPointDist = 0.0f;
 
 		ReRequestPath(true);
 	}
@@ -219,13 +230,14 @@ public class MoveAgent
 			nextWayPoint.y = -0.1f;
 			SetMainHeading();
 			ChangeSpeed(0.0f);
-			return false;
 		}
 		else
 		{
+			prevWayPointDist = currWayPointDist;
+			currWayPointDist = Common.Distance2D(Pos, currWayPoint);
+
 			float curGoalDistSq = Common.SqLength2D(pos - goalPos);
 			atGoal |= (curGoalDistSq <= goalRadius * goalRadius);
-			atEndOfPath = atGoal;
 
 			if (!atGoal)
 			{
@@ -248,21 +260,20 @@ public class MoveAgent
 				{
 					Arrived();
 				}
-				else
-				{
-					ReRequestPath(true);
-				}
 			}
+
 			if (Mathf.Abs(currWayPoint.x - pos.x) > 0.00001f || Mathf.Abs(currWayPoint.z - pos.z) > 0.00001f)
 			{
 				wayPointDir = new Vector3(currWayPoint.x - pos.x, 0.0f, currWayPoint.z - pos.z).normalized;
 			}
+
 			Vector3 wantedForward = !atGoal ? wayPointDir : flatFrontDir;
 			wantedForward = GetObstacleAvoidanceDir(wantedForward);
+
 			ChangeHeading(wantedForward);
 			ChangeSpeed(maxSpeed);
 		}
-		return true;
+		return false;
 	}
 
 	// 更新位置
@@ -270,8 +281,7 @@ public class MoveAgent
 	{
 		if (newVelocity != Vector3.zero)
 		{
-			var tmp = (float)Common.SqDistance2D(currWayPoint, pos) - 1.0f;
-			pos += (newVelocity * (Common.Sign(tmp) == 0 ? 1 : Mathf.Sqrt(2)));
+			pos += newVelocity;
 			posTileIdx = (uint)Common.PosToTileIndex(pos);
 		}
 		currentVelocity = newVelocity;
@@ -466,22 +476,20 @@ public class MoveAgent
 			return false;
 		}
 
-		if (Common.SqDistance2D(currWayPoint, pos) > goalRadius * goalRadius)
+		if (Common.SqDistance2D(currWayPoint, pos) > maxSpeed)
         {
 			return false;
         }
 
-		if (currWayPoint.y != -1.0f && nextWayPoint.y != -1.0f)
+		atEndOfPath = Common.SqDistance2D(currWayPoint, goalPos) <= goalRadius * goalRadius;
+		if (atEndOfPath)
 		{
-			atEndOfPath = Common.SqDistance2D(currWayPoint, goalPos) <= goalRadius * goalRadius;
-			if (atEndOfPath)
-			{
-				currWayPoint = goalPos;
-				nextWayPoint = goalPos;
-				atGoal = true;
-				return false;
-			}
+			currWayPoint = goalPos;
+			nextWayPoint = goalPos;
+			atGoal = true;
+			return false;
 		}
+
 		return true;
 	}
 	#endregion

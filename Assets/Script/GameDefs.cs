@@ -67,6 +67,11 @@ public static class Common
         return dx * dx + dz * dz;
     }
 
+    public static float Distance2D(Vector3 vec1, Vector3 vec2)
+    {
+        return Mathf.Sqrt(SqDistance2D(vec1, vec2));
+    }
+
     public static float Dot(Vector3 a, Vector3 b)
     {
         return a.x * b.x + a.y * b.y + a.z * b.z;

@@ -40,7 +40,7 @@ public class Enemy : MonoBehaviour
 	#region 对外接口
 	public bool GameUpdate()
     {
-		deltaTime += Time.deltaTime;
+		deltaTime += Time.deltaTime * 5;
 		if (deltaTime > 1)
 		{
 			moveAgent.GameUpdate();
@@ -48,7 +48,7 @@ public class Enemy : MonoBehaviour
 		}
 		
 		transform.localPosition = Vector3.Lerp(transform.localPosition, moveAgent.Pos, deltaTime);
-		transform.localPosition = new Vector3(transform.localPosition.x, 0, transform.localPosition.z);
+		transform.localPosition = new Vector3(moveAgent.Pos.x, 0, moveAgent.Pos.z);
 		transform.forward = moveAgent.FrontDir;
 		return true;
     }
