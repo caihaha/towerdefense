@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class UnitDef
 {
-	public int teamID; //enemy can't push
+	public int allyteam; //enemy can't push
 	public float mass; //calc push distance
 	public float radius;
 	public float maxSpeed;
@@ -14,7 +14,7 @@ public class UnitDef
 
 	public UnitDef()
     {
-		teamID = 1;
+		allyteam = 1;
 		mass = 1.0f;
 		radius = 0.5f;
 		maxSpeed = 0.2f;
@@ -65,6 +65,7 @@ public class MoveAgent
 
 	private float currWayPointDist;
 	private float prevWayPointDist;
+	private Vector3 lastAvoidanceDir;
 
 	public Vector3 Pos { get => pos; }
 	public float Speed { get => currentSpeed; set => currentSpeed = value; }
@@ -110,6 +111,7 @@ public class MoveAgent
 
 		currWayPointDist = 0.0f;
 		prevWayPointDist = 0.0f;
+		lastAvoidanceDir = Vector3.zero;
 	}
 	#endregion
 
@@ -214,6 +216,11 @@ public class MoveAgent
 			atGoal = false;
         }
     }
+
+	public Vector3 GetRightDir()
+    {
+		return new Vector3(flatFrontDir.z, 0, -flatFrontDir.x);
+	}
 	#endregion
 
 	#region 内部函数
@@ -439,24 +446,96 @@ public class MoveAgent
 		return pathID == 0;
 	}
 
-	private Vector3 GetObstacleAvoidanceDir(Vector3 wantedForward)
+	private Vector3 GetObstacleAvoidanceDir(Vector3 desiredDir)
 	{
-        if (atGoal)
+        if (WantToStop())
         {
-            return wantedForward;
+            return flatFrontDir;
         }
 
-        // 动态避障(搜索所有的enemy)
-        foreach (var id2Enemy in Common.enemys.Enemys)
+		Vector3 avoidanceVec = Vector3.zero;
+		Vector3 avoidanceDir = desiredDir;
+		lastAvoidanceDir = desiredDir;
+		var avoider = owner;
+		var avoiderMoveAgent = this;
+
+		if(Vector3.Dot(flatFrontDir, desiredDir) < 0.0f)
         {
-            MoveAgent moveAgent = id2Enemy.Value.UnitMove;
-            if (moveAgent == this)
+			return lastAvoidanceDir;
+        }
+
+		float AVOIDER_DIR_WEIGHT = 1.0f;
+		float DESIRED_DIR_WEIGHT = 0.5f;
+		float MAX_AVOIDEE_COSINE = Mathf.Cos(120.0f * 0.017453292519943295f); // cos(2π/3) = -1/2
+		float LAST_DIR_MIX_ALPHA = 0.7f;
+
+		float avoidanceRadius = Mathf.Max(currentSpeed, 0.2f) * (avoider.unitDef.radius * 2.0f);
+		float avoiderRadius = Common.FOOTPRINT_RADIUS;
+
+		// 动态避障(搜索所有的enemy)
+		foreach (var id2Enemy in Common.enemys.Enemys)
+        {
+			var avoidee = id2Enemy.Value;
+			MoveAgent avoideeMoveAgent = id2Enemy.Value.UnitMove;
+            if (avoidee == avoider)
             {
                 continue;
             }
-        }
 
-        return wantedForward;
+			if (MoveMath.IsNonBlocking(avoider, avoidee))
+            {
+				continue;
+            }
+
+			// avoidee不在移动并且是友方直接continue, avoider会将avoidee推开
+			if (avoideeMoveAgent.atGoal && avoidee.unitDef.allyteam == avoider.unitDef.allyteam)
+			{
+				continue;
+			}
+
+			bool avoideeMobile = true;
+			bool avoideeMovable = true;
+			Vector3 avoideeVector = (avoiderMoveAgent.pos + avoiderMoveAgent.currentVelocity) - (avoideeMoveAgent.pos + avoideeMoveAgent.currentVelocity);
+			float avoideeRadius = Common.FOOTPRINT_RADIUS;
+			float avoidanceRadiusSum = avoiderRadius + avoideeRadius;
+			float avoidanceMassSum = avoider.unitDef.mass + avoidee.unitDef.mass;
+			float avoideeMassScale = avoideeMobile ? (avoidee.unitDef.mass / avoidanceMassSum) : 1.0f;
+			float avoideeDistSq = Common.SqLength2D(avoideeVector);
+			float avoideeDist = Mathf.Sqrt(avoideeDistSq) + 0.01f;
+
+			if (Vector3.Dot(avoideeMoveAgent.flatFrontDir, -(avoideeVector / avoideeDist)) < MAX_AVOIDEE_COSINE)
+            {
+				continue;
+            }
+
+			if (avoideeDistSq >= Common.SqDistance2D(avoiderMoveAgent.pos, goalPos))
+            {
+				continue;
+            }
+
+			// 确定符号
+			Vector3 avoiderRight = avoiderMoveAgent.GetRightDir();
+			Vector3 avoideeRight = avoideeMoveAgent.GetRightDir();
+			float avoiderTurnSign = -Common.Sign2(Vector3.Dot(avoideeMoveAgent.pos, avoiderRight) - Vector3.Dot(avoiderMoveAgent.pos, avoiderRight));
+			float avoideeTurnSign = -Common.Sign2(Vector3.Dot(avoiderMoveAgent.pos, avoideeRight) - Vector3.Dot(avoideeMoveAgent.pos, avoideeRight));
+
+			float avoidanceCosAngle = Mathf.Clamp(Vector3.Dot(avoiderMoveAgent.flatFrontDir, avoideeMoveAgent.flatFrontDir), -1.0f, 1.0f); // cos() 相对运动时为-1
+			float avoidanceResponse = (1.0f - avoidanceCosAngle * (avoideeMobile ? 1 : 0)) + 0.1f;       // 此时为2.1
+			float avoidanceFallOff = (1.0f - Mathf.Min(1.0f, avoideeDist / (5.0f * avoidanceRadiusSum)));
+
+			if (avoidanceCosAngle < 0.0f)
+            {
+				avoiderTurnSign = Mathf.Max(avoiderTurnSign, avoideeTurnSign);
+			}
+
+			avoidanceDir = avoiderRight * AVOIDER_DIR_WEIGHT * avoiderTurnSign;
+			avoidanceVec += (avoidanceDir * avoidanceResponse * avoidanceFallOff * avoideeMassScale);
+		}
+
+		avoidanceDir = (Vector3.Lerp(desiredDir, avoidanceVec, DESIRED_DIR_WEIGHT)).normalized;
+		avoidanceDir = (Vector3.Lerp(avoidanceDir, lastAvoidanceDir, LAST_DIR_MIX_ALPHA)).normalized;
+
+		return (lastAvoidanceDir = avoidanceDir);
 	}
 
 	#region 改变下一个状态

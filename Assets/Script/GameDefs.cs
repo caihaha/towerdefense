@@ -54,6 +54,11 @@ public static class Common
         }
     }
 
+    public static int Sign2(float num)
+    {
+        return ((num > 0) ? 1 : -1);
+    }
+
     public static float SqLength2D(Vector3 vec)
     {
         return vec.x * vec.x + vec.z * vec.z;
@@ -121,13 +126,10 @@ public static class Common
     {
         return pos.x < boardMin.x || pos.z < boardMin.z || pos.x > boardMax.x || pos.z > boardMax.z;
     }
-}
 
-public static class GameDefs
-{
     public static GameTile GetGameTileByIndex(int index)
     {
-        if(index < 0 || index > Common.BoardCount)
+        if (index < 0 || index > Common.BoardCount)
         {
             return null;
         }
@@ -142,21 +144,21 @@ public static class GameDefs
 
     public static bool IsBlocked(GameTile currTile, GameTile nextTile)
     {
-        if(nextTile == null || nextTile.Content.Type == GameTileContentType.Wall)
+        if (nextTile == null || nextTile.Content.Type == GameTileContentType.Wall)
         {
             return true;
         }
 
         Vector3 diff = nextTile.ExitPoint - currTile.ExitPoint;
-        if(diff.x == 0 || diff.z == 0)
+        if (diff.x == 0 || diff.z == 0)
         {
             return false;
         }
 
         GameTile upTile = GetGameTileByPos(new Vector2Int((int)currTile.ExitPoint.x + Common.Sign(diff.x), (int)currTile.ExitPoint.z));
-        GameTile rightTile = GetGameTileByPos(new Vector2Int((int)currTile.ExitPoint.x , (int)currTile.ExitPoint.z + Common.Sign(diff.z)));
+        GameTile rightTile = GetGameTileByPos(new Vector2Int((int)currTile.ExitPoint.x, (int)currTile.ExitPoint.z + Common.Sign(diff.z)));
 
-        if(upTile.Content.Type == GameTileContentType.Wall && rightTile.Content.Type == GameTileContentType.Wall)
+        if (upTile.Content.Type == GameTileContentType.Wall && rightTile.Content.Type == GameTileContentType.Wall)
         {
             return true;
         }
@@ -172,5 +174,20 @@ public static class GameDefs
         }
         return false;
     }
+
+    public static float FOOTPRINT_RADIUS = 0.5f;
 }
+
+public static class MoveMath
+{
+    public static bool IsNonBlocking(Enemy avoider, Enemy avoidee)
+    {
+        if (avoidee == avoider)
+        {
+            return true;
+        }
+        return false;
+    }
+}
+
 
