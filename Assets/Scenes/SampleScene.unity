@@ -620,6 +620,10 @@ PrefabInstance:
       propertyPath: m_Constraints
       value: 112
       objectReference: {fileID: 0}
+    - target: {fileID: 400165256, guid: 66f19e170af67ef45b35d32a04603262, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 838999846125990467, guid: 66f19e170af67ef45b35d32a04603262,
         type: 3}
       propertyPath: m_IsActive
