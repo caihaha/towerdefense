@@ -137,23 +137,7 @@ public class MoveAgent
 
 		ReRequestPath(true);
     }
-
-	public void OwnerMoved(Vector3 oldPos, Vector3 oldForward)
-	{
-		if ((oldPos - pos).sqrMagnitude < 0.00001f)
-		{
-			currentVelocity = Vector3.zero;
-			currentSpeed = 0.0f;
-			//idling = true;
-			idling = (currWayPoint.y != -0.1f && nextWayPoint.y != -0.1f);
-			return;
-		}
-		//Vector3 ffd = flatFrontDir * Common.SqDistance2D(oldPos, pos) * 0.5f;
-		//Vector3 wpd = wayPointDir;
-		//idling = true;
-		idling = Common.SqDistance2D(oldPos, pos) < currentSpeed * 0.5f * currentSpeed * 0.5f;
-	}
-
+	
 	public void GameSlowUpdate()
 	{
 		if (progressState == ProgressState.Active)
@@ -454,6 +438,22 @@ public class MoveAgent
 	private bool WantToStop()
 	{
 		return pathID == 0;
+	}
+
+	private void OwnerMoved(Vector3 oldPos, Vector3 oldForward)
+	{
+		if ((oldPos - pos).sqrMagnitude < 0.00001f)
+		{
+			currentVelocity = Vector3.zero;
+			currentSpeed = 0.0f;
+			//idling = true;
+			idling = (currWayPoint.y != -0.1f && nextWayPoint.y != -0.1f);
+			return;
+		}
+		//Vector3 ffd = flatFrontDir * Common.SqDistance2D(oldPos, pos) * 0.5f;
+		//Vector3 wpd = wayPointDir;
+		//idling = true;
+		idling = Common.SqDistance2D(oldPos, pos) < currentSpeed * 0.5f * currentSpeed * 0.5f;
 	}
 
 	private Vector3 GetObstacleAvoidanceDir(Vector3 desiredDir)
