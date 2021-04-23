@@ -122,7 +122,7 @@ public static class Common
 
     public static Vector3 illegalPos = new Vector3(float.MinValue, 0, float.MinValue);
 
-    public static bool isIllegalPos(Vector3 pos)
+    public static bool IsIllegalPos(Vector3 pos)
     {
         return pos.x < boardMin.x || pos.z < boardMin.z || pos.x > boardMax.x || pos.z > boardMax.z;
     }
@@ -142,13 +142,15 @@ public static class Common
         return GetGameTileByIndex(BlockPos2Index(vec));
     }
 
-    public static bool IsBlocked(GameTile currTile, GameTile nextTile)
+    public static bool IsDiagonalBlocked(Vector2Int currPos, Vector2Int nextPos)
     {
-        if (nextTile == null || nextTile.Content.Type == GameTileContentType.Wall)
+        if (IsBlocked(nextPos))
         {
             return true;
         }
 
+        var currTile = GetGameTileByBlock(currPos);
+        var nextTile = GetGameTileByBlock(nextPos);
         Vector3 diff = nextTile.ExitPoint - currTile.ExitPoint;
         if (diff.x == 0 || diff.z == 0)
         {
@@ -166,14 +168,20 @@ public static class Common
         return false;
     }
 
-    public static bool IsBlocked(Vector2Int currPos, Vector2Int nextPos)
+    public static bool IsBlocked(Vector2Int nextPos)
     {
-        if (isIllegalPos(new Vector3(nextPos.x, 0, nextPos.y)))
+        if (IsIllegalPos(new Vector3(nextPos.x, 0, nextPos.y)))
         {
             return true;
         }
 
-        return IsBlocked(GetGameTileByBlock(currPos), GetGameTileByBlock(nextPos));
+        var nextTile = GetGameTileByBlock(nextPos);
+        if (nextTile == null || nextTile.Content.Type == GameTileContentType.Wall)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public static float FOOTPRINT_RADIUS = 0.5f;
