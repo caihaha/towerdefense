@@ -146,6 +146,7 @@ public class PathFinder : IPathFinder
                 continue;
             }
 
+            blockStates.nodeMask[ngbSquareIdx] |= Common.IsBlocked(square.nodePos, ngbSquareCoors) ? (int)PATHOPT.BLOCKED : 0;
             if ((blockStates.nodeMask[ngbSquareIdx] & (int)(PATHOPT.CLOSED | PATHOPT.BLOCKED)) != 0) // 阻塞或者已经在路径中
             {
                 continue;

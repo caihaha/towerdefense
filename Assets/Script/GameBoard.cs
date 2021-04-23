@@ -120,7 +120,7 @@ public class GameBoard : MonoBehaviour
         return false;
     }
 
-    public void ToggleWall (GameTile tile) {
+    public bool ToggleWall (GameTile tile) {
         if (tile.Content.Type == GameTileContentType.Wall)
         {
             SetGameTileContentType(tile, GameTileContentType.Empty);
@@ -129,6 +129,9 @@ public class GameBoard : MonoBehaviour
         {
             SetGameTileContentType(tile, GameTileContentType.Wall);
         }
+
+        // 地形有变化就返回true
+        return true;
 	}
 
     public void SetGameTileContentType(GameTile tile, GameTileContentType contentType)

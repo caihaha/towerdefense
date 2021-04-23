@@ -22,7 +22,7 @@ public static class Common
     // 根据网格索引获取网格X,Z
     public static Vector2Int BlockIndex2Pos(int index)
     {
-        if(index < 0 || index > Common.BoardCount)
+        if(index < 0 || index > BoardCount)
         {
             return new Vector2Int(int.MaxValue, int.MaxValue);
         }
@@ -129,7 +129,7 @@ public static class Common
 
     public static GameTile GetGameTileByIndex(int index)
     {
-        if (index < 0 || index > Common.BoardCount)
+        if (index < 0 || index > BoardCount)
         {
             return null;
         }
@@ -137,9 +137,9 @@ public static class Common
         return GameBoard.Instance.Tiles[index];
     }
 
-    public static GameTile GetGameTileByPos(Vector2Int vec)
+    public static GameTile GetGameTileByBlock(Vector2Int vec)
     {
-        return GetGameTileByIndex(Common.BlockPos2Index(vec));
+        return GetGameTileByIndex(BlockPos2Index(vec));
     }
 
     public static bool IsBlocked(GameTile currTile, GameTile nextTile)
@@ -155,8 +155,8 @@ public static class Common
             return false;
         }
 
-        GameTile upTile = GetGameTileByPos(new Vector2Int((int)currTile.ExitPoint.x + Common.Sign(diff.x), (int)currTile.ExitPoint.z));
-        GameTile rightTile = GetGameTileByPos(new Vector2Int((int)currTile.ExitPoint.x, (int)currTile.ExitPoint.z + Common.Sign(diff.z)));
+        GameTile upTile = GetGameTileByBlock(new Vector2Int((int)currTile.ExitPoint.x + Sign(diff.x), (int)currTile.ExitPoint.z));
+        GameTile rightTile = GetGameTileByBlock(new Vector2Int((int)currTile.ExitPoint.x, (int)currTile.ExitPoint.z + Sign(diff.z)));
 
         if (upTile.Content.Type == GameTileContentType.Wall && rightTile.Content.Type == GameTileContentType.Wall)
         {
@@ -166,13 +166,14 @@ public static class Common
         return false;
     }
 
-    public static bool IsBlocked(Vector3 currPos, Vector3 nextPos)
+    public static bool IsBlocked(Vector2Int currPos, Vector2Int nextPos)
     {
-        if (Common.isIllegalPos(nextPos))
+        if (isIllegalPos(new Vector3(nextPos.x, 0, nextPos.y)))
         {
             return true;
         }
-        return false;
+
+        return IsBlocked(GetGameTileByBlock(currPos), GetGameTileByBlock(nextPos));
     }
 
     public static float FOOTPRINT_RADIUS = 0.5f;

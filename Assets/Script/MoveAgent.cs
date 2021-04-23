@@ -128,6 +128,16 @@ public class MoveAgent
 		return true;
 	}
 
+	public void TerrainChange()
+    {
+		if(pathID == 0 || atGoal)
+        {
+			return;
+        }
+
+		ReRequestPath(true);
+    }
+
 	public void OwnerMoved(Vector3 oldPos, Vector3 oldForward)
 	{
 		if ((oldPos - pos).sqrMagnitude < 0.00001f)

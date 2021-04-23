@@ -56,6 +56,14 @@ public class EnemyCollection
 		return GetEnemyByTile(tile) != null;
 	}
 
+	public void TerrainChange(GameTile tile)
+    {
+		foreach (var enemy in enemies)
+		{
+			enemy.Value.UnitMove.TerrainChange();
+		}
+	}
+
 	private Enemy GetEnemyByTile(GameTile tile)
     {
 		foreach (var enemy in enemies)

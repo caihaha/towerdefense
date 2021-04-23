@@ -84,7 +84,10 @@ public class Game : MonoBehaviour
         {
             if(Input.GetKey(KeyCode.LeftShift))
             {
-                board.ToggleWall(tile);
+                if (board.ToggleWall(tile))
+                {
+                    enemies.TerrainChange(tile);
+                }
             }
             else
             {
