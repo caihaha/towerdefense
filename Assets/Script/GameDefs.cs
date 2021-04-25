@@ -185,6 +185,7 @@ public static class Common
     }
 
     public static float FOOTPRINT_RADIUS = 0.5f;
+    public static bool AllowUnitCollisionOverlap = false;
 }
 
 public static class MoveMath

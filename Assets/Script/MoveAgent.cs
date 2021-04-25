@@ -16,7 +16,7 @@ public class UnitDef
     {
 		allyteam = 1;
 		mass = 1.0f;
-		radius = 0.5f;
+		radius = Common.FOOTPRINT_RADIUS;
 		maxSpeed = 0.2f;
 		maxAcc = 0.2f;
 		maxDec = 0.2f;
@@ -292,8 +292,8 @@ public class MoveAgent
 
 	private void HandleObjectCollisions()
 	{
-		HandleUnitCollisions(this, currentSpeed, owner.unitDef.radius);
-		HandleFeatureCollisions(this, currentSpeed, owner.unitDef.radius);
+		HandleUnitCollisions(owner, currentSpeed, owner.unitDef.radius);
+		HandleFeatureCollisions(owner, currentSpeed, owner.unitDef.radius);
 
 		bool squareChange = (Common.PosToTileIndex(pos + currentVelocity) != Common.PosToTileIndex(pos));
 		if(squareChange)
@@ -302,9 +302,87 @@ public class MoveAgent
 		}
 	}
 
-	private void HandleUnitCollisions(MoveAgent collider, float colliderSpeed, float colliderRadius)
+	private void HandleUnitCollisions(Enemy collider, float colliderSpeed, float colliderRadius)
 	{
-		float searchRadius = colliderSpeed + (colliderRadius * 2);
+		float searchRadius = colliderSpeed + (colliderRadius * 2.0f);
+		var colliderMove = collider.UnitMove;
+
+		foreach (var id2Enemy in Common.enemys.Enemys)
+		{
+			var collidee = id2Enemy.Value;
+			if(collidee == collider)
+            {
+				continue;
+            }
+
+			var collideeMove = collidee.UnitMove;
+			float collideeSpeed = 0.2f;
+			float collideeRadius = collidee.unitDef.radius;
+
+			Vector3 separationVector = colliderMove.pos - collideeMove.pos;
+			float separationMinDistSq = (colliderRadius + collideeRadius) * (colliderRadius + collideeRadius);
+
+			if ((Common.SqLength2D(separationVector) - separationMinDistSq) > 0.01f)
+				continue; // 距离大于半径的距离,不会碰撞
+
+			bool pushCollider = true;
+			bool pushCollidee = true;
+
+			float colliderRelRadius = colliderRadius / (colliderRadius + collideeRadius);
+			float collideeRelRadius = collideeRadius / (colliderRadius + collideeRadius);
+			float collisionRadiusSum = Common.AllowUnitCollisionOverlap ?
+			(colliderRadius * colliderRelRadius + collideeRadius * collideeRelRadius) :
+			(colliderRadius + collideeRadius);
+
+			float sepDistance = Common.SqLength2D(separationVector) + 0.1f;
+			float penDistance = Mathf.Max(collisionRadiusSum - sepDistance, 1.0f);
+			float sepResponse = Mathf.Min(1.0f, penDistance * 0.5f);
+
+			Vector3 sepDirection = (separationVector / sepDistance);
+			Vector3 tmp = sepDirection * sepResponse;
+			Vector3 colResponseVec = new Vector3(tmp.x, 0, tmp.z);
+
+			float
+			m1 = 1.0f,
+			m2 = 1.0f,
+			v1 = Mathf.Max(0.2f, colliderSpeed),
+			v2 = Mathf.Max(0.2f, collideeSpeed),
+			c1 = 1.0f + (1.0f - Mathf.Abs(Vector3.Dot(colliderMove.flatFrontDir, -sepDirection))) * 5.0f,
+			c2 = 1.0f + (1.0f - Mathf.Abs(Vector3.Dot(collideeMove.flatFrontDir, sepDirection))) * 5.0f,
+			s1 = m1 * v1 * c1,
+			s2 = m2 * v2 * c2,
+ 			r1 = s1 / (s1 + s2 + 1.0f),
+ 			r2 = s2 / (s1 + s2 + 1.0f);
+
+			float colliderMassScale = Mathf.Clamp(1.0f - r1, 0.01f, 0.99f) * (Common.AllowUnitCollisionOverlap ? (1.0f / colliderRelRadius) : 1.0f);
+			float collideeMassScale = Mathf.Clamp(1.0f - r2, 0.01f, 0.99f) * (Common.AllowUnitCollisionOverlap ? (1.0f / collideeRelRadius) : 1.0f );
+
+			float colliderSlideSign = Common.Sign2(Vector3.Dot(separationVector, colliderMove.GetRightDir()));
+			float collideeSlideSign = Common.Sign2(Vector3.Dot(- separationVector,collideeMove.GetRightDir()));
+
+			Vector3 colliderPushVec = colResponseVec * colliderMassScale;
+			Vector3 collideePushVec = -colResponseVec * collideeMassScale;
+			Vector3 colliderSlideVec = colliderMove.GetRightDir() * colliderSlideSign * (1.0f / penDistance) * r2;
+			Vector3 collideeSlideVec = collideeMove.GetRightDir() * collideeSlideSign * (1.0f / penDistance) * r1;
+			Vector3 colliderMoveVec = colliderPushVec + colliderSlideVec;
+			Vector3 collideeMoveVec = collideePushVec + collideeSlideVec;
+
+			if (pushCollider || !pushCollidee)
+			{
+				if (colliderMove.TestMoveSquare(colliderMove.pos += colliderMoveVec))
+				{
+					colliderMove.pos += colliderMoveVec;
+				}
+			}
+
+			if (pushCollidee || !pushCollider)
+			{
+				if (collideeMove.TestMoveSquare(collideeMove.pos + collideeMoveVec))
+				{
+					collideeMove.pos += collideeMoveVec;
+				}
+			}
+		}
 	}
 
 	private void HandleStaticObjectCollision()
@@ -312,9 +390,10 @@ public class MoveAgent
 		
 	}
 
-	private void HandleFeatureCollisions(MoveAgent collider, float colliderSpeed, float colliderRadius)
+	private void HandleFeatureCollisions(Enemy collider, float colliderSpeed, float colliderRadius)
 	{
 		float searchRadius = colliderSpeed + (colliderRadius * 2);
+		HandleStaticObjectCollision();
 	}
 
 	private void ReRequestPath(bool forceRequest)
@@ -479,7 +558,7 @@ public class MoveAgent
 		float MAX_AVOIDEE_COSINE = Mathf.Cos(120.0f * 0.017453292519943295f); // cos(2π/3) = -1/2
 		float LAST_DIR_MIX_ALPHA = 0.7f;
 
-		float avoidanceRadius = Mathf.Max(currentSpeed, 0.2f) * (avoider.unitDef.radius * 2.0f);
+		float avoidanceRadius = Mathf.Max(currentSpeed, 1.0f) * (avoider.unitDef.radius * 2.0f);
 		float avoiderRadius = Common.FOOTPRINT_RADIUS;
 
 		// 动态避障(搜索所有的enemy)
@@ -547,6 +626,15 @@ public class MoveAgent
 
 		return (lastAvoidanceDir = avoidanceDir);
 	}
+
+	private bool TestMoveSquare(Vector3 nextPos)
+    {
+		if (Common.IsIllegalPos(nextPos))
+        {
+			return false;
+        }
+		return true;
+    }
 
 	#region 改变下一个状态
 	private void GetNextWayPoint()
