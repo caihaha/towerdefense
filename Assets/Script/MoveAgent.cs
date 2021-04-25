@@ -354,8 +354,8 @@ public class MoveAgent
  			r1 = s1 / (s1 + s2 + 1.0f),
  			r2 = s2 / (s1 + s2 + 1.0f);
 
-			float colliderMassScale = Mathf.Clamp(1.0f - r1, 0.01f, 0.99f) * (Common.AllowUnitCollisionOverlap ? (1.0f / colliderRelRadius) : 1.0f);
-			float collideeMassScale = Mathf.Clamp(1.0f - r2, 0.01f, 0.99f) * (Common.AllowUnitCollisionOverlap ? (1.0f / collideeRelRadius) : 1.0f );
+			float colliderMassScale = Mathf.Clamp(0.2f - r1, 0.01f, 0.99f) * (Common.AllowUnitCollisionOverlap ? (1.0f / colliderRelRadius) : 1.0f);
+			float collideeMassScale = Mathf.Clamp(0.2f - r2, 0.01f, 0.99f) * (Common.AllowUnitCollisionOverlap ? (1.0f / collideeRelRadius) : 1.0f );
 
 			float colliderSlideSign = Common.Sign2(Vector3.Dot(separationVector, colliderMove.GetRightDir()));
 			float collideeSlideSign = Common.Sign2(Vector3.Dot(- separationVector,collideeMove.GetRightDir()));
