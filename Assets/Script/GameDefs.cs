@@ -77,6 +77,11 @@ public static class Common
         return Mathf.Sqrt(SqDistance2D(vec1, vec2));
     }
 
+    public static float Length2D(Vector3 vec)
+    {
+        return Mathf.Sqrt(SqLength2D(vec));
+    }
+
     public static float Dot(Vector3 a, Vector3 b)
     {
         return a.x * b.x + a.y * b.y + a.z * b.z;
@@ -168,20 +173,25 @@ public static class Common
         return false;
     }
 
-    public static bool IsBlocked(Vector2Int nextPos)
+    public static bool IsBlocked(Vector2Int pos)
     {
-        if (IsIllegalPos(new Vector3(nextPos.x, 0, nextPos.y)))
+        if (IsIllegalPos(new Vector3(pos.x, 0, pos.y)))
         {
             return true;
         }
 
-        var nextTile = GetGameTileByBlock(nextPos);
+        var nextTile = GetGameTileByBlock(pos);
         if (nextTile == null || nextTile.Content.Type == GameTileContentType.Wall)
         {
             return true;
         }
 
         return false;
+    }
+
+    public static bool SquareIsBlocked(Vector2Int pos)
+    {
+        return IsBlocked(pos);
     }
 
     public static float FOOTPRINT_RADIUS = 0.5f;

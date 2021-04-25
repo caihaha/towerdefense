@@ -298,7 +298,7 @@ public class MoveAgent
 		bool squareChange = (Common.PosToTileIndex(pos + currentVelocity) != Common.PosToTileIndex(pos));
 		if(squareChange)
         {
-			HandleStaticObjectCollision();
+			HandleStaticObjectCollision(owner, owner.unitDef.radius, true, false, true);
 		}
 	}
 
@@ -334,7 +334,7 @@ public class MoveAgent
 			(colliderRadius * colliderRelRadius + collideeRadius * collideeRelRadius) :
 			(colliderRadius + collideeRadius);
 
-			float sepDistance = Common.SqLength2D(separationVector) + 0.1f;
+			float sepDistance = Common.Length2D(separationVector) + 0.1f;
 			float penDistance = Mathf.Max(collisionRadiusSum - sepDistance, 1.0f);
 			float sepResponse = Mathf.Min(1.0f, penDistance * 0.5f);
 
@@ -385,15 +385,108 @@ public class MoveAgent
 		}
 	}
 
-	private void HandleStaticObjectCollision()
+	private void HandleStaticObjectCollision(Enemy collider, float colliderRadius, bool canRequestPath, bool checkYardMap, bool checkTerrain)
 	{
-		
+		return;
+
+		var colliderMove = collider.UnitMove;
+		if (colliderMove.atGoal)
+        {
+			return;
+        }
+
+		bool wantRequestPath = false;
+
+		if (checkYardMap || checkTerrain)
+        {
+			Vector3 strafeVec = Vector3.zero;
+			Vector3 bounceVec = Vector3.zero;
+
+			Vector3 sqrSumPosition = Vector3.zero; // .y is always 0
+			Vector2 sqrPenDistance = Vector2Int.zero; // .x = sum, .y = count
+			Vector3 colliderRightDir = colliderMove.GetRightDir();
+
+			Common.GetTileXZ(colliderMove.pos, out int xmid, out int zmid);
+
+			Vector3 speed2D = colliderMove.currentVelocity;
+			for (int z = -1; z <= 1; ++z)
+			{
+				for (int x = -1; x <= 1; ++x)
+				{
+					if (x == 0 && z == 0)
+					{
+						continue;
+					}
+
+					int xabs = xmid + x;
+					int zabs = zmid + z;
+
+					if (checkTerrain)
+					{
+						continue;
+					}
+					else
+					{
+						if (!Common.SquareIsBlocked(new Vector2Int(xabs, zabs)))
+						{
+							continue;
+						}
+					}
+					Vector3 squarePos = new Vector3(xabs, 0, zabs);
+					Vector3 squareVec = colliderMove.pos - squarePos;
+
+					if (Vector3.Dot(squareVec, colliderMove.currentVelocity) > 0.0f)
+					{
+						continue;
+					}
+
+					float squareColRadiusSum = colliderRadius + 5.656854249492381f; // sqrt(32)
+					float squareSepDistance = Common.Length2D(squareVec) + 0.1f;
+					float squarePenDistance = Mathf.Min(squareSepDistance - squareColRadiusSum, 0.0f);
+
+					bounceVec += (colliderMove.GetRightDir() * (Vector3.Dot(colliderMove.GetRightDir(), squareVec / squareSepDistance)));
+
+					sqrPenDistance += new Vector2(squarePenDistance, 1.0f);
+					sqrSumPosition += new Vector3(squarePos.x, 0, squarePos.z);
+				}
+			}
+
+			if (sqrPenDistance.y > 0)
+            {
+				sqrSumPosition.x /= sqrPenDistance.y;
+				sqrSumPosition.z /= sqrPenDistance.y;
+				sqrPenDistance.x /= sqrPenDistance.y;
+
+				float strafeSign = -Common.Sign2(Vector3.Dot(sqrSumPosition, colliderRightDir) - Vector3.Dot(colliderMove.pos, colliderRightDir));
+				float strafeScale = Mathf.Min(Mathf.Max(currentSpeed * 0.0f, 0.2f), Mathf.Max(0.1f, -sqrPenDistance.x * 0.5f));
+				float bounceScale = Mathf.Min(Mathf.Max(currentSpeed * 0.0f, 0.2f), Mathf.Max(0.1f, -sqrPenDistance.x * 0.5f));
+
+				if (colliderMove.TestMoveSquare(colliderMove.pos + strafeVec + bounceVec))
+				{
+					colliderMove.pos += strafeVec + bounceVec;
+				}
+				else
+				{
+					colliderMove.pos = oldPos;
+					wantRequestPath = true;
+				}
+			}
+			wantRequestPath = ((strafeVec + bounceVec) != Vector3.zero);
+		}
+		else
+        {
+		}
+
+		if (canRequestPath && wantRequestPath)
+		{
+			ReRequestPath(false);
+		}
 	}
 
 	private void HandleFeatureCollisions(Enemy collider, float colliderSpeed, float colliderRadius)
 	{
 		float searchRadius = colliderSpeed + (colliderRadius * 2);
-		HandleStaticObjectCollision();
+		HandleStaticObjectCollision(collider, colliderRadius, (!atEndOfPath && !atGoal), false, false);
 	}
 
 	private void ReRequestPath(bool forceRequest)
