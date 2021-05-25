@@ -64,6 +64,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Script\Data\CELLReadStream.cs" />
+    <Compile Include="Assets\Script\Data\CELLRecvStream.cs" />
+    <Compile Include="Assets\Script\Data\CELLSendStream.cs" />
+    <Compile Include="Assets\Script\Data\CELLTcpClient.cs" />
+    <Compile Include="Assets\Script\Data\CELLWriteStream.cs" />
+    <Compile Include="Assets\Script\DataAgent.cs" />
     <Compile Include="Assets\Script\DirectionDefs.cs" />
     <Compile Include="Assets\Script\Enemy.cs" />
     <Compile Include="Assets\Script\EnemyCollection.cs" />

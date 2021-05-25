@@ -24,6 +24,8 @@ public class Game : MonoBehaviour
 
     int activeSlowUpdateUnit;
     int enemyNum;
+
+    DataAgent dataAgent;
     #endregion
 
     #region 内部引用
@@ -32,9 +34,11 @@ public class Game : MonoBehaviour
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
         enemyNum = 0;
+        dataAgent = new DataAgent();
+        dataAgent.DataInit();
     }
 
-    void OnValidate()
+    private void OnValidate()
     {
         if(boardSize.x < 2)
         {
@@ -48,7 +52,7 @@ public class Game : MonoBehaviour
 
     Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
 
-    void Update()
+    private void Update()
     {
         if(Input.GetMouseButtonDown(0))
         {
@@ -72,6 +76,13 @@ public class Game : MonoBehaviour
             activeSlowUpdateUnit = 0;
             enemies.GameSlowUpdate();
         }
+
+        dataAgent.DataUpdate();
+    }
+
+    private void OnDestroy()
+    {
+        dataAgent.DataDestroy();
     }
     #endregion
 
